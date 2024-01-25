@@ -4,7 +4,7 @@ import "./Home.css";
 function Home() {
     return(
         <div className="Home">
-            <h1>This is the Home Page</h1>
+            <h1>This is the Explore/Home Page</h1>
         </div>
     );
 }
