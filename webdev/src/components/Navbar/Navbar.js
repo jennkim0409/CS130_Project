@@ -3,7 +3,7 @@ export default function Navbar() {
         <h1 className="site-title">book pins</h1>
         <ul className="section">
             <li>
-                <a href="/">Explore</a>
+                <a href="/explore">Explore</a>
             </li>
             <li>
                 <a href="/saved">Saved</a>
