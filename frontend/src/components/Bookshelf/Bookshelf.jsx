@@ -19,7 +19,6 @@ import {SortablePhoto} from './SortablePhoto';
 import {Photo} from './Photo';
 import reading from './reading.json';
 import recommended from './recommended.json';
-import './styles.css';
 
 const UploadGallery = () => {
   const [items, setItems] = useState({
@@ -39,10 +38,6 @@ const UploadGallery = () => {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <div style={{ textAlign: 'center' }}>
-        <h1>BookPins</h1>
-        <hr/>
-      </div>
 
       <div>
         <h3>My Books</h3>
