@@ -1,10 +1,11 @@
 import React from "react";
 import "./Explore.css";
+import Bookshelf from '../../components/Bookshelf/Bookshelf';
 
 function Explore() {
     return(
         <div className="Explore">
-            <h1>This is the Explore Page</h1>
+            <Bookshelf />
         </div>
     );
 }
