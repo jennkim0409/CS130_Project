@@ -2,7 +2,8 @@ import React, { forwardRef } from 'react';
 
 export const Photo = forwardRef(({ url, index, faded, style, ...props }, ref) => {
   const screenWidth = window.innerWidth;
-  const width = screenWidth / 7;
+  const numColumns = 6;
+  const width = screenWidth / (numColumns+1);
   const height = (3/2) * width;
 
   const inlineStyles = {
