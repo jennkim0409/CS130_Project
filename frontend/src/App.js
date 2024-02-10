@@ -1,8 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Explore from "./pages/Explore/Explore";
-import Saved from "./pages/Saved/Saved"
-import Navbar from './components/Navbar/Navbar';
+import Library from "./pages/Library/Library";
+import Boards from "./pages/Boards/Boards"
 import NavbarLayout from './components/Navbar/NavbarLayout';
 import LoginSignup from './components/LoginSignup/LoginSignup';
 
@@ -15,8 +14,8 @@ function App() {
       <Routes>
         <Route path="/login" exact element={<LoginSignup />} />
         <Route element={<NavbarLayout/>}>
-          <Route path="/" exact element={<Explore />} />
-          <Route path="/saved" exact element={<Saved />} />
+          <Route path="/" exact element={<Library />} />
+          <Route path="/boards" exact element={<Boards />} />
         </Route>
       </Routes>
     </Router>
