@@ -1,7 +1,8 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Library from "./pages/Library/Library";
-import Boards from "./pages/Boards/Boards"
+import Boards from "./pages/Boards/Boards";
+import Board from "./pages/Board/Board";
 import NavbarLayout from './components/Navbar/NavbarLayout';
 import LoginSignup from './components/LoginSignup/LoginSignup';
 
@@ -16,6 +17,7 @@ function App() {
         <Route element={<NavbarLayout/>}>
           <Route path="/" exact element={<Library />} />
           <Route path="/boards" exact element={<Boards />} />
+          <Route path="/boards/:boardId" exact element={<Board />} />
         </Route>
       </Routes>
     </Router>
