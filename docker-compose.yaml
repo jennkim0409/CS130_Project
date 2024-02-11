@@ -2,24 +2,36 @@ version: '3.1'
 
 services:
   mongodb:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: $DB_USER
-      MONGO_INITDB_ROOT_PASSWORD: $DB_PASSWORD
-      MONGO_INITDB_DATABASE: $DB_NAME
+      image: mongo
+      restart: always
+      container_name: mongodb
+      volumes:
+        - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+        - mongodb:/data/db
+      ports:
+        - 27017:27017
+      networks:
+        app_net:
+
 
   mongo-express:
+    container_name: mongo-express
     image: mongo-express
+    depends_on:
+      - mongodb
     restart: always
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: $DB_USER
-      ME_CONFIG_MONGODB_ADMINPASSWORD: $DB_PASSWORD
-      ME_CONFIG_MONGODB_URL: mongodb://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongo2024
+      ME_CONFIG_MONGODB_URL: mongodb://root:mongo2024@mongodb:27017/
+
+    networks:
+      app_net:
 
   backend:
+    container_name: backend
     depends_on:
       - mongodb
     build: ./backend
@@ -27,5 +39,18 @@ services:
     env_file: ./.env
     ports:
       - 5555:5555
+    volumes:
+      - ./backend:/app
+      - /app/node_modules/
+    networks:
+      app_net:
+
     stdin_open: true
     tty: true
+
+
+volumes:
+  mongodb:
+
+networks:
+  app_net:

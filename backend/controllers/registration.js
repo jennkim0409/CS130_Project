@@ -3,17 +3,22 @@ import bcrypt from "bcrypt";
 
 import User from "../models/user.js";
 
-const registerRouter = express.Router()
+const registerRouter = express.Router();
 
 registerRouter.post('/', async (req, res) => {
     try {
-      const { username, password, name} = request.body
+      const { username, password, name} = req.body
+
+      if(!username || !password || !name){
+        res.status(400)
+            .json({message: "username, password and name are required."});
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
   
       const newUser = new User({
         username: username,
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         name: name
       });
   
@@ -26,7 +31,7 @@ registerRouter.post('/', async (req, res) => {
     }
   });
 
-  export default registerRouter
+  export default registerRouter;
 
   
   
