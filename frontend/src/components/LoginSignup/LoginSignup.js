@@ -1,24 +1,54 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import './LoginSignup.css'
 import email_icon from '../../assets/gmail.png'
 import user_icon from '../../assets/user.png'
 import key_icon from '../../assets/key.png'
+import { useNavigate } from "react-router-dom";
 
 function LoginSignup() {
     const [action, setAction] = useState("Sign up");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const navigate = useNavigate();
 
     const signup = () => {
         if (action === "Login") {
             setAction("Sign up");
         }
-        // proceed to have code for signing up
+        
+        // call backend API to sign up
+        if (username && password && email) {
+            axios.post('http://localhost:5555/auth/register/', { username, password, email })
+            .then(response => {
+                console.log("Sign up successful: ", response.data);
+                // refer user to login UI after successful register
+                setAction("Login");
+            })
+            .catch(error => {
+                console.error("Sign up error: ", error);
+            });
+        }
     };
 
     const login = () => {
         if (action === "Sign up") {
             setAction("Login");
         } 
-        // proceed to have code for logging in
+
+        // call backend API to log in
+        if (username && password) {
+            axios.post('http://localhost:5555/auth/login', { username, password })
+            .then(response => {
+                console.log("Login successful: ", response.data);
+                // navigate to main page
+                navigate("/"); // *** eventually pass User object here
+            })
+            .catch(error => {
+                console.error("Login error: ", error);
+            });
+        }
     };
 
     const forgot = () => {
@@ -41,20 +71,20 @@ function LoginSignup() {
                 <div></div> :
                 <div className='input'>
                     <img src={email_icon} width={35} height={35} alt='email'/>
-                    <input type='email' placeholder='Email'/>
+                    <input type='email' placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)}/>
                 </div>
                 }
 
                 {/* Username input */}
                 <div className='input'>
                     <img src={user_icon} width={35} height={35} alt='username'/>
-                    <input type='text' placeholder='Username'/>
+                    <input type='text' placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)}/>
                 </div>
                 
                 {/* Password input */}
                 <div className='input'>
                     <img src={key_icon} width={35} height={35} alt='password'/>
-                    <input type='password' placeholder='Password'/>
+                    <input type='password' placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </div>
             </div>
 
