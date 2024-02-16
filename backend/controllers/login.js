@@ -26,7 +26,7 @@ loginRouter.post('/', async (request, response) => {
     // check password if user is found 
     const passwordCorrect = user === null
         ? false
-        : bcrypt.compare(password, user.passwordHash);
+        : await bcrypt.compare(password, user.passwordHash);
 
     // if password is incorrect or the user was not found then return invalid credentials
     if ((!user || !passwordCorrect)) {

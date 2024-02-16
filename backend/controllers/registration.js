@@ -7,9 +7,9 @@ const registerRouter = express.Router();
 
 registerRouter.post('/', async (req, res) => {
     try {
-      const { username, password, name} = req.body
+      const { username, password, email} = req.body
 
-      if(!username || !password || !name){
+      if(!username || !password || !email){
         res.status(400)
             .json({message: "username, password and name are required."});
       }
@@ -19,7 +19,7 @@ registerRouter.post('/', async (req, res) => {
       const newUser = new User({
         username: username,
         passwordHash: hashedPassword,
-        name: name
+        email: email
       });
   
       // Save the user to the database
