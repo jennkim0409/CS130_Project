@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 
 import User from "../models/user.js";
+import Bookshelf from "../models/bookshelf.js";
 
 const registerRouter = express.Router();
 
@@ -24,6 +25,18 @@ registerRouter.post('/', async (req, res) => {
   
       // Save the user to the database
       const saved_user = await newUser.save();
+      // Create the three bookshelves for the user
+      const bookshelfTypes = ['current', 'finished', 'recommended'];
+      const bookshelfPromises = bookshelfTypes.map(type => 
+        new Bookshelf({
+          userId: saved_user._id, // Assuming you want to use the MongoDB generated _id
+          type,
+          books: []
+        }).save()
+      );
+
+      // Wait for all bookshelves to be created
+      await Promise.all(bookshelfPromises);
 
       res.status(201).json({ message: 'User registered successfully', user: saved_user});
     } catch (error) {
