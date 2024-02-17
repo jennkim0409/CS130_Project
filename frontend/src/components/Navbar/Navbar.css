@@ -1,0 +1,106 @@
+.nav {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+  
+.navbar {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding-left: 60px;
+    cursor: pointer;
+}
+
+.site-title {
+    font-size: 28px;
+    text-decoration: underline;
+    color: #154A14;
+}
+
+.section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.profile {
+    padding-right: 60px;
+    gap: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.option {
+    padding: 0 60px;
+}
+
+@media (max-width: 950px) {
+    .option {
+        padding: 0 30px;
+    }
+    .site-title {
+        font-size: 25px;
+    }
+    .nav {
+        font-size: 16px;
+    }
+    .account {
+        font-size: 16px;
+    }
+    .logo {
+        padding-left: 30px;
+    }
+    .profile {
+        padding-right: 30px;
+    }
+}
+
+@media (max-width: 750px) {
+    .option {
+        padding: 0 20px;
+    }
+    .site-title {
+        font-size: 20px;
+    }
+    .nav {
+        font-size: 15px;
+    }
+    .account {
+        font-size: 15px;
+    }
+    .logo {
+        padding-left: 20px;
+    }
+    .profile {
+        padding-right: 20px;
+    }
+}
+
+.option a {
+    text-decoration: none;
+    color: #154A14; 
+}
+
+.account a {
+    text-decoration: none;
+    color: #154A14;
+    cursor: pointer; 
+}
+
+.dot {
+    height: 25px;
+    width: 25px;
+    background-color: #154A14;
+    border-radius: 50%;
+}
+
