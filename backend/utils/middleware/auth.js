@@ -4,15 +4,16 @@ import jwt from "jsonwebtoken";
 const authenticateMiddleware = (req, res, next) => {
     // Checking if authorization header is present 
     const token = req.header("Authorization");
-    console.log("This is AUTH")
+    // console.log("This is AUTH")
 
     if(!token){
         return res.status(401).json({message: "Unauthorized- Missing token"});
     }
 
     try{
-        // Verify token 
-        const decode = jwt.verify(token, process.env.SECRET);
+        // Verify token
+        const SECRET = "hello"
+        const decode = jwt.verify(token, SECRET);
 
         // Attach user information 
         req.user = decode.username;
