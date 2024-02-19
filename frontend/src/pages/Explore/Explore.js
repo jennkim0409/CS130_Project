@@ -4,8 +4,8 @@ import Bookshelf from '../../components/Bookshelf/Bookshelf';
 
 function Explore() {
     return(
-        <div className="Library">
-            <Bookshelf/>
+        <div className="Explore">
+            <h2 style={{textAlign: "center"}}>Explore</h2>
         </div>
     );
 }

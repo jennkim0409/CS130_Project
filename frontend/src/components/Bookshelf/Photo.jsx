@@ -9,8 +9,8 @@ export const Photo = forwardRef(({ url, index, faded, style, ...props }, ref) =>
   const inlineStyles = {
     opacity: faded ? '0.2' : '1',
     transformOrigin: '0 0',
-    height: `${height}px`,
-    width: `${width}px`,
+    height: `calc(10vw * 3/2 * 0.8)`, // // 15% of the viewport width, 3:2 aspect ratio
+    width: `calc(10vw * 0.8)`, // 15% of the viewport width
     backgroundImage: `url("${url}")`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
