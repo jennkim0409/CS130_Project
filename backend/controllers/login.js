@@ -7,8 +7,7 @@ import authenticateMiddleware from "../utils/middleware/auth.js";
 const loginRouter = express.Router();
 
 // route to get user data
-loginRouter.get('/info', authenticateMiddleware, async (request, response) => {
-    console.log(request.user);
+loginRouter.get('/info', async (request, response) => {
 	const user = await User.findOne({ username: request.user });
 	response.json(user);
 });
@@ -16,12 +15,9 @@ loginRouter.get('/info', authenticateMiddleware, async (request, response) => {
 loginRouter.post('/', async (request, response) => {
     // picking username and password from request body
     const { username, password } = request.body;
-    console.log(password)
 
     // find the user 
     const user = await User.findOne({ username: username });
-
-    console.log(user.passwordHash)
 
     // check password if user is found 
     const passwordCorrect = user === null
@@ -29,9 +25,17 @@ loginRouter.post('/', async (request, response) => {
         : await bcrypt.compare(password, user.passwordHash);
 
     // if password is incorrect or the user was not found then return invalid credentials
-    if ((!user || !passwordCorrect)) {
+    if (!user) {
         return response.status(401).json({
-            error: 'invalid username or password'
+            message: 'Invalid username',
+            error: 'Invalid username'
+        });
+    }
+
+    if ( !passwordCorrect) {
+        return response.status(401).json({
+            message: 'Invalid password',
+            error: 'Invalid password'
         });
     }
 
@@ -40,14 +44,15 @@ loginRouter.post('/', async (request, response) => {
         id: user._id,
     }
 
-
-    const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60 * 60 })
+    const SECRET = "hello"
+    const token = jwt.sign(userForToken, SECRET, { expiresIn: 60 * 60 })
 
     response
         .status(200)
         .send({ 
             token, 
-            username: user.username, 
+            username: user.username,
+            user_id: user._id, 
             name: user.name, 
             genrePrefs: user.genrePrefs,
          });
