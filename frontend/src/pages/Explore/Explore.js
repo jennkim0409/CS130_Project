@@ -1,12 +1,12 @@
 import React from "react";
-import "./Library.css";
+import "./Explore.css";
 import Bookshelf from '../../components/Bookshelf/Bookshelf';
 
-function Library() {
+function Explore() {
     return(
         <div className="Library">
             <Bookshelf/>
         </div>
     );
 }
-export default Library;
+export default Explore;

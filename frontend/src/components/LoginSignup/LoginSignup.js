@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import './LoginSignup.css'
 import email_icon from '../../assets/gmail.png'
 import user_icon from '../../assets/user.png'
 import key_icon from '../../assets/key.png'
-import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function LoginSignup() {
     const [action, setAction] = useState("Sign up");
@@ -23,7 +25,7 @@ function LoginSignup() {
             axios.post('http://localhost:5555/auth/register/', { username, password, email })
             .then(response => {
                 console.log("Sign up successful: ", response.data);
-                // refer user to login UI after successful register
+                toast.success("Sign up was successful!");
                 setAction("Login");
             })
             .catch(error => {
@@ -43,7 +45,10 @@ function LoginSignup() {
             .then(response => {
                 console.log("Login successful: ", response.data);
                 // navigate to main page
-                navigate("/"); // *** eventually pass User object here
+                const token = response.data.token;
+                console.log(token);
+                localStorage.setItem('user_token', JSON.stringify(token));
+                navigate("/explore"); // *** eventually pass User object here
             })
             .catch(error => {
                 console.error("Login error: ", error);
@@ -99,6 +104,7 @@ function LoginSignup() {
                     onClick={login}
                 >Login</div>
             </div>
+            <ToastContainer />
         </div>
     );
 }
