@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import './LoginSignup.css'
-import email_icon from '../../assets/gmail.png'
 import user_icon from '../../assets/user.png'
 import key_icon from '../../assets/key.png'
 import { toast, ToastContainer } from 'react-toastify';
@@ -12,7 +11,6 @@ function LoginSignup() {
     const [action, setAction] = useState("Sign Up");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [email, setEmail] = useState("");
     const navigate = useNavigate();
 
     const signup = () => {
@@ -21,8 +19,8 @@ function LoginSignup() {
         }
         
         // call backend API to sign up
-        else if (username && password && email) {
-            axios.post('http://localhost:5555/auth/register/', { username, password, email })
+        else if (username && password) {
+            axios.post('http://localhost:5555/auth/register/', { username, password })
             .then(response => {
                 console.log("Sign Up successful: ", response.data);
                 toast.success("Sign Up was successful!");
@@ -111,14 +109,6 @@ function LoginSignup() {
                 <div className="rightSide">
                     {/* Inputs that should be entered by the user */}
                     <div className='inputs'>
-
-                        {/* If login action, then shouldn't have email input show up */}
-                        {action !== "Login" && (
-                            <div className='input'>
-                                <img src={email_icon} width={35} height={35} alt='email'/>
-                                <input type='email' placeholder='Email' onChange={(e) => setEmail(e.target.value)}/>
-                            </div>
-                        )}
 
                         {/* Username input */}
                         <div className='input'>
