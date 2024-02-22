@@ -3,16 +3,14 @@ import uniqueValidator from "mongoose-unique-validator";
 
 const { Schema } = mongoose;
 
-
-// Template for defining schema 
-// ID is handled by the DB automatically
 const userSchema = new Schema(
     {
         username: {
             type: String,
             required: true,
-            unique: true,
+            unique: 'Username is already taken',
         },
+        name: String,
         email: String,
         passwordHash: String,
         genrePrefs: [{
