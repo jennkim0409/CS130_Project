@@ -71,7 +71,7 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
     const response = await fetch(url);
     const data = await response.json();
 
-    const requiredFields = ['title', 'author_name', 'publish_date','isbn', 'first_sentence', 'id_goodreads', 'subject'];
+    const requiredFields = ['key', 'title', 'author_name', 'publish_date','isbn', 'id_goodreads', 'subject'];
     
     let filteredBooks = data.docs.filter(book => 
       requiredFields.every(field => 
@@ -106,10 +106,11 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
         book.cover_url = "https://example.com/default-cover.jpg";
       }
       return {
+        key: book.key,
         title: book.title,
         cover_url: book.cover_url, // Add the cover URL, whether it's the default or a found one
         author_name: book.author_name,
-        first_sentence: book.first_sentence,
+        // summary: book.summary,
         publish_date: book.publish_date,
         isbn: book.isbn,
         subject: book.subject,
@@ -117,7 +118,34 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
       };
     }));
 
-    res.json(booksWithCovers);
+    
+    const booksWithDetails = await Promise.all(booksWithCovers.map(async (book) => {
+      // Initialize description as a fallback (e.g., empty string or null)
+      let description = null;
+    
+      // Check if the book has a 'key' field
+      if (book.key) {
+        const detailsUrl = `https://openlibrary.org${book.key}.json`; // Construct the URL for fetching book details
+        try {
+          const detailsResponse = await fetch(detailsUrl);
+          if (detailsResponse.ok) {
+            const detailsData = await detailsResponse.json();
+            // Extract the description field, handling both string descriptions and object descriptions with a 'value' field
+            description = detailsData.description ? (typeof detailsData.description === 'string' ? detailsData.description : detailsData.description.value) : null;
+          }
+        } catch (error) {
+          console.log(`Failed to fetch details for book with key ${book.key}:`, error);
+        }
+      }
+    
+      // Return the book object with the description added
+      return {
+        ...book, // Keep all existing book fields
+        summary: description, // Add the fetched description
+      };
+    }));
+
+    res.json(booksWithDetails);
 
   } catch (error) {
     console.error('Error fetching books:', error);
