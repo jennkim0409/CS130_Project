@@ -13,7 +13,7 @@ const userSchema = new Schema(
             required: true,
             unique: true,
         },
-        email: String,
+        name: String,
         passwordHash: String,
         genrePrefs: [{
             type: String
@@ -28,6 +28,7 @@ userSchema.set('toJSON', {
 		delete returnedObject._id
 		delete returnedObject.__v
 		delete returnedObject.passwordHash
+        return returnedObject
 	}
 })
 

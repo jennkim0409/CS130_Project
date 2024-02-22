@@ -8,16 +8,32 @@ const bookSchema = new Schema({
   },
   cover: {
     type: String, // URL to the cover image
-    required: false, // Depending on whether every book must have a cover
+    required: false,
   },
   author: {
     type: String,
     required: true,
   },
-  summary: {
+  summary: [{
     type: String,
     required: false, // Assuming the summary is optional
+  }],
+  publish_date: {
+    type: String,
+    required: true
   },
+  isbn: [{
+    type: String,
+    required: true
+  }],
+  subject: [{
+    type: String,
+    required: true
+  }],
+  id_goodreads: {
+    type: String,
+    required: false
+  }
 });
 
 bookSchema.set('toJSON', {
