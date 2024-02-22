@@ -4,6 +4,7 @@ import cors from "cors"
 
 import { PORT, mongodbURL } from "./config.js";
 import loginRouter from "./controllers/login.js"
+import boardRouter from "./controllers/board.js"
 import registerRouter from "./controllers/registration.js"
 import handlebooksRouter from "./controllers/handle_books.js";
 // import fetchBookInfoRouter from "./controllers/fetchBookInfo.js";
@@ -30,6 +31,7 @@ app.use('/api/*', authenticateMiddleware);
 app.use('/api/handlebooks', handlebooksRouter);
 app.use('/auth/register', registerRouter)
 app.use('/auth/login', loginRouter)
+app.use('/api/board', boardRouter);
 
 
 // Passing the port and a callback function 
