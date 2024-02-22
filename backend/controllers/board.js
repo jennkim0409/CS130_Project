@@ -29,7 +29,7 @@ boardRouter.post('/addBoard', async (req, res) => {
     }
     catch (error) {
         console.error('Error adding board:', error);
-        res.status(500).json({ message: 'Failed to add book', error: error.message });
+        res.status(500).json({ message: 'Failed to add board', error: error.message });
     }
 });
 
