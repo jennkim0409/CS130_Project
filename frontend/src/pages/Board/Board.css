@@ -1,0 +1,29 @@
+.board {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.boardInfo {
+    background-color: #97AD97;
+    height: 20vh;
+    justify-content: center;
+    text-align: center;
+}
+
+.go_back {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    cursor: pointer;
+    padding-left: 15px;
+    gap: 5px;
+}
+
+.back_svg {
+    width: 20px; /* Set the size as needed */
+    height: 20px; /* Set the size as needed */
+    fill: #154A14;
+}
+  

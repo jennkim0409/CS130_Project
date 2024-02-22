@@ -79,7 +79,8 @@ function Modal(props) {
         title: '',
         description: '',
         img_blob: '',
-        pin_size: ''
+        pin_size: '',
+        unique_id: ''
     });
 
     const [showLabel, setShowLabel] = useState(true);
