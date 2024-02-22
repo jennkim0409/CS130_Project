@@ -76,7 +76,7 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
     let filteredBooks = data.docs.filter(book => 
       requiredFields.every(field => 
         book[field] !== undefined && book[field] !== null && (Array.isArray(book[field]) ? book[field].length > 0 : true))
-    ).slice(0, 5); // Keep only up to 5 results
+    )
 
     filteredBooks = filteredBooks.map(book => ({
       ...book,
@@ -85,15 +85,16 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
       id_goodreads: Array.isArray(book.id_goodreads) ? book.id_goodreads[0] : book.id_goodreads,
     }));
 
-    const booksWithCovers = await Promise.all(filteredBooks.map(async (book) => {
+    const booksWithDetailsAndCovers = await Promise.all(filteredBooks.map(async (book) => {
       let coverFound = false;
+      let description = null;
 
       for (const isbn of book.isbn) {
         const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
         try {
           const coverResponse = await fetch(coverUrl);
           if (coverResponse.ok) {
-            book.cover_url = coverUrl; // Add cover URL directly to book object
+            book.cover_url = coverUrl;
             coverFound = true;
             break;
           }
@@ -105,12 +106,26 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
       if (!coverFound) {
         book.cover_url = "https://example.com/default-cover.jpg";
       }
+
+      if (book.key) {
+        const detailsUrl = `https://openlibrary.org${book.key}.json`;
+        try {
+          const detailsResponse = await fetch(detailsUrl);
+          if (detailsResponse.ok) {
+            const detailsData = await detailsResponse.json();
+            description = detailsData.description ? (typeof detailsData.description === 'string' ? detailsData.description : detailsData.description.value) : null;
+          }
+        } catch (error) {
+          console.log(`Failed to fetch details for book with key ${book.key}:`, error);
+        }
+      }
+
       return {
         key: book.key,
         title: book.title,
         cover_url: book.cover_url, // Add the cover URL, whether it's the default or a found one
         author_name: book.author_name,
-        // summary: book.summary,
+        summary: description,
         publish_date: book.publish_date,
         isbn: book.isbn,
         subject: book.subject,
@@ -118,34 +133,8 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
       };
     }));
 
-    
-    const booksWithDetails = await Promise.all(booksWithCovers.map(async (book) => {
-      // Initialize description as a fallback (e.g., empty string or null)
-      let description = null;
-    
-      // Check if the book has a 'key' field
-      if (book.key) {
-        const detailsUrl = `https://openlibrary.org${book.key}.json`; // Construct the URL for fetching book details
-        try {
-          const detailsResponse = await fetch(detailsUrl);
-          if (detailsResponse.ok) {
-            const detailsData = await detailsResponse.json();
-            // Extract the description field, handling both string descriptions and object descriptions with a 'value' field
-            description = detailsData.description ? (typeof detailsData.description === 'string' ? detailsData.description : detailsData.description.value) : null;
-          }
-        } catch (error) {
-          console.log(`Failed to fetch details for book with key ${book.key}:`, error);
-        }
-      }
-    
-      // Return the book object with the description added
-      return {
-        ...book, // Keep all existing book fields
-        summary: description, // Add the fetched description
-      };
-    }));
-
-    res.json(booksWithDetails);
+    const completeBooks = booksWithDetailsAndCovers.filter(book => book.summary !== null).slice(0, 5);
+    res.json(completeBooks);
 
   } catch (error) {
     console.error('Error fetching books:', error);
