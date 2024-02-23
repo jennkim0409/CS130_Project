@@ -11,7 +11,6 @@ const userSchema = new Schema(
             unique: 'Username is already taken',
         },
         name: String,
-        email: String,
         passwordHash: String,
         genrePrefs: [{
             type: String
@@ -26,6 +25,7 @@ userSchema.set('toJSON', {
 		delete returnedObject._id
 		delete returnedObject.__v
 		delete returnedObject.passwordHash
+        return returnedObject
 	}
 })
 
