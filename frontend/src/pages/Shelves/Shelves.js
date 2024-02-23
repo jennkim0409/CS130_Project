@@ -1,12 +1,13 @@
 import React from "react";
-import "./Library.css";
+import "./Shelves.css";
 import Bookshelf from '../../components/Bookshelf/Bookshelf';
 
-function Library() {
+function Shelves() {
     return(
         <div className="Library">
+            <h2 style={{textAlign: "center"}}>My Shelves</h2>
             <Bookshelf/>
         </div>
     );
 }
-export default Library;
+export default Shelves;

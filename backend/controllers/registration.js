@@ -8,19 +8,18 @@ const registerRouter = express.Router();
 
 registerRouter.post('/', async (req, res) => {
     try {
-      const { username, password, email} = req.body
+      const { username, password} = req.body
 
-      if(!username || !password || !email){
+      if(!username || !password){
         res.status(400)
-            .json({message: "username, password and name are required."});
-      }
+            .json({message: "username and password required."});
+      } 
 
       const hashedPassword = await bcrypt.hash(password, 10);
   
       const newUser = new User({
         username: username,
         passwordHash: hashedPassword,
-        email: email
       });
   
       // Save the user to the database
@@ -40,6 +39,9 @@ registerRouter.post('/', async (req, res) => {
 
       res.status(201).json({ message: 'User registered successfully', user: saved_user});
     } catch (error) {
+      if(error.message.includes('Username is already taken')){
+        return res.status(400).json({ message: 'Username is already taken.' });
+      }
       res.status(500).json({ message: 'An error occurred', error: error.message });
     }
   });
