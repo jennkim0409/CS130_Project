@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import "./Boards.css";
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select';
+import remove from '../../assets/remove.png';
 
 /* Idea is that this array is already created and utilized by the 
     Reading bookshelf in Shelves. And every time a book already has a pinterest board,
@@ -35,6 +36,15 @@ function Boards() {
         // navigating would be after the user clicks on the book
         // navigate(`/boards/${book_id}`);
     }
+
+    const removeBook = (opt) => {
+        console.log(opt)
+        setSelectedBooks(currentBooks =>
+            currentBooks.filter(book => book.value !== opt)
+        );
+
+        {/* include other board to account for removing book board from database */}
+    };
 
     const selectStyles = {
         container: (provided) => ({
@@ -87,12 +97,24 @@ function Boards() {
             <div className="selectedBooks">
                 {selectedBooks.map(book => (
                     <div key={book.value} className="selectedBook">
-                        <img 
-                        className="bookImage" 
-                        src={book.bookcover} 
-                        alt={book.label}
-                        onClick={()=>navigate(`/boards/${book.value}`)}
-                        />
+                        <div className="book-image-container">
+                            <img 
+                            className="bookImage" 
+                            src={book.bookcover} 
+                            alt={book.label}
+                            onClick={()=>navigate(`/boards/${book.value}`)}
+                            />
+                            <div 
+                                className="remove-button" 
+                                onClick={() => {
+                                    if (window.confirm("Are you sure you want to delete this book board?")) {
+                                        removeBook(book.value)
+                                    }
+                                }}
+                            >
+                                <img src={remove} alt="Remove" />
+                            </div>
+                        </div>
                         <h3 style={{cursor: "default"}}>{book.label}</h3>
                     </div>
                 ))}
