@@ -1,4 +1,7 @@
 import express from 'express';
+import Board from "../models/board.js"
+// import Item from "../item/board.js"
+// import Book
 
 const boardRouter = express.Router();
 
