@@ -16,7 +16,7 @@ const bookSchema = new Schema({
   },
   summary: [{
     type: String,
-    required: false, // Assuming the summary is optional
+    required: true,
   }],
   publish_date: {
     type: String,
@@ -32,7 +32,7 @@ const bookSchema = new Schema({
   }],
   id_goodreads: {
     type: String,
-    required: false
+    required: true
   }
 });
 

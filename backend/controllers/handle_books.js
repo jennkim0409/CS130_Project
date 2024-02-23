@@ -124,7 +124,7 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
         key: book.key,
         title: book.title,
         cover_url: book.cover_url, // Add the cover URL, whether it's the default or a found one
-        author_name: book.author_name,
+        author_name: book.author,
         summary: description,
         publish_date: book.publish_date,
         isbn: book.isbn,
@@ -136,6 +136,23 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
     const completeBooks = booksWithDetailsAndCovers.filter(book => book.summary !== null).slice(0, 5);
     res.json(completeBooks);
 
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    res.status(500).json({ message: 'Failed to fetch books', error: error.message });
+  }
+});
+
+handlebooksRouter.get('/getBooks', async (req, res) => {
+  const { userId, type } = req.query;
+  try {
+    // Find the bookshelf for the user with the specified type
+    const bookshelf = await Bookshelf.findOne({ userId, type }).populate('books'); // Assuming 'books' is a field that references book documents
+    if (!bookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found' });
+    }
+
+    // Respond with the books from the bookshelf
+    res.json(bookshelf.books);
   } catch (error) {
     console.error('Error fetching books:', error);
     res.status(500).json({ message: 'Failed to fetch books', error: error.message });
