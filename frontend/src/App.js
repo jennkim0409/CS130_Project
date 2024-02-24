@@ -8,6 +8,7 @@ import Shelves from "./pages/Shelves/Shelves"
 import Account from "./pages/Account/Account"
 import NavbarLayout from './components/Navbar/NavbarLayout';
 import LoginSignup from './components/LoginSignup/LoginSignup';
+import SignupPersonalize from './components/SignupPersonalize/SignupPersonalize';
 import { ToastContainer } from 'react-toastify';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
       <Routes>
         <Route element={<NavbarLayout/>}>
           <Route path="/" element={isLoggedIn ? <Navigate replace to="/explore" /> : <LoginSignup />} />
+          <Route path="/personalize" exact element={<SignupPersonalize />} />
           <Route path="/explore" exact element={<Explore />} />
           <Route path="/shelves" exact element={<Shelves />} />
           <Route path="/boards" exact element={<Boards />} />

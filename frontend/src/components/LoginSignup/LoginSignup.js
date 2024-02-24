@@ -24,7 +24,7 @@ function LoginSignup() {
             .then(response => {
                 console.log("Sign Up successful: ", response.data);
                 toast.success("Sign Up was successful!");
-                setAction("Login");
+                navigate("/personalize"); // redirect to onboarding page
             })
             .catch(error => {
                 console.error("Sign Up error: ", error);

@@ -97,6 +97,7 @@
 .information {
     display: flex;
     justify-content: center;
+    gap: 0px;
 }
 
 @media (max-width: 950px) {
@@ -104,16 +105,25 @@
         flex-direction: column;
         padding-top: 20px;
     }
+    .rightSide {
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 .rightSide {
+    flex: 1;
+    padding-top: 10px;
     justify-content: center;
     align-items: center;
+    margin: 0 -5px;
 }
 
 .leftSide {
+    flex: 1;
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
+    margin: 0 -5px;
 }
