@@ -1,0 +1,83 @@
+.personalize-container {
+    margin: auto;
+    padding-bottom: 30px;
+    width: 70%;
+}
+
+.name-edit, .genre-select, .search-books {
+    display: flex;
+    flex-direction: column;
+    padding-left: 10%;
+    width: 100%;
+}
+
+.name-edit input, .search-books input {
+    width: 50%;
+    min-width: 200px;
+    height: 42px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    background-color: white;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.personalize-instructions {
+    justify-content: center;
+    text-align: center;
+    max-width: 40%;
+    color: #337032;
+}
+
+.inputs-personalize {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.save-button {
+    padding-top: 30px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    padding-left: 10%;
+}
+
+@media (max-width: 950px) {
+    .name-edit, .genre-select, .search-books {
+        padding-left: 0%;
+        align-items: center;
+    }
+    .save-button {
+        padding-left: 0%;
+        align-items: center;
+    }
+}
+
+.book-retrieve {
+    display: flex;
+    gap: 2%;
+}
+
+.search-button, .submit-personalize {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 35px;
+    color: #605063;
+    font-size: 12px;
+    background: #F0ABFB;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.submit-personalize {
+    width: 120px;
+    color: #ffff;
+    font-size: 18px;
+    background: #337032;
+}
