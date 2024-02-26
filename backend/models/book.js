@@ -33,7 +33,12 @@ const bookSchema = new Schema({
   id_goodreads: {
     type: String,
     required: true
-  }
+  },
+  boardId:{
+    type: Schema.Types.ObjectId,
+    required: false,
+    ref: 'Board'
+  },
 });
 
 bookSchema.set('toJSON', {
