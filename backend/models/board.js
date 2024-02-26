@@ -2,8 +2,6 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-// TO DO: update Book schema so that we can add a Board object to it (optional)
-
 // id handled automatically
 const boardSchema = new Schema({
     bookTitle: { // for exploring other users' boards for a particular book
