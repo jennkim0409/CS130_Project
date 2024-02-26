@@ -14,7 +14,7 @@ const userSchema = new Schema(
         passwordHash: String,
         genrePrefs: [{
             type: String
-        }]
+        }],
     }
 );
 
