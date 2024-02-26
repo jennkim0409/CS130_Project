@@ -1,15 +1,11 @@
 import express from 'express';
 import Board from "../models/board.js"
-// import Item from "../item/board.js"
-// import Book
+import Book from '../models/book.js';
 
 const boardRouter = express.Router();
 
 boardRouter.post('/addBoard', async (req, res) => {
     try {
-        // need bookId to add the board to that Book's Board
-        // to do: add Board to field of Book...
-
         const { bookId, bookTitle, bookAuthor } = req.body;
 
         const newBoard = new Board({
@@ -19,14 +15,13 @@ boardRouter.post('/addBoard', async (req, res) => {
 
         const savedBoard = await newBoard.save();
 
-        // update Book obj with this Board // UNCOMMENT WHEN "boardId" ADDED TO BOOK MODEL
-        // if (bookId) {
-        //     await Book.findByIdAndUpdate(
-        //         bookId,
-        //         { $set: { boardId: savedBoard._id } }, 
-        //         { new: true }
-        //     );
-        // }
+        if (bookId) {
+            await Book.findByIdAndUpdate(
+                bookId,
+                { $set: { boardId: savedBoard._id } }, 
+                { new: true }
+            );
+        }
 
         res.status(201).json({ message: 'Board added successfully', board: savedBoard});
     }
@@ -36,8 +31,11 @@ boardRouter.post('/addBoard', async (req, res) => {
     }
 });
 
-// TO DO:
-// routes for adding item to board
-// getting items from board
+// TO DO ***:
+// route: given board ID, get all the items for that board
+// route: given board ID and ID of an item in that board, remove that item from the board's list of items
+    // (and delete that item from the Items table in DB)
+// route: given board id and ID of an item, insert that item in the board's list of items
+    // (and add it to the Items table in DB)
 
 export default boardRouter;
