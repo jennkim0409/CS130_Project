@@ -92,17 +92,18 @@ function SignupPersonalize() {
     };
 
     const save = () => {
-        // save name (waiting for muskan route)
+        // @kaylee TO DO: save name (waiting for muskan route)
 
-        // create genre preferences list
+        // @jenn TO DO: create genre preferences list
             // preferences input by user + genres of the books from matchedBooks
             // NOTE: the list of genres pertaining to each book is found in the book's "subject" field
 
-        // save genre preferences (waiting for muskan route)
+        // @kaylee TO DO: save genre preferences (waiting for muskan route)
 
         // save "books you enjoy" to currently reading bookshelf
-        // @jenn TO DO: update this code to be performed on "BooksEnjoyed" instead of matchedBooks
-            // where "BooksEnjoyed" is the variable you've created for the books the user selected
+        // @jenn TO DO: update this code to be performed on "booksEnjoyed" instead of matchedBooks
+            // i.e. booksEnjoyed.forEach(bookToInsert => { ... etc
+            // where "booksEnjoyed" is the variable you've created for the books the user selected
             // you can call the variable whatever hehe
         matchedBooks.forEach(bookToInsert => {
             bookToInsert.userId = '65dd0510811e11471f25515c'; // @jenn TO DO: update with user id from local storage
