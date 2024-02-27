@@ -124,7 +124,7 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
         key: book.key,
         title: book.title,
         cover_url: book.cover_url, // Add the cover URL, whether it's the default or a found one
-        author_name: book.author,
+        author_name: book.author_name,
         summary: description,
         publish_date: book.publish_date,
         isbn: book.isbn,
