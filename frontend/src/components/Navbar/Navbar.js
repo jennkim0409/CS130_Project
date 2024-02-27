@@ -16,7 +16,7 @@ export default function Navbar() {
                 <div className="site-title">bookpins</div>
             </div>
             
-            {location.pathname !== "/" && (
+            {(location.pathname !== "/" && location.pathname !== "/personalize") && (
                 <>
                 <div className="section">
                     <div className="option">

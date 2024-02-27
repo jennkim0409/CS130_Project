@@ -23,8 +23,18 @@ function LoginSignup() {
             axios.post('http://localhost:5555/auth/register/', { username, password })
             .then(response => {
                 console.log("Sign Up successful: ", response.data);
-                toast.success("Sign Up was successful!");
-                navigate("/personalize"); // redirect to onboarding page
+
+                const token = response.data.token;
+                const user_id = response.data.user.id;
+
+                localStorage.setItem('user_token', token);
+                localStorage.setItem('user_id', user_id);
+
+                toast.success("Sign Up was successful!", {
+                    autoClose: 2000,
+                    pauseOnHover: false,
+                    onClose: () => navigate("/personalize") // redirect to onboarding page
+                  });
             })
             .catch(error => {
                 console.error("Sign Up error: ", error);
@@ -46,13 +56,12 @@ function LoginSignup() {
             axios.post('http://localhost:5555/auth/login', { username, password })
             .then(response => {
                 console.log("Login successful: ", response.data);
-                
-                // navigate to main page
+            
                 const token = response.data.token;
                 const user_id = response.data.user_id;
 
-                localStorage.setItem('user_token', JSON.stringify(token));
-                localStorage.setItem('user_id', JSON.stringify(user_id));
+                localStorage.setItem('user_token', token);
+                localStorage.setItem('user_id', user_id);
                 navigate("/explore"); // *** eventually pass User object here
             })
             .catch(error => {
@@ -97,7 +106,7 @@ function LoginSignup() {
             </div>
 
             <div className="information">
-                <div className="leftSide">
+                <div className="leftSide" style={{flexDirection: 'column'}}>
                     <div className="page-instructions">
                     Create or log-in to your account to save your bookpins!
                     </div>
