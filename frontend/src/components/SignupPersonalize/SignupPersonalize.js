@@ -143,13 +143,12 @@ function SignupPersonalize() {
     const save = () => {
         // @kaylee TO DO: save name (waiting for muskan route)
 
-        console.log(genrePreferences);
-        console.log(additionalGenres);
-
         // This is an array of all the additional genres retrieved from their selected books
-        const condensedAdditinalGenres = [...new Set(additionalGenres.flat())];
+        const condensedAdditionalGenres = [...new Set(additionalGenres.flat())];
         // This is an array of the genres they entered in Genre Preferences
         const condensedGenrePreferences = genrePreferences.map(obj => obj.value);
+        console.log(condensedGenrePreferences);
+        console.log(condensedAdditionalGenres);
 
         // @kaylee TO DO: save genre preferences (waiting for muskan route)
         
