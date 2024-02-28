@@ -60,6 +60,27 @@ handlebooksRouter.post('/moveBook', async (req, res) => {
       }
 });
 
+handlebooksRouter.post('/removeBook', async (req, res) => {
+  try{
+    const {userId, bookshelfType, bookId} = req.body;
+
+    const updatedBookshelf = await Bookshelf.findOneAndUpdate(
+      { userId: userId, type: bookshelfType }, // Match the bookshelf by userId and type
+      { $pull: { books: bookId } },
+      { new: true } 
+    );
+    if (!updatedBookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found or book not on shelf' });
+    }
+    res.status(200).json({ message: 'Book removed successfully', bookshelf: updatedBookshelf });
+  }
+  catch(error){
+    console.error('Error deleting book:', error);
+    res.status(500).json({ message: 'Failed to remove book', error: error.message });
+  }
+});
+
+
 handlebooksRouter.get('/searchBooksName', async (req, res) => {
   const {q:title} = req.query; // Assuming the title is passed as a query parameter
   const baseUrl = 'https://openlibrary.org/search.json';
