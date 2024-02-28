@@ -58,6 +58,7 @@ function SignupPersonalize() {
     const [addedBooks, setAddedBooks] = useState({});
     const [genrePreferences, setGenrePreferences] = useState([]);
     const [additionalGenres, setAdditionalGenres] = useState([]);
+    const [name, setName] = useState('');
 
   useEffect(() => {
     function handleResize() {
@@ -128,7 +129,10 @@ function SignupPersonalize() {
 
                 toast.success("Successfully added book!");
                 setAddedBooks(prev => ({ ...prev, [bookToInsert.isbn]: true }));
-                setAdditionalGenres([...additionalGenres, bookToInsert.subject]);
+    
+                // add max of 5 genres to additionalGenres
+                const genres = bookToInsert.subject.length > 5 ? bookToInsert.subject.slice(0, 5) : bookToInsert.subject;
+                setAdditionalGenres([...additionalGenres, genres]);
             })
             .catch(error => {
                 console.error("Error adding book to current shelf: ", error.response);
@@ -141,16 +145,35 @@ function SignupPersonalize() {
 
     /* Save the genre preferences and name */
     const save = () => {
-        // @kaylee TO DO: save name (waiting for muskan route)
-
-        // This is an array of all the additional genres retrieved from their selected books
+        // This is an array of the additional genres retrieved from their selected books (5 max per book)
         const condensedAdditionalGenres = [...new Set(additionalGenres.flat())];
         // This is an array of the genres they entered in Genre Preferences
         const condensedGenrePreferences = genrePreferences.map(obj => obj.value);
-        console.log(condensedGenrePreferences);
-        console.log(condensedAdditionalGenres);
+        
+        const combinedGenrePreferences = [...condensedAdditionalGenres, ...condensedGenrePreferences];
+        console.log(combinedGenrePreferences)
 
-        // @kaylee TO DO: save genre preferences (waiting for muskan route)
+        // Save name and genre preferences
+        const path = 'http://localhost:5555/api/user/set/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
+        axios.patch(path,
+            { name: name, genrePrefs: combinedGenrePreferences },
+            {
+              headers: {
+                Authorization: localStorage.getItem("user_token")
+              }
+            }
+        )
+        .then(response => {
+            console.log("Name and genre preferences saved successfully: ", response.data);
+            toast.success("Account preferences saved!");
+        })
+        .catch(error => {
+            console.error("Error saving name & genre preferences: ", error);
+
+            // error message
+            const error_message = error.response.data.message;
+            toast.error(error_message);
+        });
         
         navigate('/explore');
     };
@@ -172,7 +195,11 @@ function SignupPersonalize() {
                         <div className="inputs-personalize">
                             <div className='name-edit'>
                                 <h4>Name</h4>
-                                <input type='text'/>
+                                <input 
+                                type='text'
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                />
                             </div>
                             <div className="genre-select">
                                 <h4>Genre Preferences</h4>
