@@ -11,11 +11,11 @@ function SearchBooks({ books, save_book, addedBooks }) {
                     <div className="individual-book-title">{book.title}</div>
                     <div className="individual-book-author">{book.author}</div>
                     <img src={book.cover} alt={`Book cover of ${book.title}`} style={{ height: '150px' }} />
-                    <button 
+                    <div 
                     className={addedBooks[book.isbn] ? 'button-added' : 'button-add'}
                     onClick={() => save_book(book)}>
                         {addedBooks[book.isbn] ? "Added" : "Add"}
-                    </button>
+                    </div>
                 </div>
             ))}
         </div>

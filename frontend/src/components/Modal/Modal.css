@@ -15,12 +15,29 @@
     padding: 35px;
     border-radius: 16px;
     display: flex;
+    flex-direction: column;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     overflow: hidden;
     background-color: white;
+    align-items: center;
+}
+
+.add_pin_details_image {
+    flex: 3;
+    display: flex;
+}
+
+.add_pin_details_text {
+    padding-top: 5%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
 }
 
 .side {
@@ -131,7 +148,7 @@
     font-size: 16px;
     font-weight: 700px;
     cursor: pointer;
-    background-color: rgb(209, 169, 117);
+    background-color: #337032;
     color: white;
 
     justify-content: center;
@@ -139,7 +156,7 @@
     display: flex;
 }
 
-#right_side .section2 .new_pin_input {
+#right_side .section2 .new_pin_input, .add_pin_details_text .new_pin_input {
     width: 100%;
     height: 50px;
     margin-bottom: 20px;
@@ -197,14 +214,8 @@
     align-items: center;
 }
 
-/* .pin_image img {
-    opacity: 0;
+.top {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
-
-.pin_max_height {
-    max-height: 100%;
-}
-
-.pin_max_width {
-    max-width: 100%;
-} */
