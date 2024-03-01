@@ -1,7 +1,5 @@
 import express from 'express';
 import fetch from 'node-fetch';
-import Bookshelf from '../models/bookshelf.js';
-import Book from '../models/book.js';
 import User from '../models/user.js';
 
 const recommendationRouter = express.Router();
