@@ -68,8 +68,9 @@ boardRouter.get('/getBoard', async (req,res) => {
 
 boardRouter.get('/getBoardsbyBook', async (req, res) => {
     try{
-        const {bookTitle, bookAuthor} = req.query;
+        const {userId, bookTitle, bookAuthor} = req.query;
         const boards = await Board.find({
+            userId: { $ne: userId }, // Exclude boards that belong to the user
             bookTitle: bookTitle,
             bookAuthor: bookAuthor,
             visibility: true
