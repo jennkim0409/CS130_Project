@@ -1,16 +1,14 @@
 import React, {useState} from 'react';
 
 import {Photo} from '../Bookshelf/Photo';
-import reading from '../Bookshelf/reading.json';
-import recommended from '../Bookshelf/recommended.json';
+import recommended from '../Bookshelf/recommendations.json';
 import '../LoginSignup/LoginSignup.css';
 
 const Recommendations = () => {
   // items imported from .json (links to images)
   // hash table into readingList and recommendedList
   const [items, setItems] = useState({
-    readingList: reading,
-    recommendedList: recommended,
+    recommendations: recommended,
   })
 
   const recListStyle = {
@@ -30,16 +28,16 @@ const Recommendations = () => {
       <br/><br/><br/>
 
       <div>
-          {items.readingList.map((url, index) => (
-            <div style= {recListStyle}>
+          {items.recommendations.map((book, index) => (
+            <div style= {recListStyle} key= {index}>
               {/* book cover */}
-              <Photo key={url} url={url} index={index} height= '18vw' width= '12vw' />
+              <Photo key={book.image_url} url={book.image_url} index={index} height= '18vw' width= '12vw' />
               {/* book info */} 
               <div style= {{ marginLeft: '5%' }}>
-                <h3 style= {{ margin: '0px' }} >Title of Book</h3>
-                <h5 style= {{ margin: '0px' }}>Author First, Last</h5>
-                <h5 style= {{ width: '40vw' }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate.</h5>
-                <h5>Subject: List of Subjects</h5>
+                <h3 style= {{ margin: '0px' }} >{book.title}</h3>
+                <h5 style= {{ margin: '0px' }}>{book.author}</h5>
+                <h5 style= {{ width: '40vw' }}>{book.description}</h5>
+                <h5>Subject: {book.subjects.join(", ")}</h5>
               </div>
               {/* save button */} 
               <div className="submit gray" style= {{ width: '10vw' }} >Save</div>
