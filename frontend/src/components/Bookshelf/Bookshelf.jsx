@@ -216,14 +216,6 @@ const Bookshelf = () => {
       return;
     }
 
-    const activeIndex = items[activeContainer].indexOf(active.id);
-    const overIndex = items[overContainer].indexOf(overId);
-    
-    console.log('drag end, active container: ' + activeContainer);
-    console.log('drag end, over container: ' + overContainer);
-    console.log('active index: ' + activeIndex);
-    console.log('over index: ' + overIndex);
-
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
     const overIndex = items[overContainer].findIndex(book => book.cover === overId);
  
