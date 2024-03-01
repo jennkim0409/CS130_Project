@@ -55,7 +55,7 @@ function Pin(props) {
                 <div className="modal_head">
                     <div className="pint_mock_icon_container" onClick={() => {
                         if (window.confirm("Are you sure you want to delete this pin?")) {
-                            props.removePin(props.pinDetails.unique_id);
+                            props.removePin(props.pinDetails.ordering_id);
                         }
                     }}>
                         <img src={remove} alt="remove" className="pint_mock_icon_remove" />

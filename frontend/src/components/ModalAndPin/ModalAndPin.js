@@ -19,11 +19,12 @@ class ModalAndPin extends React.Component {
                 ..._state.pins
             ]
 
-            // key is a unique attribute of this pin
+            // key is an ordering attribute of this pin
             // we use the length of the state pins since this keeps increasing with every new pin
             new_pins.push(
-                <Pin pinDetails={pinDetails} key={pinDetails.unique_id} pinId={pinDetails.unique_id} removePin={this.remove_pin}/>
+                <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} removePin={this.remove_pin}/>
             )
+            console.log(new_pins);
             return {
                 pins: new_pins,
                 show_modal: false
@@ -31,9 +32,9 @@ class ModalAndPin extends React.Component {
         })
     }
 
-    remove_pin = (uniqueId) => {
+    remove_pin = (orderingId) => {
         this.setState(prevState => ({
-            pins: prevState.pins.filter(pinElement => pinElement.props.pinDetails.unique_id !== uniqueId)
+            pins: prevState.pins.filter(pinElement => pinElement.props.pinDetails.ordering_id !== orderingId)
         }));
     }
 
