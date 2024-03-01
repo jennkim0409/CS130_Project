@@ -127,7 +127,8 @@ const Bookshelf = () => {
   set this component to the active ID */
   function handleDragStart(event) {
     setActiveId(event.active.id);
-    console.log(event.active.id);
+    console.log("drag start: " + event.active.id);
+    console.log("drag start: " + findContainer(event.active.id));
   }
 
   /* when user drags draggable over a droppable
@@ -144,8 +145,7 @@ const Bookshelf = () => {
     const overContainer = findContainer(overId);
 
     // if containers are null, return
-    if (!activeContainer || !overContainer
-    ) {
+    if (!activeContainer || !overContainer) {
       return;
     }
 
@@ -228,7 +228,6 @@ const Bookshelf = () => {
   //   console.log('drag end, over container: ' + overContainer);
   //   console.log('active index: ' + activeIndex);
   //   console.log('over index: ' + overIndex);
-
   //   // if the draggable is dragged into a new position
   //   if (activeIndex !== overIndex) {
   //     setItems((items) => ({
