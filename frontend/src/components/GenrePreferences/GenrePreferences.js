@@ -1,5 +1,5 @@
 import Select from 'react-select';
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 const genreOptions = [
     { label: 'fiction', value: 'fiction' },
@@ -39,14 +39,23 @@ const selectStyles = {
     }),
 };
 
-function GenrePreferences({return_genres}) {
-    return(
+function GenrePreferences({ return_genres }) {
+    const [selectedGenres, setSelectedGenres] = useState([]);
+
+    const handleChange = (selectedOptions) => {
+        setSelectedGenres(selectedOptions);
+        return_genres(selectedOptions);
+    };
+
+    return (
         <div className="genre">
             <h4>Genre Preferences</h4>
-            <Select 
-                className='dropdown' 
-                options={genreOptions} 
-                onChange={opt => return_genres(opt)}
+            <Select
+                className='dropdown'
+                placeholder='Select up to 5...'
+                options={genreOptions}
+                value={selectedGenres} 
+                onChange={handleChange}
                 isMulti
                 menuPlacement="auto"
                 styles={selectStyles}
@@ -62,7 +71,8 @@ function GenrePreferences({return_genres}) {
                         /* border color of the select dropbox */
                         primary: '#F0ABFB',
                     },
-                    })}
+                })}
+                isOptionDisabled={() => selectedGenres.length >= 5} // Disable further selections after 5 options
             />
         </div>
     );
