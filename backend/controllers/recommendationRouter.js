@@ -15,7 +15,7 @@ const searchBookByName = async(title) => {
     try {
       const response = await fetch(url);
       const data = await response.json();
-      const requiredFields = ['key', 'title', 'author_name', 'publish_date','isbn', 'id_goodreads', 'subject'];
+      const requiredFields = ['key', 'title', 'author_name','isbn', 'subject'];
       
       let filteredBooks = data.docs.filter(book => 
         requiredFields.every(field => 
@@ -25,8 +25,6 @@ const searchBookByName = async(title) => {
       filteredBooks = filteredBooks.map(book => ({
         ...book,
         author_name: Array.isArray(book.author_name) ? book.author_name[0] : book.author_name,
-        publish_date: Array.isArray(book.publish_date) ? book.publish_date[0] : book.publish_date,
-        id_goodreads: Array.isArray(book.id_goodreads) ? book.id_goodreads[0] : book.id_goodreads,
       }));
   
       const booksWithDetailsAndCovers = await Promise.all(filteredBooks.map(async (book) => {
@@ -48,7 +46,7 @@ const searchBookByName = async(title) => {
         }
   
         if (!coverFound) {
-          book.cover_url = "https://example.com/default-cover.jpg";
+          book.cover_url = "";
         }
   
         if (book.key) {
@@ -70,10 +68,8 @@ const searchBookByName = async(title) => {
           cover_url: book.cover_url, 
           author_name: book.author_name,
           summary: description,
-          publish_date: book.publish_date,
           isbn: book.isbn,
           subject: book.subject,
-          id_goodreads: book.id_goodreads,
         };
       }));
   
@@ -97,7 +93,7 @@ const searchBookByGenre = async(genre) => {
             title: work.title,
         }));
 
-        console.log("This is recommendedBooks", recommendedBooks)
+        // console.log("This is recommendedBooks", recommendedBooks)
         let book_details =[]
         for (let book of recommendedBooks) {
             console.log("book title", book.title);
@@ -107,16 +103,12 @@ const searchBookByGenre = async(genre) => {
             }
             book_details.push(details)
         }
-        console.log("this is book details",book_details)
-
 
         return book_details;
     } catch(error){
         console.error(`Error searching for books in genre ${genre}:`, error.message);
         return [];
     }
-    
-
 };
 
 
@@ -128,7 +120,6 @@ recommendationRouter.post('/:userId', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
         const genrePrefs = user.genrePrefs;
-
         const recommendedBooks = [];
         for(let genre of genrePrefs){
             let books = await searchBookByGenre(genre);
@@ -137,7 +128,7 @@ recommendationRouter.post('/:userId', async (req, res) => {
                 continue;
             }
             recommendedBooks.push(...books);
-            console.log((recommendedBooks.length))
+            // console.log((recommendedBooks.length))
         }
         res.json(recommendedBooks)
 
