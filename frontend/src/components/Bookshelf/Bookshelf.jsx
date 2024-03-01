@@ -73,7 +73,6 @@ const Bookshelf = () => {
   // books activated by mouse and touch sensors
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
-  
   return (
     // all DND components must be within DndContext component
     <DndContext
@@ -197,13 +196,11 @@ const Bookshelf = () => {
     const { active, over } = event;
     const { id } = active;
     const { id: overId } = over;
+
     // find the bookshelf containers that they are in
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
-    console.log("active cont")
-    console.log(activeContainer)
-    console.log("over cont")
-    console.log(overContainer)
+
     // if there is no active, over, or if they are do not collide
     // (i.e. no interaction being made, simply return)
     if (
@@ -214,51 +211,15 @@ const Bookshelf = () => {
       return;
     }   
 
-    // it's saying they are the same because handleDragOver is assigning the item
-    // to the new shelf BEFORE i drop it in ?
-
-    // TO DO: the code below needs to only run if the containers are the same.
-    // currently it runs regardless of that
- 
-    // for item that will be displaced (moved to the right)
-    // after insertion of new element
-    // active index = initial index of this item
-    // over index = resulting index of this item (always 1 more)
-    // UNLESS it is being moved within same shelf, then it works fine
-
-    console.log("active id")
-    console.log(active.id)
-    console.log("over id")
-    console.log(overId)
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
-    console.log("active index drop end")
-    console.log(activeIndex)
     const overIndex = items[overContainer].findIndex(book => book.cover === overId);
-    console.log("over index drop end")
-    console.log(overIndex)
-
-    // it's moving the wrong item
-    // it's moving the item we JUST INSERTED one forward
-    // but in reality it should be moving the one that was just there, forward
-
-    // i.e. active ID object is getting moved forward instead of over ID object
-
-    // if the draggable is dragged into a new position
-    // if we are shifting in among the same shelf we want this: 
+ 
     if (activeIndex !== overIndex) {
       setItems((items) => ({
         ...items,
         [overContainer]: arrayMove(items[overContainer], activeIndex, overIndex)
       }));
     }
-
-    // if are shifting between shelves we want this: 
-    // if (activeIndex !== overIndex) {
-    //   setItems((items) => ({
-    //     ...items,
-    //     [overContainer]: arrayMove(items[overContainer], activeIndex+1, overIndex)
-    //   }));
-    // }
 
     // after exchange is made, set active ID to null
     setActiveId(null);
@@ -270,11 +231,13 @@ const Bookshelf = () => {
   }
 
   // helper function to locate bookshelf container by component ID
+  // id = url corresponding to cover images
   function findContainer(id) {
     if (id in items) {
       return id;
     }
 
+    // return name of bookshelf that contains the book corresponding to this id (cover url)
     return Object.keys(items).find((shelfName) => {
       const shelf = items[shelfName];
       return shelf.some(book => book.cover === id);
