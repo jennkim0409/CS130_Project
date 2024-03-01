@@ -7,16 +7,14 @@ const handlebooksRouter = express.Router();
 
 handlebooksRouter.post('/addBook', async (req, res) => {
   try {
-    const { userId, bookshelfType, title, cover, author, summary, publish_date, isbn, subject, id_goodreads } = req.body;
+    const { userId, bookshelfType, title, cover, author, summary, isbn, subject } = req.body;
     const newBook = new Book({
       title,
       cover,
       author,
       summary,
-      publish_date,
       isbn,
-      subject,
-      id_goodreads
+      subject
     });
     const savedBook = await newBook.save();
 
@@ -92,7 +90,7 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
     const response = await fetch(url);
     const data = await response.json();
 
-    const requiredFields = ['key', 'title', 'author_name', 'publish_date','isbn', 'id_goodreads', 'subject'];
+    const requiredFields = ['key', 'title', 'author_name','isbn', 'subject'];
     
     let filteredBooks = data.docs.filter(book => 
       requiredFields.every(field => 
@@ -102,8 +100,6 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
     filteredBooks = filteredBooks.map(book => ({
       ...book,
       author_name: Array.isArray(book.author_name) ? book.author_name[0] : book.author_name,
-      publish_date: Array.isArray(book.publish_date) ? book.publish_date[0] : book.publish_date,
-      id_goodreads: Array.isArray(book.id_goodreads) ? book.id_goodreads[0] : book.id_goodreads,
     }));
 
     const booksWithDetailsAndCovers = await Promise.all(filteredBooks.map(async (book) => {
@@ -125,7 +121,7 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
       }
 
       if (!coverFound) {
-        book.cover_url = "https://example.com/default-cover.jpg";
+        book.cover_url = "";
       }
 
       if (book.key) {
@@ -144,13 +140,11 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
       return {
         key: book.key,
         title: book.title,
-        cover_url: book.cover_url, // Add the cover URL, whether it's the default or a found one
+        cover_url: book.cover_url, // Add the cover URL, whether it's blank or a found one
         author_name: book.author_name,
         summary: description,
-        publish_date: book.publish_date,
         isbn: book.isbn,
-        subject: book.subject,
-        id_goodreads: book.id_goodreads,
+        subject: book.subject
       };
     }));
 

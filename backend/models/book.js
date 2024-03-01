@@ -18,10 +18,6 @@ const bookSchema = new Schema({
     type: String,
     required: true,
   }],
-  publish_date: {
-    type: String,
-    required: true
-  },
   isbn: [{
     type: String,
     required: true
@@ -30,10 +26,6 @@ const bookSchema = new Schema({
     type: String,
     required: true
   }],
-  id_goodreads: {
-    type: String,
-    required: true
-  },
   boardId:{
     type: Schema.Types.ObjectId,
     required: false,
