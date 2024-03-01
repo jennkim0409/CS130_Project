@@ -3,6 +3,7 @@ import './Pin.css';
 import download from '../../assets/downloads.png';
 import edit from '../../assets/edit.png';
 import remove from '../../assets/remove.png';
+import TextSize from '../TextSize/TextSize';
 
 function check_size(event) {
     const image = event.target;
@@ -41,6 +42,10 @@ function Pin(props) {
         downloadImage(imageSrc);
     };
 
+    if (props.pinDetails.quote !== '') {
+        props.pinDetails.pin_size = 'medium';
+    }
+
     console.log(props.pinDetails)
     return (
         <div className = {`card card_${props.pinDetails.pin_size}`}>
@@ -50,28 +55,31 @@ function Pin(props) {
                 <div className="modal_head">
                     <div className="pint_mock_icon_container" onClick={() => {
                         if (window.confirm("Are you sure you want to delete this pin?")) {
-                            props.removePin(props.pinDetails.unique_id);
+                            props.removePin(props.pinDetails.ordering_id);
                         }
                     }}>
                         <img src={remove} alt="remove" className="pint_mock_icon_remove" />
                     </div>
                 </div>
                 <div className="modal_foot">
-                    <div className="pint_mock_icon_container" onClick={handleDownloadClick}>
-                        <img src={download} alt="download" className="pint_mock_icon" /> 
-                    </div>
-                    
-                    {/* Work on edit button */}
-                    <div className="pint_mock_icon_container" onClick={() => 
-                        props.editPin(props.pinDetails.unique_id)}>
-                        <img src={edit} alt="edit" className="pint_mock_icon" />
-                    </div>
+                    { (props.pinDetails.quote === '') ? 
+                        <div className="pint_mock_icon_container" onClick={handleDownloadClick}>
+                            <img src={download} alt="download" className="pint_mock_icon" /> 
+                        </div>
+                        :
+                        null
+                    }
                 </div>
             </div>
-
-            <div className="pin_image">
-                <img onLoad={check_size} src={props.pinDetails.img_blob} alt="pin_image"/>
-            </div>
+            { (props.pinDetails.quote === '') ?
+                <div className="pin_image">
+                    <img onLoad={check_size} src={props.pinDetails.img_blob} alt="pin_image"/>
+                </div>
+                :
+                <div className="pin_text">
+                    <TextSize quote={props.pinDetails.quote} color={props.pinDetails.text_color}/>
+                </div>
+            }
         </div>
     )
 }
