@@ -91,7 +91,7 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
   try {
     const response = await fetch(url);
     const data = await response.json();
-
+    console.log(data)
     const requiredFields = ['key', 'title', 'author_name', 'publish_date','isbn', 'id_goodreads', 'subject'];
     
     let filteredBooks = data.docs.filter(book => 
