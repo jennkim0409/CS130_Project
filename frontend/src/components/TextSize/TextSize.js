@@ -29,7 +29,6 @@ function TextSize({ quote, color }) {
       }
 
       if ((minFontSize > maxFontSize) && quote_ref.current.scrollHeight <= grandparentHeight) {
-        console.log(quote_ref.current.scrollHeight);
         found = true;
         setFontSize(currentFontSize);
       }

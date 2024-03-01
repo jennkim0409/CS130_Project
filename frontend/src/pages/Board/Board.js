@@ -26,7 +26,7 @@ const Board = () => {
       </div>
       <div className="modal">
         {/* Render your layout and data based on boardId */}
-        <ModalAndPin boardId={boardId}/>
+        <ModalAndPin/>
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ import upload from '../../assets/cloud-computing.png';
 import _uniqueId from 'lodash/uniqueId';
 import Toggle from 'react-toggle';
 import "react-toggle/style.css"
-import { SketchPicker } from 'react-color';
 import { ChromePicker } from 'react-color'
 
 function upload_img(event, pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded) {
@@ -58,32 +57,30 @@ function check_size(event) {
     image.style.opacity = 1;
 }
 
-function save_pin(pinDetails, boardId, add_pin, id) {
+function save_pin(pinDetails, add_pin, id) {
     const pinSize = document.querySelector('#pin_size').value;
     if (pinSize === "") {
         alert("Please select a size before saving.");
     } else {
         const users_data = {
             ...pinDetails,
-            board: boardId,
             title: document.querySelector('#pin_title').value,
             description: document.querySelector('#pin_description').value,
             pin_size: document.querySelector('#pin_size').value,
-            unique_id: id
+            ordering_id: id
         }
 
         add_pin(users_data);
     }
 }
 
-function save_pin_text(pinDetails, boardId, add_pin, id, textColor) {
+function save_pin_text(pinDetails, add_pin, id, textColor) {
     const users_data = {
         ...pinDetails,
-        board: boardId,
         title: document.querySelector('#pin_title').value,
         quote: document.querySelector('#pin_quote').value,
         text_color: textColor,
-        unique_id: id
+        ordering_id: id
     }
 
     add_pin(users_data);
@@ -92,14 +89,13 @@ function save_pin_text(pinDetails, boardId, add_pin, id, textColor) {
 function Modal(props) { 
 
     const [pinDetails, setPinDetails] = useState({
-        board: '',
-        title: '',
-        description: '',
-        quote: '',
-        img_blob: '',
-        pin_size: '',
-        unique_id: '',
-        text_color: '',
+        title: '', // required for all
+        ordering_id: '', // required for all
+        description: '', // image pin
+        img_blob: '', // image pin
+        pin_size: '', // image pin
+        quote: '', // quote pin
+        text_color: '', // quote pin
     });
 
     const [showLabel, setShowLabel] = useState(true);
@@ -130,7 +126,7 @@ function Modal(props) {
                             color={textColor}
                             onChangeComplete={(color) => setTextColor(color.hex)}
                         />
-                        <div className="submit" onClick={() => save_pin_text(pinDetails, props.boardId, props.add_pin, id, textColor)}>Save</div>
+                        <div className="submit" onClick={() => save_pin_text(pinDetails, props.add_pin, id, textColor)}>Save</div>
                     </div>
                     :
                     <div className="add_pin_details_image">
@@ -186,7 +182,7 @@ function Modal(props) {
                                         <option value="medium">Medium</option>
                                         <option value="large">Large</option>
                                     </select>
-                                    <div onClick={() => save_pin(pinDetails, props.boardId, props.add_pin, id)} className="save_pin">Save</div>
+                                    <div onClick={() => save_pin(pinDetails, props.add_pin, id)} className="save_pin">Save</div>
                                 </div>
                             </div>
                             <div className="section2">

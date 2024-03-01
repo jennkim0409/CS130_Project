@@ -24,7 +24,6 @@ class ModalAndPin extends React.Component {
             new_pins.push(
                 <Pin pinDetails={pinDetails} key={pinDetails.unique_id} pinId={pinDetails.unique_id} removePin={this.remove_pin}/>
             )
-            console.log(new_pins);
             return {
                 pins: new_pins,
                 show_modal: false
@@ -58,7 +57,7 @@ class ModalAndPin extends React.Component {
                 >
                     {
                         this.state.show_modal ? 
-                        <Modal boardId = {this.props.boardId} add_pin={this.add_pin}/> : null
+                        <Modal add_pin={this.add_pin}/> : null
                     }
                 </div>
             </div>
