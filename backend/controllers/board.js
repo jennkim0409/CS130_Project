@@ -53,7 +53,7 @@ boardRouter.post('/removeBoard', async(req, res) => {
 // route: given board ID, get that board
 boardRouter.get('/getBoard', async (req,res) => {
     try {
-        const {boardId} = req.body;
+        const {boardId} = req.query;
         const board = await Board.findById(boardId);
         if(!board){
             return res.status(404).json({ message: 'Board not found' });
@@ -65,6 +65,24 @@ boardRouter.get('/getBoard', async (req,res) => {
     }
 });
 
+
+boardRouter.get('/getBoardsbyBook', async (req, res) => {
+    try{
+        const {bookTitle, bookAuthor} = req.query;
+        const boards = await Board.find({
+            bookTitle: bookTitle,
+            bookAuthor: bookAuthor,
+            visibility: true
+        });
+
+        if (!boards || boards.length === 0) {
+            return res.status(404).json({ message: 'No boards found for the given book' });
+        }
+        res.json(boards);
+    } catch(error){
+        res.status(500).json({ message: 'Error getting boards', error: error.message });
+    }
+});
 
 // route: given board ID and ID of an item in that board, remove that item from the board's list of items
     // (and delete that item from the Items table in DB)
@@ -87,9 +105,9 @@ boardRouter.post('/removeItem', async (req, res) => {
     // (and add it to the Items table in DB)
 boardRouter.post('/addItem', async (req, res) => {
     try {
-        const {boardId, type, data} = req.body;
+        const {boardId, title, ordering_id, description, pin_size, quote, text_color} = req.body;
 
-        const newItem = new Item({ type, data });
+        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color });
         const savedItem = await newItem.save();
 
         const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true });

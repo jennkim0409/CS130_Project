@@ -16,7 +16,10 @@ const boardSchema = new Schema({
         [{
         type: Schema.Types.ObjectId,
         ref: 'Item'
-        }]
+        }],
+    visibility:{
+        type: Boolean
+    }
   });
 
 boardSchema.set('toJSON', {

@@ -5,6 +5,8 @@ import Book from '../models/book.js';
 
 const handlebooksRouter = express.Router();
 
+
+//if the isbn is already stored, send error
 handlebooksRouter.post('/addBook', async (req, res) => {
   try {
     const { userId, bookshelfType, title, cover, author, summary, publish_date, isbn, subject, id_goodreads } = req.body;
