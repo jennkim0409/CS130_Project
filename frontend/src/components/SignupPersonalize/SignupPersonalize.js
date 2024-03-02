@@ -57,10 +57,8 @@ function SignupPersonalize() {
                     cover: book.cover_url, 
                     author: book.author_name,
                     summary: book.summary,
-                    publish_date: book.publish_date,
                     isbn: book.isbn,
                     subject: book.subject,
-                    id_goodreads: book.id_goodreads
                 };
             });
 
