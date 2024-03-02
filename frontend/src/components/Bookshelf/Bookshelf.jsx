@@ -28,6 +28,9 @@ const Bookshelf = () => {
     finishedList: [],
   });
 
+  // starting shelf for a book that is moved
+  const [startingShelf, setStartingShelf] = useState('');
+
   // runs when component mounts
   useEffect(() => {
     const fetchBookshelfData = async () => {
@@ -127,8 +130,9 @@ const Bookshelf = () => {
   set this component to the active ID */
   function handleDragStart(event) {
     setActiveId(event.active.id);
-    console.log("drag start: " + event.active.id);
-    console.log("drag start: " + findContainer(event.active.id));
+    // console.log("drag start: " + event.active.id);
+    // console.log("drag start: " + findContainer(event.active.id));
+    setStartingShelf(findContainer(event.active.id));
   }
 
   /* when user drags draggable over a droppable
@@ -144,8 +148,8 @@ const Bookshelf = () => {
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
 
-    console.log('drag over, active container: ' + activeContainer);
-    console.log('drag over, over container: ' + overContainer);
+    // console.log('drag over, active container: ' + activeContainer);
+    // console.log('drag over, over container: ' + overContainer);
 
     // if there is no active, over, or if they do not collide
     // (i.e. no interaction being made, simply return)
@@ -206,6 +210,9 @@ const Bookshelf = () => {
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
 
+    // console.log("drag end active container: " + activeContainer);
+    // console.log("drag end active container: " + overContainer);
+
     // if there is no active, over, or if they are do not collide
     // (i.e. no interaction being made, simply return)
     if (
@@ -219,6 +226,35 @@ const Bookshelf = () => {
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
     const overIndex = items[overContainer].findIndex(book => book.cover === overId);
  
+    const endingShelf = activeContainer;
+    // if the shelves are different, insert at active index
+    console.log("drag end: ")
+    if (startingShelf != endingShelf) {
+      const bookToMove = items[endingShelf].find(book => book.cover === id);
+
+      console.log("book to move: ");
+      console.log(bookToMove);
+      console.log("ending shelf is: ");
+      console.log(endingShelf);
+      console.log("ending index is: ") ;
+      console.log(activeIndex);
+
+      // CALL DIANA API HERE using bookToMove, endingShelf, activeIndex
+    }
+    // if shelves are the same, insert at the over index
+    else {
+      const bookToMove = items[startingShelf].find(book => book.cover === id);
+
+      console.log("book to move: ");
+      console.log(bookToMove);
+      console.log("starting & ending shelf: ");
+      console.log(startingShelf);
+      console.log("ending index is: ");
+      console.log(overIndex);
+
+      // CALL DIANA API HERE using bookToMove, endingShelf, activeIndex
+    }
+    
     if (activeIndex !== overIndex) {
       setItems((items) => ({
         ...items,
