@@ -41,7 +41,6 @@ function Shelves() {
                     cover: book.cover_url, 
                     author: book.author_name,
                     summary: book.summary,
-
                     isbn: book.isbn,
                     subject: book.subject,
                 };
