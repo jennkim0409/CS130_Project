@@ -18,6 +18,7 @@
 
 .pin_modal:hover {
     opacity: 1;
+    cursor: pointer;
 }
 
 .pin_modal .modal_head {
@@ -55,7 +56,6 @@
     cursor:pointer;
 }
 
-
 .pint_mock_icon_remove {
     width: 100%;
 }
@@ -66,6 +66,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .pin_image img {
