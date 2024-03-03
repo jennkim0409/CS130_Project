@@ -7,11 +7,12 @@ const boardRouter = express.Router();
 
 boardRouter.post('/addBoard', async (req, res) => {
     try {
-        const { bookId, bookTitle, bookAuthor } = req.body;
+        const { bookId, bookTitle, bookAuthor, visibility } = req.body;
 
         const newBoard = new Board({
             bookTitle,
-            bookAuthor
+            bookAuthor,
+            visibility,
         });
 
         const savedBoard = await newBoard.save();
