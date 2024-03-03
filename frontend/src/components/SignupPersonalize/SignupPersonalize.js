@@ -134,6 +134,7 @@ function SignupPersonalize() {
         .then(response => {
             console.log("Name and genre preferences saved successfully: ", response.data);
             toast.success("Account preferences saved!");
+            localStorage.setItem('user_name', name);
         })
         .catch(error => {
             console.error("Error saving name & genre preferences: ", error);
