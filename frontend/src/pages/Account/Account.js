@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import "./Account.css";
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -26,7 +27,25 @@ function Account(props) {
     const update = () => {
         if (name != '') {
             // update the name in backend
-            localStorage.setItem('user_name', name);
+            const path = 'http://localhost:5555/api/user/set/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
+            axios.patch(path,
+                { name: name },
+                {
+                headers: {
+                    Authorization: localStorage.getItem("user_token")
+                }
+            })
+            .then(response => {
+                console.log("Name saved successfully: ", response.data);
+                localStorage.setItem('user_name', name);
+            })
+            .catch(error => {
+                console.error("Error saving name: ", error);
+
+                // error message
+                const error_message = error.response.data.message;
+                toast.error(error_message);
+            });            
         }
         if (currentPassword != '' && newPassword != '' && newPassword2 != '') {
             // grab password from backend and check that it's correct
