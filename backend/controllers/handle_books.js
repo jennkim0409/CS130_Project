@@ -78,6 +78,25 @@ handlebooksRouter.post('/removeBook', async (req, res) => {
   }
 });
 
+handlebooksRouter.post('/clearBookshelf', async (req, res) => {
+  try{
+    const {userId, bookshelfType} = req.body;
+    const updatedBookshelf = await Bookshelf.findOneAndUpdate(
+      { userId: userId, type: bookshelfType },
+      { $set: { books: [] } }, 
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedBookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found' });
+    }
+    res.status(200).json({ message: 'Bookshelf cleared successfully', bookshelf: updatedBookshelf });
+  } catch(error){
+    console.error('Error clearing bookshelf:', error);
+    res.status(500).json({ message: 'Failed to clear bookshelf', error: error.message });
+  }
+});
+
 
 handlebooksRouter.get('/searchBooksName', async (req, res) => {
   const {q:title} = req.query; // Assuming the title is passed as a query parameter
