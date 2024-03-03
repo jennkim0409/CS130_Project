@@ -15,8 +15,11 @@ const bookshelfSchema = new Schema({
   },
   books:
   [{
-    type: Schema.Types.ObjectId,
-    ref: 'Book'
+    bookId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Book'
+    },
+    order: Number // New field to track the order of books
   }]
 
 });
