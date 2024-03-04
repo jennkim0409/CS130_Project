@@ -7,12 +7,12 @@ const boardRouter = express.Router();
 
 boardRouter.post('/addBoard', async (req, res) => {
     try {
-        const { bookId, bookTitle, bookAuthor, visibility } = req.body;
+        const { bookId, bookTitle, bookAuthor, publicVisibility } = req.body;
 
         const newBoard = new Board({
             bookTitle,
             bookAuthor,
-            visibility,
+            publicVisibility,
         });
 
         const savedBoard = await newBoard.save();
@@ -67,14 +67,14 @@ boardRouter.get('/getBoard', async (req,res) => {
 });
 
 
-boardRouter.get('/getBoardsbyBook', async (req, res) => {
+boardRouter.get('/getBoardsByBook', async (req, res) => {
     try{
         const {userId, bookTitle, bookAuthor} = req.query;
         const boards = await Board.find({
             userId: { $ne: userId }, // Exclude boards that belong to the user
             bookTitle: bookTitle,
             bookAuthor: bookAuthor,
-            visibility: true
+            publicVisibility: true
         });
 
         if (!boards || boards.length === 0) {
