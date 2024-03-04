@@ -130,8 +130,6 @@ const Bookshelf = () => {
   set this component to the active ID */
   function handleDragStart(event) {
     setActiveId(event.active.id);
-    // console.log("drag start: " + event.active.id);
-    // console.log("drag start: " + findContainer(event.active.id));
     setStartingShelf(findContainer(event.active.id));
   }
 
@@ -147,9 +145,6 @@ const Bookshelf = () => {
     // find the bookshelf container that they are in
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
-
-    // console.log('drag over, active container: ' + activeContainer);
-    // console.log('drag over, over container: ' + overContainer);
 
     // if there is no active, over, or if they do not collide
     // (i.e. no interaction being made, simply return)
@@ -209,9 +204,6 @@ const Bookshelf = () => {
     // find the bookshelf containers that they are in
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
-
-    // console.log("drag end active container: " + activeContainer);
-    // console.log("drag end active container: " + overContainer);
 
     // if there is no active, over, or if they are do not collide
     // (i.e. no interaction being made, simply return)
