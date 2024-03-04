@@ -208,7 +208,8 @@ const Recommendations = () => {
                 <h3 style= {{ margin: '0px' }} >{book.title}</h3>
                 <h5 style= {{ margin: '0px' }}>{book.author}</h5>
                 <h5 style= {{ width: '40vw' }}>{book.summary[0]}</h5>
-                <h5>Subjects: {book.subject.join(", ")}</h5>
+                {/* show max 10 subjects per book */} 
+                <h5>Subjects: {book.subject.length > 10 ? book.subject.slice(0, 10).join(", ") : book.subject.join(", ")}</h5>
               </div>
               {/* save button */} 
               {/* @ charlene TO DO: also button dimensions here */} 
