@@ -233,14 +233,20 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
 handlebooksRouter.get('/getBooks', async (req, res) => {
   const { userId, type } = req.query;
   try {
-    // Find the bookshelf for the user with the specified type
-    const bookshelf = await Bookshelf.findOne({ userId, type }).populate('books'); // Assuming 'books' is a field that references book documents
+    const bookshelf = await Bookshelf.findOne({ userId, type })
+      .populate({
+        path: 'books.bookId',
+        model: 'Book'
+      }); // Assuming 'books' is a field that references book documents
     if (!bookshelf) {
       return res.status(404).json({ message: 'Bookshelf not found' });
     }
-
-    // Respond with the books from the bookshelf
-    res.json(bookshelf.books);
+    const sortedBooks = bookshelf.books.sort((a, b) => a.order - b.order).map(book => ({
+      ...book.bookId._doc,
+      order: book.order // Include the order in the response
+    }));
+    
+    res.json(sortedBooks);
   } catch (error) {
     console.error('Error fetching books:', error);
     res.status(500).json({ message: 'Failed to fetch books', error: error.message });
