@@ -6,6 +6,8 @@ import _uniqueId from 'lodash/uniqueId';
 import Toggle from 'react-toggle';
 import "react-toggle/style.css"
 import { ChromePicker } from 'react-color'
+import 'react-tooltip/dist/react-tooltip.css'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 function upload_img(event, pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded) {
     if (event.target.files && event.target.files[0]) {
@@ -172,7 +174,7 @@ function Modal(props) {
                         <div className="side" id="left_side">
                             <div className="section1">
                                 { imageUploaded ? 
-                                    <div className="pint_mock_icon_container" onClick={() => remove_image(pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded)}>
+                                    <div className="pint_mock_icon_container" data-tooltip-id="my-tooltip-1" onClick={() => remove_image(pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded)}>
                                         <img src={remove} alt="remove" className="pint_mock_icon_remove" /> 
                                     </div>
                                     : null
@@ -250,7 +252,7 @@ function Modal(props) {
                         <div className="side" id="left_side">
                             <div className="section1">
                                 { imageUploaded ? 
-                                    <div className="pint_mock_icon_container" onClick={() => remove_image(pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded)}>
+                                    <div className="pint_mock_icon_container" data-tooltip-id="my-tooltip-1" onClick={() => remove_image(pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded)}>
                                         <img src={remove} alt="remove" className="pint_mock_icon_remove" /> 
                                     </div>
                                     : null
@@ -310,6 +312,12 @@ function Modal(props) {
                 }
             </div>
             }
+
+            <ReactTooltip
+                id="my-tooltip-1"
+                place="bottom"
+                content="Remove Image"
+            />    
         </div>
     )
 }

@@ -17,6 +17,7 @@
     "react-select": "^5.8.0",
     "react-toastify": "^10.0.4",
     "react-toggle": "^4.1.3",
+    "react-tooltip": "^5.26.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
