@@ -5,6 +5,8 @@ import Book from '../models/book.js';
 
 const handlebooksRouter = express.Router();
 
+
+//if the isbn is already stored, send error
 handlebooksRouter.post('/addBook', async (req, res) => {
   try {
     const { userId, bookshelfType, title, cover, author, summary, isbn, subject } = req.body;
@@ -19,18 +21,29 @@ handlebooksRouter.post('/addBook', async (req, res) => {
     const savedBook = await newBook.save();
 
     if (userId && bookshelfType) {
-      const bookshelf = await Bookshelf.findOneAndUpdate(
-        { userId: userId, type: bookshelfType },
-        { $addToSet: { books: savedBook._id } }, // Add book to the bookshelf
-      );
-      
+      // Find the bookshelf
+      const bookshelf = await Bookshelf.findOne({ userId: userId, type: bookshelfType });
+
       if (!bookshelf) {
-        return res.status(404).json({ message: 'Bookshelf not found and could not be created' });
+        return res.status(404).json({ message: 'Bookshelf not found' });
       }
+
+      // Determine the next order value
+      let maxOrder = 0;
+      bookshelf.books.forEach(book => {
+        if (book.order >= maxOrder) {
+          maxOrder = book.order + 1;
+        }
+      });
+
+      // Add the new book with the next order value
+      bookshelf.books.push({ bookId: savedBook._id, order: maxOrder });
+      await bookshelf.save();
+
+      res.status(201).json({ message: 'Book added successfully', book: savedBook, bookshelf: bookshelf });
     } else {
       return res.status(400).json({ message: 'UserId and bookshelfType are required' });
     }
-    res.status(201).json({ message: 'Book added successfully', book: savedBook });
   } catch (error) {
     console.error('Error adding book:', error);
     res.status(500).json({ message: 'Failed to add book', error: error.message });
@@ -39,19 +52,47 @@ handlebooksRouter.post('/addBook', async (req, res) => {
 
 handlebooksRouter.post('/moveBook', async (req, res) => {
     try {
-        const { userId, bookId, fromShelf, toShelf } = req.body;
+        const { userId, bookId, fromShelf, toShelf, newOrder } = req.body;
+
+        const sourceShelf = await Bookshelf.findOne({ userId, type: fromShelf });
+        if (!sourceShelf) {
+          return res.status(404).json({ message: 'Source bookshelf not found' });
+        }
+        const bookToRemoveIndex = sourceShelf.books.findIndex(book => book.bookId.equals(bookId));
+        if (bookToRemoveIndex === -1) {
+          return res.status(404).json({ message: 'Book not found on shelf' });
+        }
+        const bookToRemoveOrder = sourceShelf.books[bookToRemoveIndex].order;
     
-        await Bookshelf.updateOne(
-          { userId: userId, type: fromShelf },
-          { $pull: { books: bookId } }
-        );
+        sourceShelf.books.splice(bookToRemoveIndex, 1);
     
-        await Bookshelf.updateOne(
-          { userId: userId, type: toShelf },
-          { $addToSet: { books: bookId } }, // $addToSet prevents duplicate entries
-        );
+        // Adjust the orders of the remaining books
+        sourceShelf.books.forEach(book => {
+          if (book.order > bookToRemoveOrder) {
+            book.order -= 1;
+          }
+        });
+        await sourceShelf.save();
+
+
+        const targetShelf = await Bookshelf.findOne({ userId, type: toShelf });
+        if (!targetShelf) {
+          return res.status(404).json({ message: 'Target bookshelf not found' });
+        }
+        targetShelf.books.forEach(book => {
+          if (book.order >= newOrder) {
+            book.order += 1;
+          }
+        });
     
-        res.status(200).json({ message: 'Book moved successfully' });
+        // Sort books by the updated order to maintain consistency
+        targetShelf.books.sort((a, b) => a.order - b.order);
+    
+        // Add the new book at its designated order
+        targetShelf.books.push({ bookId, order: newOrder });
+    
+        await targetShelf.save();
+        res.status(200).json({ message: 'Book moved successfully', fromShelf: sourceShelf, toShelf: targetShelf });
       } catch (error) {
         console.error('Error moving book:', error);
         res.status(500).json({ message: 'Failed to move book', error: error.message });
@@ -62,19 +103,51 @@ handlebooksRouter.post('/removeBook', async (req, res) => {
   try{
     const {userId, bookshelfType, bookId} = req.body;
 
-    const updatedBookshelf = await Bookshelf.findOneAndUpdate(
-      { userId: userId, type: bookshelfType }, // Match the bookshelf by userId and type
-      { $pull: { books: bookId } },
-      { new: true } 
-    );
-    if (!updatedBookshelf) {
-      return res.status(404).json({ message: 'Bookshelf not found or book not on shelf' });
+    const bookshelf = await Bookshelf.findOne({ userId: userId, type: bookshelfType });
+    if (!bookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found' });
     }
-    res.status(200).json({ message: 'Book removed successfully', bookshelf: updatedBookshelf });
+
+    // Find and remove the book from the bookshelf, and remember its order
+    const bookIndex = bookshelf.books.findIndex(b => b.bookId.toString() === bookId);
+    if (bookIndex === -1) {
+      return res.status(404).json({ message: 'Book not found on shelf' });
+    }
+    const removedBookOrder = bookshelf.books[bookIndex].order;
+    bookshelf.books.splice(bookIndex, 1);
+
+    // Adjust the order of the remaining books
+    bookshelf.books.forEach(book => {
+      if (book.order > removedBookOrder) {
+        book.order -= 1;
+      }
+    });
+
+    await bookshelf.save();
+    res.status(200).json({ message: 'Book removed successfully', bookshelf: bookshelf });
   }
   catch(error){
     console.error('Error deleting book:', error);
     res.status(500).json({ message: 'Failed to remove book', error: error.message });
+  }
+});
+
+handlebooksRouter.post('/clearBookshelf', async (req, res) => {
+  try{
+    const {userId, bookshelfType} = req.body;
+    const updatedBookshelf = await Bookshelf.findOneAndUpdate(
+      { userId: userId, type: bookshelfType },
+      { $set: { books: [] } }, 
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedBookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found' });
+    }
+    res.status(200).json({ message: 'Bookshelf cleared successfully', bookshelf: updatedBookshelf });
+  } catch(error){
+    console.error('Error clearing bookshelf:', error);
+    res.status(500).json({ message: 'Failed to clear bookshelf', error: error.message });
   }
 });
 

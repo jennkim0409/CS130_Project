@@ -57,10 +57,8 @@ function SignupPersonalize() {
                     cover: book.cover_url, 
                     author: book.author_name,
                     summary: book.summary,
-                    publish_date: book.publish_date,
                     isbn: book.isbn,
                     subject: book.subject,
-                    id_goodreads: book.id_goodreads
                 };
             });
 
@@ -93,8 +91,8 @@ function SignupPersonalize() {
                 toast.success("Successfully added book!");
                 setAddedBooks(prev => ({ ...prev, [bookToInsert.isbn]: true }));
     
-                // add max of 5 genres to additionalGenres
-                const genres = bookToInsert.subject.length > 5 ? bookToInsert.subject.slice(0, 5) : bookToInsert.subject;
+                // add max of 3 genres to additionalGenres
+                const genres = bookToInsert.subject.length > 3 ? bookToInsert.subject.slice(0, 3) : bookToInsert.subject;
                 setAdditionalGenres([...additionalGenres, genres]);
             })
             .catch(error => {
@@ -108,18 +106,25 @@ function SignupPersonalize() {
 
     /* Save the genre preferences and name */
     const save = () => {
-        // This is an array of the additional genres retrieved from their selected books (5 max per book)
+        // This is an array of the additional genres retrieved from their selected books (3 max per book)
         const condensedAdditionalGenres = [...new Set(additionalGenres.flat())];
         // This is an array of the genres they entered in Genre Preferences
         const condensedGenrePreferences = genrePreferences.map(obj => obj.value);
         
-        const combinedGenrePreferences = [...condensedAdditionalGenres, ...condensedGenrePreferences];
-        console.log(combinedGenrePreferences)
+        while (condensedGenrePreferences.length < 5 && condensedAdditionalGenres.length > 0) {
+            const randomIndex = Math.floor(Math.random() * condensedAdditionalGenres.length);
+            const randomElement = condensedAdditionalGenres[randomIndex];
+            if (!condensedGenrePreferences.includes(randomElement.toLowerCase())) {
+                condensedGenrePreferences.push(randomElement.toLowerCase()); // Add to condensedGenrePreferences in lowercase
+                condensedAdditionalGenres.splice(randomIndex, 1); // Remove the element from condensedAdditionalGenres
+            }
+        }
+        console.log(condensedGenrePreferences)
 
         // Save name and genre preferences
         const path = 'http://localhost:5555/api/user/set/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
         axios.patch(path,
-            { name: name, genrePrefs: combinedGenrePreferences },
+            { name: name, genrePrefs: condensedGenrePreferences },
             {
               headers: {
                 Authorization: localStorage.getItem("user_token")
@@ -129,6 +134,7 @@ function SignupPersonalize() {
         .then(response => {
             console.log("Name and genre preferences saved successfully: ", response.data);
             toast.success("Account preferences saved!");
+            localStorage.setItem('user_name', name);
         })
         .catch(error => {
             console.error("Error saving name & genre preferences: ", error);
