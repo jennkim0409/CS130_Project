@@ -225,34 +225,58 @@ const Bookshelf = () => {
 
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
     const overIndex = items[overContainer].findIndex(book => book.cover === overId);
- 
+
+    // update backend of book movement
     const endingShelf = activeContainer;
+
     // if the shelves are different, insert at active index
-    console.log("drag end: ")
+      // NOTE: this code inserts the book at the place it is *supposed* to be inserted
+      // -> in other words, it disregards the current visual bug where the book is inserted one index AFTER it is supposed to be
+      // -> ultimately, once that visual bug is fixed, this code will line up with visuals
     if (startingShelf != endingShelf) {
       const bookToMove = items[endingShelf].find(book => book.cover === id);
 
-      console.log("book to move: ");
-      console.log(bookToMove);
-      console.log("ending shelf is: ");
-      console.log(endingShelf);
-      console.log("ending index is: ") ;
-      console.log(activeIndex);
+      let bookData = {};
+      bookData.userId = localStorage.getItem("user_id").replace(/"/g, '');
+      bookData.bookId = bookToMove._id;
+      bookData.fromShelf = startingShelf === "readingList" ? "current" : "finished";
+      bookData.toShelf = endingShelf === "readingList" ? "current" : "finished";
+      bookData.newOrder = activeIndex;
 
-      // CALL DIANA API HERE using bookToMove, endingShelf, activeIndex
+      axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookData }, {
+        headers: {
+            Authorization: localStorage.getItem("user_token")
+        }
+      })
+      .then(response => {
+          console.log("Book successfully moved across shelves: ", response.data);
+      })
+      .catch(error => {
+          console.error("Error moving book across shelves: ", error.response);
+      });
     }
     // if shelves are the same, insert at the over index
     else {
       const bookToMove = items[startingShelf].find(book => book.cover === id);
 
-      console.log("book to move: ");
-      console.log(bookToMove);
-      console.log("starting & ending shelf: ");
-      console.log(startingShelf);
-      console.log("ending index is: ");
-      console.log(overIndex);
+      let bookData = {};
+      bookData.userId = localStorage.getItem("user_id").replace(/"/g, '');
+      bookData.bookId = bookToMove._id;
+      bookData.fromShelf = startingShelf === "readingList" ? "current" : "finished";
+      bookData.toShelf = bookData.fromShelf;
+      bookData.newOrder = overIndex;
 
-      // CALL DIANA API HERE using bookToMove, endingShelf, activeIndex
+      axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookData }, {
+        headers: {
+            Authorization: localStorage.getItem("user_token")
+        }
+      })
+      .then(response => {
+          console.log("Book successfully moved within the shelf: ", response.data);
+      })
+      .catch(error => {
+          console.error("Error moving book within the shelf: ", error.response);
+      });
     }
     
     if (activeIndex !== overIndex) {
