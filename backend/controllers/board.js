@@ -123,4 +123,13 @@ boardRouter.post('/addItem', async (req, res) => {
     }
 });
 
+boardRouter.post('/updateItem', async (req, res) => {
+    try{
+        const {} = req.body;
+        res.status(200).json({ message: 'Item updated successfully', item });
+    } catch(error){
+        res.status(500).json({ message: 'Error updating item', error: error.message });
+    }
+})
+
 export default boardRouter;
