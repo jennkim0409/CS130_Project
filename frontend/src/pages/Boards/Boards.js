@@ -19,40 +19,43 @@ function Boards() {
     // runs when component mounts
     useEffect(() => {
         const fetchBoardsData = async () => {
-        try {
-            const response = await axios.get('http://localhost:5555/api/handlebooks/getBooks/', {
-                params: { userId: localStorage.getItem("user_id").replace(/"/g, ''), type: 'current' },
-                headers: { Authorization: localStorage.getItem("user_token") }
-            });
-            const currBooks = response.data;
-            console.log("curr books: ");
-            console.log(currBooks);
+            try {
+                const shelves = ["current", "finished"];
+                const promises = shelves.map(async (shelfName) => {
+                    const response = await axios.get('http://localhost:5555/api/handlebooks/getBooks/', {
+                        params: { userId: localStorage.getItem("user_id").replace(/"/g, ''), type: shelfName },
+                        headers: { Authorization: localStorage.getItem("user_token") }
+                    });
+                    return response.data;
+                });
+            
+                const results = await Promise.all(promises);
+                const currBooks = results.flat();
+            
+                console.log("results: ");
+                console.log(currBooks);
 
-            // adjust formatting to match frontend
-            currBooks.forEach(book => {
-                book.label = book.title;
-            });
+                // adjust formatting to match frontend
+                currBooks.forEach(book => {
+                    book.label = book.title;
+                });
 
-            // filter books based on whether or not they have boards
-            let updatedReading = [...reading];
-            let updatedSelectedBooks = [...selectedBooks];
+                // filter books based on whether or not they have boards
+                let updatedReading = [...reading];
+                let updatedSelectedBooks = [...selectedBooks];
 
-            currBooks.forEach(book => {
-                if (book.hasOwnProperty("boardId")) {
-                    updatedSelectedBooks.push(book);
-                }
-                else {
+                currBooks.forEach(book => {
+                    if (book.hasOwnProperty("boardId")) {
+                        updatedSelectedBooks.push(book);
+                    }   
                     updatedReading.push(book);
-                }
-            });
-            setReading(updatedReading);
-            setSelectedBooks(updatedSelectedBooks);
-        } 
-        catch (error) {
-            console.error("Error fetching boards data: ", error);
-        }
+                });
+                setReading(updatedReading);
+                setSelectedBooks(updatedSelectedBooks);
+            } catch (error) {
+                console.error("Error fetching boards data: ", error);
+            }
         };
-
         fetchBoardsData();
     }, []);
 
@@ -98,24 +101,23 @@ function Boards() {
     }
 
     const removeBook = async (opt) => {
-        console.log(opt)
+        const bookToRemove = (selectedBooks.filter(book => book._id === opt))[0];
+
         setSelectedBooks(currentBooks =>
             currentBooks.filter(book => book._id !== opt)
         );
 
-        // TO DO: continue once diana updates route so that it clears boardId field for a given book as well
-        // remove board for this book in backend
-        // try {
-        //     const response = await axios.post('http://localhost:5555/api/board/removeBoard/', { boardId: opt.boardId }, 
-        //     {
-        //         headers: { Authorization: localStorage.getItem("user_token") }
-        //     });
-        //     console.log(response.data);
+        try {
+            const response = await axios.post('http://localhost:5555/api/board/removeBoard/', { boardId: bookToRemove.boardId }, 
+            {
+                headers: { Authorization: localStorage.getItem("user_token") }
+            });
+            console.log(response.data);
             
-        // } 
-        // catch (error) {
-        //     console.error("Error removing board: ", error);
-        // }
+        } 
+        catch (error) {
+            console.error("Error removing board: ", error);
+        }
     };
 
     const selectStyles = {
