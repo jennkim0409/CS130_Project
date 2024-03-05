@@ -223,12 +223,13 @@ function Modal(props) {
                                         <option value="medium">Medium</option>
                                         <option value="large">Large</option>
                                     </select>
-                                    <div onClick={() => save_pin(pinDetails, props.add_pin, id)} className="save_pin">Save</div>
+                                    
                                 </div>
                             </div>
                             <div className="section2">
                                 <input placeholder="Add a title" type="text" className="new_pin_input" id="pin_title" />
                                 <textarea placeholder="What is this pin about?" type="text" className="new_pin_input" id="pin_description" />
+                                <div onClick={() => save_pin(pinDetails, props.add_pin, id)} className="save_pin">Save</div>
                             </div>
                         </div>
                     </div>
@@ -300,12 +301,12 @@ function Modal(props) {
                                         <option value="medium">Medium</option>
                                         <option value="large">Large</option>
                                     </select>
-                                    <div className="update_pin" onClick={() => update_pin(pinDetails, props.change_pin)}>Update</div>
                                 </div>
                             </div>
                             <div className="section2">
                                 <input placeholder="Add a title" type="text" className="new_pin_input" id="pin_title" value={pinDetails.title} onChange={(e) => setPinDetails({ ...pinDetails, title: e.target.value })}/>
                                 <textarea placeholder="What is this pin about?" type="text" className="new_pin_input" id="pin_description" value={pinDetails.description} onChange={(e) => setPinDetails({ ...pinDetails, description: e.target.value })}/>
+                                <div className="update_pin" onClick={() => update_pin(pinDetails, props.change_pin)}>Update</div>
                             </div>
                         </div>
                     </div>
