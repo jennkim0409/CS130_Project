@@ -17,7 +17,7 @@ const boardSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Item'
         }],
-    visibility:{
+    publicVisibility:{
         type: Boolean
     }
   });
