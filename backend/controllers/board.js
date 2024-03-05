@@ -107,9 +107,9 @@ boardRouter.post('/removeItem', async (req, res) => {
     // (and add it to the Items table in DB)
 boardRouter.post('/addItem', async (req, res) => {
     try {
-        const {boardId, title, ordering_id, description, pin_size, quote, text_color} = req.body;
+        const {boardId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
 
-        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color });
+        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color, img_blob });
         const savedItem = await newItem.save();
 
         const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true });

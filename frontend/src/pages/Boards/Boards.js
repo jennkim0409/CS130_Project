@@ -1,35 +1,95 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "./Boards.css";
+import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select';
 import remove from '../../assets/remove.png';
 
 /* Idea is that this array is already created and utilized by the 
     Reading bookshelf in Shelves. And every time a book already has a pinterest board,
-    it'll be removed from this array. The value is the key value that we use to 
+    it'll be removed from this array. The _id is the key _id that we use to 
     identify the books from backend
 */
-const reading = [
-    {label: "Cat in the Hat", value: "2123521", bookcover: "https://m.media-amazon.com/images/I/41j05R2RKJL._SY445_SX342_.jpg" },
-    {label: "The Giving Tree", value: "123512", bookcover: "https://m.media-amazon.com/images/I/41fR2KV7jzL._SY445_SX342_.jpg" },
-    {label: "Atomic Habits", value: "584982", bookcover: "https://m.media-amazon.com/images/W/MEDIAX_849526-T3/images/I/51ZJ9RjiC0L._SY445_SX342_.jpg" },
-    {label: "The Hunger Games", value: "346345", bookcover: "https://m.media-amazon.com/images/I/51vOc7NtICL.jpg" },
-    {label: "Pachinko", value: "6786786", bookcover: "https://m.media-amazon.com/images/I/41JF5hKN8EL.jpg" },
-    {label: "If Cats Disappeared from the World", value: "938124", bookcover:  "https://m.media-amazon.com/images/W/MEDIAX_849526-T3/images/I/71tQ71QaNML._SY522_.jpg"},
-];
-
 function Boards() {
     const navigate = useNavigate();
     const [selectedBook, setSelectedBook] = useState(null); // track current selection
     const [selectedBooks, setSelectedBooks] = useState([]); // track books that are selected to have board page
+    const [reading, setReading] = useState([]); // track books that are selected to have board page
 
-    const createBoard = (opt) => {
+    // runs when component mounts
+    useEffect(() => {
+        const fetchBoardsData = async () => {
+        try {
+            const response = await axios.get('http://localhost:5555/api/handlebooks/getBooks/', {
+                params: { userId: localStorage.getItem("user_id").replace(/"/g, ''), type: 'current' },
+                headers: { Authorization: localStorage.getItem("user_token") }
+            });
+            const currBooks = response.data;
+            console.log("curr books: ");
+            console.log(currBooks);
+
+            // adjust formatting to match frontend
+            currBooks.forEach(book => {
+                book.label = book.title;
+            });
+
+            // filter books based on whether or not they have boards
+            let updatedReading = [...reading];
+            let updatedSelectedBooks = [...selectedBooks];
+
+            currBooks.forEach(book => {
+                if (book.hasOwnProperty("boardId")) {
+                    updatedSelectedBooks.push(book);
+                }
+                else {
+                    updatedReading.push(book);
+                }
+            });
+            setReading(updatedReading);
+            setSelectedBooks(updatedSelectedBooks);
+        } 
+        catch (error) {
+            console.error("Error fetching boards data: ", error);
+        }
+        };
+
+        fetchBoardsData();
+    }, []);
+
+    // remove later
+    useEffect(() => {
+        console.log("reading changed: ", reading);
+    }, [reading]); 
+
+    // remove later
+    useEffect(() => {
+        console.log("selected books changed: ", selectedBooks);
+    }, [selectedBooks]);
+
+    const createBoard = async (opt) => {
         // check if the book is not already in selectedBooks
-        if (!selectedBooks.find(book => book.value === opt.value)) {
+        if (!selectedBooks.find(book => book._id === opt._id)) {
             // find the book in the reading array and add to selectedBooks array
-            const selectedBook = reading.find(book => book.value === opt.value);
-            setSelectedBooks([...selectedBooks, selectedBook]);
-            // Optionally navigate or perform other actions here
+            const selectedBook = reading.find(book => book._id === opt._id);
+            
+            // add board for this book in backend
+            let boardData = {};
+            boardData.bookId = selectedBook._id;
+            boardData.bookTitle = selectedBook.title;
+            boardData.bookAuthor = selectedBook.author;
+            boardData.publicVisibility = true; // update if we give user option to set boards private/public
+
+            try {
+                const response = await axios.post('http://localhost:5555/api/board/addBoard/', {...boardData}, 
+                {
+                    headers: { Authorization: localStorage.getItem("user_token") }
+                });
+                selectedBook.boardId = response.data.board.id;
+                setSelectedBooks([...selectedBooks, selectedBook]);
+            } 
+            catch (error) {
+                console.error("Error creating board: ", error);
+            }
         }
         // reset selection so that the select dropbox goes back to default look
         setSelectedBook(null);
@@ -37,13 +97,25 @@ function Boards() {
         // navigate(`/boards/${book_id}`);
     }
 
-    const removeBook = (opt) => {
+    const removeBook = async (opt) => {
         console.log(opt)
         setSelectedBooks(currentBooks =>
-            currentBooks.filter(book => book.value !== opt)
+            currentBooks.filter(book => book._id !== opt)
         );
 
-        {/* include other board to account for removing book board from database */}
+        // TO DO: continue once diana updates route so that it clears boardId field for a given book as well
+        // remove board for this book in backend
+        // try {
+        //     const response = await axios.post('http://localhost:5555/api/board/removeBoard/', { boardId: opt.boardId }, 
+        //     {
+        //         headers: { Authorization: localStorage.getItem("user_token") }
+        //     });
+        //     console.log(response.data);
+            
+        // } 
+        // catch (error) {
+        //     console.error("Error removing board: ", error);
+        // }
     };
 
     const selectStyles = {
@@ -64,7 +136,7 @@ function Boards() {
         book board exists) then make it disabled */
     const modifiedOptions = reading.map(book => ({
         ...book,
-        isDisabled: selectedBooks.some(selectedBook => selectedBook.value === book.value),
+        isDisabled: selectedBooks.some(selectedBook => selectedBook._id === book._id),
     }));
 
     return(
@@ -96,19 +168,19 @@ function Boards() {
 
             <div className="selectedBooks">
                 {selectedBooks.map(book => (
-                    <div key={book.value} className="selectedBook">
+                    <div key={book._id} className="selectedBook">
                         <div className="book-image-container">
                             <img 
                             className="bookImage" 
-                            src={book.bookcover} 
+                            src={book.cover} 
                             alt={book.label}
-                            onClick={()=>navigate(`/boards/${book.value}`)}
+                            onClick={()=>navigate(`/boards/${book.boardId}`)}
                             />
                             <div 
                                 className="remove-button" 
                                 onClick={() => {
                                     if (window.confirm("Are you sure you want to delete this book board?")) {
-                                        removeBook(book.value)
+                                        removeBook(book._id)
                                     }
                                 }}
                             >
