@@ -1,4 +1,3 @@
-import Select from 'react-select';
 import React, { useState, useEffect } from "react";
 import './SignupPersonalize.css'
 import { toast, ToastContainer } from 'react-toastify';
@@ -7,44 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import SearchBooks from '../SearchBooks/SearchBooks';
 import axios from 'axios';
 import { set } from 'mongoose';
+import GenrePreferences from '../GenrePreferences/GenrePreferences';
 
-const genreOptions = [
-    { label: 'fiction', value: 'fiction' },
-    { label: 'mystery', value: 'mystery' },
-    { label: 'romance', value: 'romance' },
-    { label: 'science fiction', value: 'science fiction' },
-    { label: 'fantasy', value: 'fantasy' },
-    { label: 'thriller', value: 'thriller' },
-    { label: 'horror', value: 'horror' },
-    { label: 'historical fiction', value: 'historical fiction' },
-    { label: 'non-fiction', value: 'non-fiction' },
-    { label: 'biography', value: 'biography' },
-    { label: 'autobiography', value: 'autobiography' },
-    { label: 'memoir', value: 'memoir' },
-    { label: 'self-help', value: 'self-help' },
-    { label: 'young adult', value: 'young adult' },
-    { label: "children's literature", value: "children's literature" },
-    { label: 'poetry', value: 'poetry' },
-    { label: 'comedy', value: 'comedy' },
-    { label: 'drama', value: 'drama' },
-    { label: 'adventure', value: 'adventure' },
-    { label: 'crime', value: 'crime' },
-];
-
-// style for react-select component
-const selectStyles = {
-    container: (provided) => ({
-        ...provided,
-        width: '60%', 
-        minWidth: '300px',
-        textAlign: "center",
-    }),
-    control: (provided) => ({
-        ...provided,
-        borderRadius: "10px",
-        width: '100%',
-    }),
-};
 // overriding leftSide style
 const leftSideStyle = {
     display: 'flex',
@@ -94,10 +57,8 @@ function SignupPersonalize() {
                     cover: book.cover_url, 
                     author: book.author_name,
                     summary: book.summary,
-                    publish_date: book.publish_date,
                     isbn: book.isbn,
                     subject: book.subject,
-                    id_goodreads: book.id_goodreads
                 };
             });
 
@@ -130,8 +91,8 @@ function SignupPersonalize() {
                 toast.success("Successfully added book!");
                 setAddedBooks(prev => ({ ...prev, [bookToInsert.isbn]: true }));
     
-                // add max of 5 genres to additionalGenres
-                const genres = bookToInsert.subject.length > 5 ? bookToInsert.subject.slice(0, 5) : bookToInsert.subject;
+                // add max of 3 genres to additionalGenres
+                const genres = bookToInsert.subject.length > 3 ? bookToInsert.subject.slice(0, 3) : bookToInsert.subject;
                 setAdditionalGenres([...additionalGenres, genres]);
             })
             .catch(error => {
@@ -145,18 +106,25 @@ function SignupPersonalize() {
 
     /* Save the genre preferences and name */
     const save = () => {
-        // This is an array of the additional genres retrieved from their selected books (5 max per book)
+        // This is an array of the additional genres retrieved from their selected books (3 max per book)
         const condensedAdditionalGenres = [...new Set(additionalGenres.flat())];
         // This is an array of the genres they entered in Genre Preferences
         const condensedGenrePreferences = genrePreferences.map(obj => obj.value);
         
-        const combinedGenrePreferences = [...condensedAdditionalGenres, ...condensedGenrePreferences];
-        console.log(combinedGenrePreferences)
+        while (condensedGenrePreferences.length < 5 && condensedAdditionalGenres.length > 0) {
+            const randomIndex = Math.floor(Math.random() * condensedAdditionalGenres.length);
+            const randomElement = condensedAdditionalGenres[randomIndex];
+            if (!condensedGenrePreferences.includes(randomElement.toLowerCase())) {
+                condensedGenrePreferences.push(randomElement.toLowerCase()); // Add to condensedGenrePreferences in lowercase
+                condensedAdditionalGenres.splice(randomIndex, 1); // Remove the element from condensedAdditionalGenres
+            }
+        }
+        console.log(condensedGenrePreferences)
 
         // Save name and genre preferences
         const path = 'http://localhost:5555/api/user/set/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
         axios.patch(path,
-            { name: name, genrePrefs: combinedGenrePreferences },
+            { name: name, genrePrefs: condensedGenrePreferences },
             {
               headers: {
                 Authorization: localStorage.getItem("user_token")
@@ -166,6 +134,7 @@ function SignupPersonalize() {
         .then(response => {
             console.log("Name and genre preferences saved successfully: ", response.data);
             toast.success("Account preferences saved!");
+            localStorage.setItem('user_name', name);
         })
         .catch(error => {
             console.error("Error saving name & genre preferences: ", error);
@@ -202,28 +171,7 @@ function SignupPersonalize() {
                                 />
                             </div>
                             <div className="genre-select">
-                                <h4>Genre Preferences</h4>
-                                <Select 
-                                    className='dropdown' 
-                                    options={genreOptions} 
-                                    onChange={opt => setGenrePreferences(opt)}
-                                    isMulti
-                                    menuPlacement="auto"
-                                    styles={selectStyles}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        borderRadius: 0,
-                                        colors: {
-                                            ...theme.colors,
-                                            /* when hovering */
-                                            primary25: '#97AD97',
-                                            /* when clicking */
-                                            primary50: '#97AD97',
-                                            /* border color of the select dropbox */
-                                            primary: '#F0ABFB',
-                                        },
-                                        })}
-                                />
+                                <GenrePreferences return_genres={setGenrePreferences}/>
                             </div>
                         </div>
                     </div>

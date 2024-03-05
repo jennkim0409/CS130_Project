@@ -10,6 +10,7 @@ import userRouter from "./controllers/userRouter.js"
 import handlebooksRouter from "./controllers/handle_books.js";
 // import fetchBookInfoRouter from "./controllers/fetchBookInfo.js";
 import authenticateMiddleware from "./utils/middleware/auth.js";
+import recommendationRouter from "./controllers/recommendationRouter.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(express.json());
 app.use('/api/*', authenticateMiddleware);
 app.use('/api/user', userRouter);
 app.use('/api/handlebooks', handlebooksRouter);
+app.use('/api/recommend', recommendationRouter);
 app.use('/auth/register', registerRouter)
 app.use('/auth/login', loginRouter)
 app.use('/api/board', boardRouter);

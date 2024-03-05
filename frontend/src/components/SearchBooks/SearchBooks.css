@@ -39,6 +39,8 @@
     bottom: 0px;
     border-radius: 30px;
     background-color: #154A14;
+    padding: 5px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
     color: white;
 }
 
@@ -53,6 +55,8 @@
     bottom: 0px;
     border-radius: 30px;
     background-color: #154a1497;
+    padding: 5px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
     color: white;
 }
 
