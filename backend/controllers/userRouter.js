@@ -48,28 +48,49 @@ userRouter.patch("/delete-genres/:user_id", async (request, response) => {
 
 userRouter.patch("/resetpass/:user_id", async (request, response) => {
     const user_id = request.params.user_id
-    const { username, new_password} = request.body
+    const { currentPassword, newPassword, re_newPassword} = request.body
 
     try {
-        if(!username || !new_password){
-            response.status(400)
-                .json({message: "username and password are required."});
+        if(!user_id || !currentPassword|| !newPassword || !re_newPassword){
+            return response.status(400)
+                .json({message: "user ID, current password, new password and re-entered new password are required"});
           }
-
-        const hashedPassword = await bcrypt.hash(new_password, 10);
-
-        const user = await User.findOneAndUpdate(
-            { _id: user_id},
-            { $set: {passwordHash: hashedPassword}},
-            {new: true}
-        );
+    
+        const user = await User.findOne({ _id: user_id });
 
         if(!user){
-            return response.status(404).json({message: "Invalid User"});
+            return response.status(404).json({message: "User not found"});
         }
-    
-        response.status(201).json({ message: 'Changed Password Successfully', user});
+        
+        const passwordCorrect = user === null
+          ? false
+          : await bcrypt.compare(currentPassword, user.passwordHash);
 
+        if(!passwordCorrect){
+            return response.status(401).json({
+                message: 'Entered Invalid Current Password',
+                error: 'Invalid password'
+            });
+        }
+
+        const matchPasswords = newPassword == re_newPassword
+
+        if(!matchPasswords){
+            return response.status(401).json({ 
+                message: 'Passwords do not match', 
+                error: 'Passwords do not match'
+            });
+        }
+        
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const updated_user = await User.findOneAndUpdate(
+                    { _id: user_id},
+                    { $set: {passwordHash: hashedPassword}},
+                    {new: true}
+            );
+
+        return response.status(201).json({ message: 'Changed Password Successfully', updated_user});
     } catch(error){
         console.log(error)
         return response.status(500).json({message: "Server Error"})
