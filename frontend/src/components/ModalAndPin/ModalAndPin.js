@@ -27,11 +27,20 @@ class ModalAndPin extends React.Component {
             console.log("pins from api: ");
             console.log(pins);
 
-            // TO DO: wait for diana to populate this with an array of items
-            // instead of array of item objects
+            // populate pins from DB
+            const new_pins = [];
 
-            // then, assign these to the pins field in this.state.pins
-            // hopefully this populates page with pre-existing pins!
+            // key is an ordering attribute of this pin
+            // we use the length of the state pins since this keeps increasing with every new pin
+            pins.forEach((pinDetails) => {
+                new_pins.push(
+                    <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} removePin={this.remove_pin}/>
+                )
+            });
+
+            this.setState({
+                pins: new_pins
+            });
         } 
         catch (error) {
             console.error("Error fetching pins data: ", error);
@@ -42,7 +51,7 @@ class ModalAndPin extends React.Component {
         this.setState(async _state => {
             const new_pins = [
                 ..._state.pins
-            ]
+            ]  
 
             // key is an ordering attribute of this pin
             // we use the length of the state pins since this keeps increasing with every new pin
@@ -54,7 +63,8 @@ class ModalAndPin extends React.Component {
             pinDetails.boardId = this.state.boardId; 
 
             // TO DO: the actual imb_blob makes the payload too large for the HTTP library to handle
-            // we need to do some additional processing, such as compressing the image          
+            // we need to do some additional processing, such as compressing the image
+            // (below is hardcoded image link for now)          
             pinDetails.img_blob = "https://m.media-amazon.com/images/W/MEDIAX_849526-T3/images/I/71tQ71QaNML._SY522_.jpg";
             
             try {
@@ -69,6 +79,19 @@ class ModalAndPin extends React.Component {
                 console.error("Error adding pin: ", error);
             }
 
+            // @jenn read here
+
+            // if I add this, then the pin will show properly upon being added
+            // but not sure if this affects other things...
+
+            // this.setState({
+            //     pins: new_pins
+            // });
+
+            // I think I broke something relating to this functionality
+            // when I add a pin, it no longer appears unless I refresh page and it's fetched from backend
+            // I think it's no longer storing them in state
+            // which is affecting how ordering_id is incremented
             return {
                 pins: new_pins,
                 show_modal: false
@@ -76,11 +99,31 @@ class ModalAndPin extends React.Component {
         })
     }
 
-    remove_pin = (orderingId) => {
+    remove_pin = async (orderingId) => {
+        // @ kaylee TO DO:
+        // when ordering_id incrementing thing is fixed, this code below can be uncommented
+        // const pinRemoveData = this.state.pins.filter(pinElement => pinElement.props.pinDetails.ordering_id === orderingId);
+        const pinRemoveData = this.state.pins[0];
+        const pinToRemove = pinRemoveData.props.pinDetails;
+        console.log("pin to remove: ");
+        console.log(pinToRemove);
+
         this.setState(prevState => ({
             pins: prevState.pins.filter(pinElement => pinElement.props.pinDetails.ordering_id !== orderingId)
         }));
-        // TO DO: update DB when pin is removed
+
+        // remove pin in backend
+        try {
+            const response = await axios.post('http://localhost:5555/api/board/removeItem/', 
+            {boardId: this.state.boardId, itemId: pinToRemove.id}, 
+            {
+                headers: { Authorization: localStorage.getItem("user_token") }
+            });
+            console.log(response.data);
+        } 
+        catch (error) {
+            console.error("Error removing pin: ", error);
+        }
     }
 
     render() {
