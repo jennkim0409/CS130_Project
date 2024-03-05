@@ -4,14 +4,25 @@ const { Schema } = mongoose;
 
 // id handled automatically
 const itemSchema = new Schema({
-    type: {
-        type: String,
-        required: true,
-        enum: ['text', 'image']
+    title: {
+      type: String,
+      required: true
     },
-    data: {
-        type: String, // both text & images stored as strings
-        required: true
+    ordering_id: {
+      type: Number,
+      required: true
+    },
+    description: {
+      type: String
+    },
+    pin_size: {
+      type: String
+    },
+    quote: {
+      type: String
+    },
+    text_color: {
+      type: String
     }
   });
 

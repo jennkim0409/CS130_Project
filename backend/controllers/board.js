@@ -7,11 +7,12 @@ const boardRouter = express.Router();
 
 boardRouter.post('/addBoard', async (req, res) => {
     try {
-        const { bookId, bookTitle, bookAuthor } = req.body;
+        const { bookId, bookTitle, bookAuthor, publicVisibility } = req.body;
 
         const newBoard = new Board({
             bookTitle,
-            bookAuthor
+            bookAuthor,
+            publicVisibility,
         });
 
         const savedBoard = await newBoard.save();
@@ -39,12 +40,17 @@ boardRouter.post('/removeBoard', async(req, res) => {
         if (!board) {
             return res.status(404).json({ message: 'Board not found' });
         }
+        await Book.updateMany(
+            { boardId: boardId },
+            { $unset: { boardId: "" } } // Remove the boardId field
+        );
         await Item.deleteMany({ _id: { $in: board.items } });
         await Board.findByIdAndDelete(boardId);
 
         res.status(200).json({ message: 'Board and all associated items have been removed successfully' });
     }
     catch(error){
+        console.error('Error removing board:', error);
         res.status(500).json({ message: 'Error removing board', error: error.message });
     }
 });
@@ -53,8 +59,10 @@ boardRouter.post('/removeBoard', async(req, res) => {
 // route: given board ID, get that board
 boardRouter.get('/getBoard', async (req,res) => {
     try {
-        const {boardId} = req.body;
-        const board = await Board.findById(boardId);
+        const {boardId} = req.query;
+        const board = await Board.findById(boardId)
+            .populate('items')
+            .select('bookTitle bookAuthor items publicVisibility');
         if(!board){
             return res.status(404).json({ message: 'Board not found' });
         }
@@ -65,6 +73,25 @@ boardRouter.get('/getBoard', async (req,res) => {
     }
 });
 
+
+boardRouter.get('/getBoardsByBook', async (req, res) => {
+    try{
+        const {userId, bookTitle, bookAuthor} = req.query;
+        const boards = await Board.find({
+            userId: { $ne: userId }, // Exclude boards that belong to the user
+            bookTitle: bookTitle,
+            bookAuthor: bookAuthor,
+            publicVisibility: true
+        }).populate('items');
+
+        if (!boards || boards.length === 0) {
+            return res.status(404).json({ message: 'No boards found for the given book' });
+        }
+        res.json(boards);
+    } catch(error){
+        res.status(500).json({ message: 'Error getting boards', error: error.message });
+    }
+});
 
 // route: given board ID and ID of an item in that board, remove that item from the board's list of items
     // (and delete that item from the Items table in DB)
@@ -87,9 +114,9 @@ boardRouter.post('/removeItem', async (req, res) => {
     // (and add it to the Items table in DB)
 boardRouter.post('/addItem', async (req, res) => {
     try {
-        const {boardId, type, data} = req.body;
+        const {boardId, title, ordering_id, description, pin_size, quote, text_color} = req.body;
 
-        const newItem = new Item({ type, data });
+        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color });
         const savedItem = await newItem.save();
 
         const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true });
