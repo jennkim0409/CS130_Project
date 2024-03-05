@@ -40,12 +40,17 @@ boardRouter.post('/removeBoard', async(req, res) => {
         if (!board) {
             return res.status(404).json({ message: 'Board not found' });
         }
+        await Book.updateMany(
+            { boardId: boardId },
+            { $unset: { boardId: "" } } // Remove the boardId field
+        );
         await Item.deleteMany({ _id: { $in: board.items } });
         await Board.findByIdAndDelete(boardId);
 
         res.status(200).json({ message: 'Board and all associated items have been removed successfully' });
     }
     catch(error){
+        console.error('Error removing board:', error);
         res.status(500).json({ message: 'Error removing board', error: error.message });
     }
 });
@@ -55,7 +60,9 @@ boardRouter.post('/removeBoard', async(req, res) => {
 boardRouter.get('/getBoard', async (req,res) => {
     try {
         const {boardId} = req.query;
-        const board = await Board.findById(boardId);
+        const board = await Board.findById(boardId)
+            .populate('items')
+            .select('bookTitle bookAuthor items publicVisibility');
         if(!board){
             return res.status(404).json({ message: 'Board not found' });
         }
@@ -75,7 +82,7 @@ boardRouter.get('/getBoardsByBook', async (req, res) => {
             bookTitle: bookTitle,
             bookAuthor: bookAuthor,
             publicVisibility: true
-        });
+        }).populate('items');
 
         if (!boards || boards.length === 0) {
             return res.status(404).json({ message: 'No boards found for the given book' });
