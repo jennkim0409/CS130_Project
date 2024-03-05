@@ -205,11 +205,11 @@ const Recommendations = () => {
               <Photo key={book.cover} url={book.cover} index={index} height= '18vw' width= '12vw' />
               {/* book info */} 
               <div style= {{ marginLeft: '5%' }}>
-                <h3 style= {{ margin: '0px' }} >{book.title}</h3>
+                <h3 style= {{ margin: '0px', width: '40vw' }} >{book.title}</h3>
                 <h5 style= {{ margin: '0px' }}>{book.author}</h5>
                 <h5 style= {{ width: '40vw' }}>{book.summary[0]}</h5>
                 {/* show max 10 subjects per book */} 
-                <h5>Subjects: {book.subject.length > 10 ? book.subject.slice(0, 10).join(", ") : book.subject.join(", ")}</h5>
+                <h5 style= {{ width: '40vw' }}>Subjects: {book.subject.length > 10 ? book.subject.slice(0, 10).join(", ") : book.subject.join(", ")}</h5>
               </div>
               {/* save button */} 
               {/* @ charlene TO DO: also button dimensions here */} 
