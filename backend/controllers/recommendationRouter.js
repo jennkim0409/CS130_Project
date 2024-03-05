@@ -84,6 +84,7 @@ const searchBookByGenre = async(genre) => {
     const limit = 10;
     const url = `${baseURL}/${genre}.json?limit=${limit}`;
     console.log(`Searching for books in genre: ${genre}`);
+    const book_details = [];
     try{
         const response = await fetch(url);
         const data = await response.json();
@@ -118,16 +119,11 @@ recommendationRouter.post('/:userId', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
         const genrePrefs = user.genrePrefs;
-        const recommendedBooks = [];
-        for(let genre of genrePrefs){
-            let books = await searchBookByGenre(genre);
-            console.log((books.length))
-            if((books.length === 0)){
-                continue;
-            }
-            recommendedBooks.push(...books);
-            // console.log((recommendedBooks.length))
-        }
+        const genrePromises = genrePrefs.map(genre => searchBookByGenre(genre));
+        const genreBooks = await Promise.all(genrePromises);
+
+        const recommendedBooks = genreBooks.flat();
+        console.log(recommendedBooks.length)
         res.json(recommendedBooks)
 
 
