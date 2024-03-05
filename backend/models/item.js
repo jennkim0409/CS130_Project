@@ -23,6 +23,9 @@ const itemSchema = new Schema({
     },
     text_color: {
       type: String
+    },
+    img_blob :{
+      type: String
     }
   });
 

@@ -75,7 +75,7 @@ boardRouter.get('/getBoardsByBook', async (req, res) => {
             bookTitle: bookTitle,
             bookAuthor: bookAuthor,
             publicVisibility: true
-        });
+        }).populate('items');
 
         if (!boards || boards.length === 0) {
             return res.status(404).json({ message: 'No boards found for the given book' });
@@ -107,12 +107,12 @@ boardRouter.post('/removeItem', async (req, res) => {
     // (and add it to the Items table in DB)
 boardRouter.post('/addItem', async (req, res) => {
     try {
-        const {boardId, title, ordering_id, description, pin_size, quote, text_color} = req.body;
+        const {boardId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
 
-        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color });
+        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color, img_blob });
         const savedItem = await newItem.save();
 
-        const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true });
+        const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true }).populate('items');
         if(!board){
             return res.status(404).json({ message: 'Board not found' });
         }
@@ -125,8 +125,28 @@ boardRouter.post('/addItem', async (req, res) => {
 
 boardRouter.post('/updateItem', async (req, res) => {
     try{
-        const {} = req.body;
-        res.status(200).json({ message: 'Item updated successfully', item });
+        const {itemId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
+        let updateItem = {};
+        
+        if (title !== null) updateItem.title = title;
+        if (ordering_id !== null) updateItem.ordering_id = ordering_id;
+        if (description !== null) updateItem.description = description;
+        if (pin_size !== null) updateItem.pin_size = pin_size;
+        if (quote !== null) updateItem.quote = quote;
+        if (text_color !== null) updateItem.text_color = text_color;
+        if (img_blob !== null) updateItem.img_blob = img_blob;
+
+        const updatedItem = await Item.findByIdAndUpdate(
+            itemId,
+            { $set: updateItem },
+            { new: true, runValidators: true, omitUndefined: true } // Return the updated document and run schema validators
+        );
+
+        if (!updatedItem) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({ message: 'Item updated successfully', item: updatedItem });
     } catch(error){
         res.status(500).json({ message: 'Error updating item', error: error.message });
     }
