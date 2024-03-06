@@ -51,7 +51,7 @@ function Pin(props) {
         <div className = {`card card_${props.pinDetails.pin_size}`}>
             <div className="pin_title">{props.pinDetails.title}</div>
 
-            <div className="pin_modal">
+            <div className="pin_modal" onClick={() => props.editPin(props.pinDetails)}>
                 <div className="modal_head">
                     <div className="pint_mock_icon_container" onClick={() => {
                         if (window.confirm("Are you sure you want to delete this pin?")) {

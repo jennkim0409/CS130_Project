@@ -132,25 +132,20 @@
     height: 100%;
     background-color: #EFEFEF;
     border: none;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-radius: 8px;
     text-align: center;
     outline: none;
     font-size: 14px;
 }
 
-#right_side .section1 .select_size .save_pin {
-    width: 30%;
-    height: 100%;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-
+#right_side .section2 .save_pin, #right_side .section2 .update_pin {
+    padding: 10px;
+    border-radius: 10px;
     font-size: 16px;
     font-weight: 700px;
     cursor: pointer;
     background-color: #337032;
     color: white;
-
     justify-content: center;
     align-items: center;
     display: flex;
@@ -218,4 +213,8 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+
+.add_pin_details_text textarea, .section2 textarea {
+    font-family: 'Inter', Arial;
 }
