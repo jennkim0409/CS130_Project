@@ -7,27 +7,68 @@ import "react-toggle/style.css"
 import { ChromePicker } from 'react-color'
 import 'react-tooltip/dist/react-tooltip.css'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+
+function resizeImage(file, callback) {
+    // limit max size of image
+    const maxWidth = 800;
+    const maxHeight = 800;
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = document.createElement("img");
+        img.onload = () => {
+            let canvas = document.createElement("canvas");
+            let ctx = canvas.getContext("2d");
+            let width = img.width;
+            let height = img.height;
+
+            // adjust canvas dimensions if too big
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+
+            // resized image bg transparent
+            ctx.fillStyle = 'rgba(0,0,0,0)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, width, height);
+            // webp compresses better than png and jpeg, while maintaining quality
+            canvas.toBlob(callback, 'image/webp', 0.5);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 
 function upload_img(event, pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded) {
     if (event.target.files && event.target.files[0]) {
-        // if type of the file is image/* where * can be PNG, GIF, etc.
-        // then we can upload
         if (/image\/*/.test(event.target.files[0].type)) {
-            const reader = new FileReader();
+            resizeImage(event.target.files[0], (resizedImage) => {
+                const reader = new FileReader();
 
-            // once the file is read, we set Pin Details
-            // use old pinDetails info if already present and set img_blob to image
-            reader.onload = function() {
-                setPinDetails({
-                    ...pinDetails,
-                    img_blob: reader.result
-                });
-                setShowLabel(false);
-                setShowModalPin(true);
-                setImageUploaded(true);
-            }
-
-            reader.readAsDataURL(event.target.files[0]);
+                // once the file is read, we set Pin Details
+                // use old pinDetails info if already present and set img_blob to image
+                reader.onload = function(e) {
+                    setPinDetails({
+                        ...pinDetails,
+                        img_blob: e.target.result
+                    });
+                    setShowLabel(false);
+                    setShowModalPin(true);
+                    setImageUploaded(true);
+                };
+                reader.readAsDataURL(resizedImage);
+            });
         }
     }
 }
@@ -60,36 +101,85 @@ function check_size(event) {
 
 function save_pin(pinDetails, add_pin) {
     const pinSize = document.querySelector('#pin_size').value;
+    const pinTitle = document.querySelector('#pin_title').value;
     if (pinSize === "") {
-        alert("Please select a size before saving.");
-    } else {
+        toast.error("Please select a size before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    } 
+    else if (pinTitle === "") {
+        toast.error("Please enter a title for your pin before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    }
+    else if (pinDetails.img_blob === "") {
+        toast.error("Please add an image before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    }
+    else {
         const users_data = {
             ...pinDetails,
-            title: document.querySelector('#pin_title').value,
+            title: pinTitle,
             description: document.querySelector('#pin_description').value,
-            pin_size: document.querySelector('#pin_size').value,
+            pin_size: pinSize,
         }
 
         add_pin(users_data);
     }
 }
 
-function save_pin_text(pinDetails, add_pin, textColor ) {
-    const users_data = {
-        ...pinDetails,
-        title: document.querySelector('#pin_title').value,
-        quote: document.querySelector('#pin_quote').value,
-        text_color: textColor,
+function save_pin_text(pinDetails, add_pin, id, textColor) {
+    const pinTitle = document.querySelector('#pin_title').value;
+    const pinQuote = document.querySelector('#pin_quote').value;
+    if (pinTitle === "") {
+        toast.error("Please enter a title for your pin before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    } 
+    else if (pinQuote === "") {
+        toast.error("Please enter your quote before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
     }
-
-    add_pin(users_data);
+    else {
+        const users_data = {
+            ...pinDetails,
+            title: pinTitle,
+            quote: pinQuote,
+            text_color: textColor,
+        }
+        add_pin(users_data);
+    }
 }
 
 function update_pin(pinDetails, change_pin) {
     const pinSize = document.querySelector('#pin_size').value;
+    const pinTitle = document.querySelector('#pin_title').value;
     if (pinSize === "") {
-        alert("Please select a size before saving.");
-    } else {
+        toast.error("Please select a size before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    } 
+    else if (pinTitle === "") {
+        toast.error("Please enter a title for your pin before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    }
+    else if (pinDetails.img_blob === null) {
+        toast.error("Please add an image before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    }
+    else {
         const users_data = {
             ...pinDetails,
         }
@@ -98,10 +188,26 @@ function update_pin(pinDetails, change_pin) {
 }
 
 function update_pin_text(pinDetails, change_pin) {
-    const users_data = {
-        ...pinDetails,
+    const pinTitle = document.querySelector('#pin_title').value;
+    const pinQuote = document.querySelector('#pin_quote').value;
+    if (pinTitle === "") {
+        toast.error("Please enter a title for your pin before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    } 
+    else if (pinQuote === "") {
+        toast.error("Please enter your quote before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
     }
-    change_pin(users_data);
+    else {
+        const users_data = {
+            ...pinDetails,
+        }
+        change_pin(users_data);
+    }
 }
 
 function Modal(props) { 
@@ -309,12 +415,12 @@ function Modal(props) {
                 }
             </div>
             }
-
             <ReactTooltip
                 id="my-tooltip-1"
                 place="bottom"
                 content="Remove Image"
             />    
+            <ToastContainer style={{ zIndex: "100000" }} position="top-center" autoClose={2000} pauseOnHover={false} />
         </div>
     )
 }

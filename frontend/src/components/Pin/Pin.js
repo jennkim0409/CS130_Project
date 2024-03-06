@@ -1,7 +1,6 @@
 import React from 'react';
 import './Pin.css';
 import download from '../../assets/downloads.png';
-import edit from '../../assets/edit.png';
 import remove from '../../assets/remove.png';
 import TextSize from '../TextSize/TextSize';
 
@@ -53,7 +52,8 @@ function Pin(props) {
 
             <div className="pin_modal" onClick={() => props.editPin(props.pinDetails)}>
                 <div className="modal_head">
-                    <div className="pint_mock_icon_container" onClick={() => {
+                    <div className="pint_mock_icon_container" onClick={(event) => {
+                        event.stopPropagation(); // so edit mode doesn't show up when clicking remove
                         if (window.confirm("Are you sure you want to delete this pin?")) {
                             props.removePin(props.pinDetails.ordering_id);
                         }
