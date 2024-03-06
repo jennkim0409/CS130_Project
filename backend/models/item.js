@@ -9,7 +9,7 @@ const itemSchema = new Schema({
       required: true
     },
     ordering_id: {
-      type: Number,
+      type: String,
       required: true
     },
     description: {
@@ -22,6 +22,9 @@ const itemSchema = new Schema({
       type: String
     },
     text_color: {
+      type: String
+    },
+    img_blob: {
       type: String
     }
   });

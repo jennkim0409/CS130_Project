@@ -28,6 +28,9 @@ const Bookshelf = () => {
     finishedList: [],
   });
 
+  // starting shelf for a book that is moved
+  const [startingShelf, setStartingShelf] = useState('');
+
   // runs when component mounts
   useEffect(() => {
     const fetchBookshelfData = async () => {
@@ -127,8 +130,7 @@ const Bookshelf = () => {
   set this component to the active ID */
   function handleDragStart(event) {
     setActiveId(event.active.id);
-    console.log("drag start: " + event.active.id);
-    console.log("drag start: " + findContainer(event.active.id));
+    setStartingShelf(findContainer(event.active.id));
   }
 
   /* when user drags draggable over a droppable
@@ -143,9 +145,6 @@ const Bookshelf = () => {
     // find the bookshelf container that they are in
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
-
-    console.log('drag over, active container: ' + activeContainer);
-    console.log('drag over, over container: ' + overContainer);
 
     // if there is no active, over, or if they do not collide
     // (i.e. no interaction being made, simply return)
@@ -218,7 +217,60 @@ const Bookshelf = () => {
 
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
     const overIndex = items[overContainer].findIndex(book => book.cover === overId);
- 
+
+    // update backend of book movement
+    const endingShelf = activeContainer;
+
+    // if the shelves are different, insert at active index
+      // NOTE: this code inserts the book at the place it is *supposed* to be inserted
+      // -> in other words, it disregards the current visual bug where the book is inserted one index AFTER it is supposed to be
+      // -> ultimately, once that visual bug is fixed, this code will line up with visuals
+    if (startingShelf != endingShelf) {
+      const bookToMove = items[endingShelf].find(book => book.cover === id);
+
+      let bookData = {};
+      bookData.userId = localStorage.getItem("user_id").replace(/"/g, '');
+      bookData.bookId = bookToMove._id;
+      bookData.fromShelf = startingShelf === "readingList" ? "current" : "finished";
+      bookData.toShelf = endingShelf === "readingList" ? "current" : "finished";
+      bookData.newOrder = activeIndex;
+
+      axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookData }, {
+        headers: {
+            Authorization: localStorage.getItem("user_token")
+        }
+      })
+      .then(response => {
+          console.log("Book successfully moved across shelves: ", response.data);
+      })
+      .catch(error => {
+          console.error("Error moving book across shelves: ", error.response);
+      });
+    }
+    // if shelves are the same, insert at the over index
+    else {
+      const bookToMove = items[startingShelf].find(book => book.cover === id);
+
+      let bookData = {};
+      bookData.userId = localStorage.getItem("user_id").replace(/"/g, '');
+      bookData.bookId = bookToMove._id;
+      bookData.fromShelf = startingShelf === "readingList" ? "current" : "finished";
+      bookData.toShelf = bookData.fromShelf;
+      bookData.newOrder = overIndex;
+
+      axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookData }, {
+        headers: {
+            Authorization: localStorage.getItem("user_token")
+        }
+      })
+      .then(response => {
+          console.log("Book successfully moved within the shelf: ", response.data);
+      })
+      .catch(error => {
+          console.error("Error moving book within the shelf: ", error.response);
+      });
+    }
+    
     if (activeIndex !== overIndex) {
       setItems((items) => ({
         ...items,
