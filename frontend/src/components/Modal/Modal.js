@@ -10,8 +10,9 @@ import 'react-tooltip/dist/react-tooltip.css'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 function resizeImage(file, callback) {
-    const maxWidth = 1024;
-    const maxHeight = 1024;
+    // limit max size of image
+    const maxWidth = 800;
+    const maxHeight = 800;
     const reader = new FileReader();
     reader.onload = e => {
         const img = document.createElement("img");
@@ -21,7 +22,7 @@ function resizeImage(file, callback) {
             let width = img.width;
             let height = img.height;
 
-            // Calculate the new canvas dimensions
+            // adjust canvas dimensions if too big
             if (width > height) {
                 if (width > maxWidth) {
                     height *= maxWidth / width;
@@ -40,8 +41,8 @@ function resizeImage(file, callback) {
             ctx.fillStyle = 'rgba(0,0,0,0)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0, width, height);
-            // can only save image as a png
-            canvas.toBlob(callback, 'image/png', 0.7);
+            // webp compresses better than png and jpeg, while maintaining quality
+            canvas.toBlob(callback, 'image/webp', 0.5);
         };
         img.src = e.target.result;
     };
@@ -50,8 +51,6 @@ function resizeImage(file, callback) {
 
 function upload_img(event, pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded) {
     if (event.target.files && event.target.files[0]) {
-        // if type of the file is image/* where * can be PNG, GIF, etc.
-        // then we can upload
         if (/image\/*/.test(event.target.files[0].type)) {
             resizeImage(event.target.files[0], (resizedImage) => {
                 const reader = new FileReader();
