@@ -128,9 +128,6 @@ class ModalAndPin extends React.Component {
         const pinRemoveData = this.state.pins.filter(pinElement => pinElement.props.pinDetails.ordering_id === orderingId);
         const pinToRemove = pinRemoveData.length > 0 ? pinRemoveData[0].props.pinDetails : null;
 
-        console.log("pin to remove: ");
-        console.log(pinToRemove);
-
         this.setState(prevState => ({
             pins: prevState.pins.filter(pinElement => pinElement.props.pinDetails.ordering_id !== orderingId)
         }));
