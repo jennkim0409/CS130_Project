@@ -18,8 +18,6 @@ class ModalAndPin extends React.Component {
     }
 
     async componentDidMount() {
-        console.log("Component initialized");
-
         try {
             const response = await axios.get('http://localhost:5555/api/board/getBoard/', {
                 params: { boardId: this.state.boardId },
@@ -66,17 +64,16 @@ class ModalAndPin extends React.Component {
         // compute next id
         const nextId = this.state.lastId + 1;
         pinDetails.ordering_id = `pin-${nextId}`;
-    
-        // remove this line after merging jenn's PR
         pinDetails.boardId = this.state.boardId;
-        pinDetails.img_blob = "https://m.media-amazon.com/images/W/MEDIAX_849526-T3/images/I/71tQ71QaNML._SY522_.jpg";
     
         try {
             // insert new pin in the backend
             const response = await axios.post('http://localhost:5555/api/board/addItem/', {...pinDetails}, {
                 headers: { Authorization: localStorage.getItem("user_token") }
             });
-            console.log(response.data);
+        
+            // update pinDetails id to reflect DB id
+            pinDetails.id = (response.data.board.items[response.data.board.items.length - 1]).id;
     
             // update state with new pin and the lastId
             this.setState(prevState => ({
@@ -91,7 +88,22 @@ class ModalAndPin extends React.Component {
     }
 
     // function to account for updating a pin
-    change_pin = pinDetails => {
+    change_pin = async pinDetails => {
+        // update backend
+        pinDetails.itemId = pinDetails.id;
+
+        try {
+            const response = await axios.post('http://localhost:5555/api/board/updateItem/', {...pinDetails}, 
+            {
+                headers: { Authorization: localStorage.getItem("user_token") }
+            });
+            console.log(response.data);
+        } 
+        catch (error) {
+            console.error("Error updating pin: ", error);
+        }
+        
+        // update frontend
         this.setState(_state => {
             // map through the existing pins to find the one to update
             const updated = _state.pins.map(pinElement => {

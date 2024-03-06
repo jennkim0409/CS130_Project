@@ -74,12 +74,12 @@ function Boards() {
         if (!selectedBooks.find(book => book._id === opt._id)) {
             // find the book in the reading array and add to selectedBooks array
             const selectedBook = reading.find(book => book._id === opt._id);
-            
             // add board for this book in backend
             let boardData = {};
             boardData.bookId = selectedBook._id;
             boardData.bookTitle = selectedBook.title;
             boardData.bookAuthor = selectedBook.author;
+            boardData.bookCover = selectedBook.cover;
             boardData.publicVisibility = true; // update if we give user option to set boards private/public
 
             try {
