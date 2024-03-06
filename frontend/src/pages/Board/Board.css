@@ -26,4 +26,27 @@
     height: 20px; /* Set the size as needed */
     fill: #154A14;
 }
+
+.discover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    width: 10%;
+    margin: auto;
+    height: 35px;
+    color: #ffff;
+    font-size: 18px;
+    background: #337032;
+    border-radius: 30px;
+}
+
+.privacy label{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
   
