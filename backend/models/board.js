@@ -12,6 +12,9 @@ const boardSchema = new Schema({
         type: String,
         required: true
     },
+    bookCover: {
+        type: String
+    },
     items:
         [{
         type: Schema.Types.ObjectId,

@@ -7,11 +7,12 @@ const boardRouter = express.Router();
 
 boardRouter.post('/addBoard', async (req, res) => {
     try {
-        const { bookId, bookTitle, bookAuthor, publicVisibility } = req.body;
-
+        const { bookId, bookTitle, bookAuthor, bookCover, publicVisibility } = req.body;
+  
         const newBoard = new Board({
             bookTitle,
             bookAuthor,
+            bookCover,
             publicVisibility,
         });
 
@@ -62,7 +63,7 @@ boardRouter.get('/getBoard', async (req,res) => {
         const {boardId} = req.query;
         const board = await Board.findById(boardId)
             .populate('items')
-            .select('bookTitle bookAuthor items publicVisibility');
+            .select('bookTitle bookAuthor bookCover items publicVisibility');
         if(!board){
             return res.status(404).json({ message: 'Board not found' });
         }
