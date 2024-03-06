@@ -122,9 +122,26 @@ function save_pin_text(pinDetails, add_pin, id, textColor) {
 
 function update_pin(pinDetails, change_pin) {
     const pinSize = document.querySelector('#pin_size').value;
+    const pinTitle = document.querySelector('#pin_title').value;
     if (pinSize === "") {
-        alert("Please select a size before saving.");
-    } else {
+        toast.error("Please select a size before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    } 
+    else if (pinTitle === "") {
+        toast.error("Please enter a title for your pin before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    }
+    else if (pinDetails.img_blob === null) {
+        toast.error("Please add an image before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    }
+    else {
         const users_data = {
             ...pinDetails,
         }
@@ -133,10 +150,26 @@ function update_pin(pinDetails, change_pin) {
 }
 
 function update_pin_text(pinDetails, change_pin) {
-    const users_data = {
-        ...pinDetails,
+    const pinTitle = document.querySelector('#pin_title').value;
+    const pinQuote = document.querySelector('#pin_quote').value;
+    if (pinTitle === "") {
+        toast.error("Please enter a title for your pin before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
+    } 
+    else if (pinQuote === "") {
+        toast.error("Please enter your quote before saving.", {
+            autoClose: 2000,
+            pauseOnHover: false,
+        });
     }
-    change_pin(users_data);
+    else {
+        const users_data = {
+            ...pinDetails,
+        }
+        change_pin(users_data);
+    }
 }
 
 function Modal(props) { 
