@@ -1,8 +1,7 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import './Modal.css';
 import remove from '../../assets/remove.png';
 import upload from '../../assets/cloud-computing.png';
-import _uniqueId from 'lodash/uniqueId';
 import Toggle from 'react-toggle';
 import "react-toggle/style.css"
 import { ChromePicker } from 'react-color'
@@ -59,7 +58,7 @@ function check_size(event) {
     image.style.opacity = 1;
 }
 
-function save_pin(pinDetails, add_pin, id) {
+function save_pin(pinDetails, add_pin) {
     const pinSize = document.querySelector('#pin_size').value;
     if (pinSize === "") {
         alert("Please select a size before saving.");
@@ -69,20 +68,18 @@ function save_pin(pinDetails, add_pin, id) {
             title: document.querySelector('#pin_title').value,
             description: document.querySelector('#pin_description').value,
             pin_size: document.querySelector('#pin_size').value,
-            ordering_id: id
         }
 
         add_pin(users_data);
     }
 }
 
-function save_pin_text(pinDetails, add_pin, id, textColor) {
+function save_pin_text(pinDetails, add_pin, textColor ) {
     const users_data = {
         ...pinDetails,
         title: document.querySelector('#pin_title').value,
         quote: document.querySelector('#pin_quote').value,
         text_color: textColor,
-        ordering_id: id
     }
 
     add_pin(users_data);
@@ -120,7 +117,6 @@ function Modal(props) {
     const [pinDetails, setPinDetails] = useState(initialPinDetails);
     const [showLabel, setShowLabel] = useState(true);
     const [showModalPin, setShowModalPin] = useState(false);
-    const [id] = useState(_uniqueId('pin-'));
     const [imageUploaded, setImageUploaded] = useState(false);
     const [toggleText, setToggleText] = useState(false);
     const [textColor, setTextColor] = useState('#000');
@@ -167,7 +163,7 @@ function Modal(props) {
                             color={textColor}
                             onChangeComplete={(color) => setTextColor(color.hex)}
                         />
-                        <div className="submit" onClick={() => save_pin_text(pinDetails, props.add_pin, id, textColor)}>Save</div>
+                        <div className="submit" onClick={() => save_pin_text(pinDetails, props.add_pin, textColor)}>Save</div>
                     </div>
                     :
                     <div className="add_pin_details_image">
@@ -229,7 +225,7 @@ function Modal(props) {
                             <div className="section2">
                                 <input placeholder="Add a title" type="text" className="new_pin_input" id="pin_title" />
                                 <textarea placeholder="What is this pin about?" type="text" className="new_pin_input" id="pin_description" />
-                                <div onClick={() => save_pin(pinDetails, props.add_pin, id)} className="save_pin">Save</div>
+                                <div onClick={() => save_pin(pinDetails, props.add_pin)} className="save_pin">Save</div>
                             </div>
                         </div>
                     </div>
