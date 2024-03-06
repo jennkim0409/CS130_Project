@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import "./Account.css";
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,16 +25,65 @@ function Account(props) {
     }
 
     const update = () => {
-        if (name != '') {
-            // update the name in backend
-            localStorage.setItem('user_name', name);
+        const promises = [];
+    
+        // update password in backend
+        if (currentPassword !== '' && newPassword !== '' && newPassword2 !== '') {
+            if (newPassword !== newPassword2) {
+                toast.error("The new passwords you provided do not match.");
+                return;
+            }
+    
+            const passwordPath = 'http://localhost:5555/api/user/resetpass/' + localStorage.getItem("user_id").replace(/"/g, '');
+            promises.push(
+                axios.patch(passwordPath,
+                    { currentPassword: currentPassword, newPassword: newPassword, re_newPassword: newPassword2 },
+                    {
+                        headers: {
+                            Authorization: localStorage.getItem("user_token")
+                        }
+                    })
+                    .then(response => {
+                        console.log("Password saved successfully: ", response.data);
+                    })
+                    .catch(error => {
+                        throw error;
+                    })
+            );
         }
-        if (currentPassword != '' && newPassword != '' && newPassword2 != '') {
-            // grab password from backend and check that it's correct
-            // check to see if newPassword and newPassword2 are the same and if so, update password in backend
+    
+        // update name in backend
+        if (name !== '') {
+            const namePath = 'http://localhost:5555/api/user/set/' + localStorage.getItem("user_id").replace(/"/g, '');
+            promises.push(
+                axios.patch(namePath,
+                    { name: name },
+                    {
+                        headers: {
+                            Authorization: localStorage.getItem("user_token")
+                        }
+                    })
+                    .then(response => {
+                        console.log("Name saved successfully: ", response.data);
+                        localStorage.setItem('user_name', name);
+                    })
+                    .catch(error => {
+                        throw error;
+                    })
+            );
         }
+    
+        Promise.all(promises)
+            .then(() => {
+                toast.success("Account preferences successfully updated!");
+            })
+            .catch(error => {
+                console.error("Error during update: ", error);
+                const error_message = error.response.data.message;
+                toast.error(error_message);                
+            });
+    };
 
-    }
     return(
         <div className="account">
             <h2 style={{textAlign: "center"}}>Account</h2>
