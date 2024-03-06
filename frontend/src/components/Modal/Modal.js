@@ -132,7 +132,7 @@ function save_pin(pinDetails, add_pin) {
     }
 }
 
-function save_pin_text(pinDetails, add_pin, id, textColor) {
+function save_pin_text(pinDetails, add_pin, textColor) {
     const pinTitle = document.querySelector('#pin_title').value;
     const pinQuote = document.querySelector('#pin_quote').value;
     if (pinTitle === "") {

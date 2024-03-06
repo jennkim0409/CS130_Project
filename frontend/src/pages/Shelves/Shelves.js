@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import "./Shelves.css";
 import Bookshelf from '../../components/Bookshelf/Bookshelf';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SearchBooks from '../../components/SearchBooks/SearchBooks';
 
