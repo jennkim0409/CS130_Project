@@ -16,6 +16,8 @@ function Boards() {
     const [selectedBooks, setSelectedBooks] = useState([]); // track books that are selected to have board page
     const [reading, setReading] = useState([]); // track books that are selected to have board page
 
+    const userId = localStorage.getItem('user_id');
+
     // runs when component mounts
     useEffect(() => {
         const fetchBoardsData = async () => {
@@ -176,7 +178,7 @@ function Boards() {
                             className="bookImage" 
                             src={book.cover} 
                             alt={book.label}
-                            onClick={()=>navigate(`/boards/${book.boardId}`)}
+                            onClick={()=>navigate(`/boards/${userId}/${book.boardId}`)}
                             />
                             <div 
                                 className="remove-button" 

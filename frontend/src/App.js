@@ -37,7 +37,7 @@ function App() {
           <Route path="/explore" exact element={<Explore />} />
           <Route path="/shelves" exact element={<Shelves />} />
           <Route path="/boards" exact element={<Boards />} />
-          <Route path="/boards/:boardId" exact element={<Board />} />
+          <Route path="/boards/:userId/:boardId" exact element={<Board />} />
           <Route path="/account" element={<Account signOut={() => setIsLoggedIn(false)} />} />
         </Route>
       </Routes>

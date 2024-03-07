@@ -39,6 +39,9 @@ const Board = () => {
     }
   }
 
+  // todo @ kaylee : get a list of boards with user's name from backend
+  // also togglePublic stores whether a user wants board to be public or not
+  // so store this in backend as well!
   async function getDropdownOptions() {
     try {
       // code to get a list of other boards of the same book
@@ -75,7 +78,13 @@ const Board = () => {
   }, []); 
 
   if (!boardDetails) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-page">
+          <h4 style={{marginBottom: '0px'}}>Loading...</h4>
+          <div className="spinner"/>
+          <div className="boardInfo"/>
+      </div>
+    );
   }
 
   // Here, you can fetch data based on boardId, or import a layout component and pass boardId to it
@@ -118,7 +127,7 @@ const Board = () => {
       </div>
       <div className="modal">
         {/* Render your layout and data based on boardId */}
-        <ModalAndPin/>
+        <ModalAndPin boardId={boardId}/>
       </div>
       <ReactTooltip
         id="my-tooltip-1"
