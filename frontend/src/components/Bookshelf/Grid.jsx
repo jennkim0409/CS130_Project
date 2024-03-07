@@ -45,8 +45,7 @@ export function Grid({children, title, columns}) {
             WebkitBorderRadius: '5px',
             MozBorderRadius: '5px',
             borderRadius: '5px',
-            height: '14.75vw',
-            width: '75vw'
+
           }}
         >
           {children}

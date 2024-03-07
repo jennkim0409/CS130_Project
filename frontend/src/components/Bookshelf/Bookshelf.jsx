@@ -172,6 +172,11 @@ const Bookshelf = () => {
       return;
     }
 
+    const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
+    const overIndex = items[overContainer].findIndex(book => book.cover === overId);
+
+    console.log("active, over index:", activeIndex, overIndex);
+
     setItems((prev) => {
       const activeItems = prev[activeContainer];
       const overItems = prev[overContainer];
@@ -179,7 +184,7 @@ const Bookshelf = () => {
       // find the indexes for the items
       const activeIndex = activeItems.findIndex(book => book.cover === id);
       const overIndex = overItems.findIndex(book => book.cover === overId);
-
+      console.log("2 active, over index:", activeIndex, overIndex);
       let newIndex;
       if (overId in prev) {
         // we're at the root droppable of a container
@@ -234,6 +239,7 @@ const Bookshelf = () => {
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
     const overIndex = items[overContainer].findIndex(book => book.cover === overId);
 
+    console.log("active, over index:", activeIndex, overIndex);
     // update backend of book movement
     const endingShelf = activeContainer;
 
