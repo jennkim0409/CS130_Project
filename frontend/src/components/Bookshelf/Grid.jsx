@@ -1,6 +1,11 @@
-import React from 'react';
+import React from "react";
+import { useDroppable } from "@dnd-kit/core";
 
 export function Grid({children, title, columns}) {
+  const { setNodeRef } = useDroppable({
+    id: title
+  });
+
   return (
     <div
       style={{
@@ -25,6 +30,7 @@ export function Grid({children, title, columns}) {
         }}
       >
         <div
+          ref={setNodeRef}
           style={{
             display: 'grid',
             gridTemplateColumns: `repeat(${columns}, 1fr)`,
@@ -39,6 +45,8 @@ export function Grid({children, title, columns}) {
             WebkitBorderRadius: '5px',
             MozBorderRadius: '5px',
             borderRadius: '5px',
+            height: '14.75vw',
+            width: '75vw'
           }}
         >
           {children}

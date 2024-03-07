@@ -83,16 +83,6 @@ const Bookshelf = () => {
   // books activated by mouse and touch sensors
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
-  // Use useDroppable hook to get setNodeRef for reading list
-  const { setNodeRef: readingListRef } = useDroppable({
-    id: 'reading', // Unique ID for the droppable area
-  });
-
-  // Use useDroppable hook to get setNodeRef for finished list
-  const { setNodeRef: finishedListRef } = useDroppable({
-    id: 'finished', // Unique ID for the droppable area
-  });
-
   return (
     // all DND components must be within DndContext component
     <DndContext
@@ -131,7 +121,7 @@ const Bookshelf = () => {
       
 
       {/* handles overlay and smooth animation */}
-      <DragOverlay adjustScale={true}>
+      <DragOverlay>
         {/* only trigger when there is an active component, else display nothing */}
         {activeId ? (
           <div>
@@ -319,6 +309,9 @@ const Bookshelf = () => {
     if (id in items) {
       return id;
     }
+
+    if (id == "Interested") { return "readingList" };
+    if (id == "Finished") { return "finishedList" };
 
     // return name of bookshelf that contains the book corresponding to this id (cover url)
     return Object.keys(items).find((shelfName) => {
