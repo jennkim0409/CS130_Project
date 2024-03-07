@@ -35,7 +35,6 @@ const Bookshelf = () => {
   // starting shelf for a book that is moved
   const [startingShelf, setStartingShelf] = useState('');
   const [startIndex, setStartIndex] = useState('');
-  const [endIndex, setEndIndex] = useState('');
 
   // Map items to an array of strings containing the ids
   const readingListIds = useMemo(() => items.readingList.map((item) => item.cover), [items.readingList]);
@@ -258,7 +257,7 @@ const Bookshelf = () => {
       bookData.bookId = bookToMove._id;
       bookData.fromShelf = startingShelf === "readingList" ? "current" : "finished";
       bookData.toShelf = endingShelf === "readingList" ? "current" : "finished";
-      bookData.newOrder = activeIndex;
+      bookData.newOrder = overIndex;
 
       axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookData }, {
         headers: {
