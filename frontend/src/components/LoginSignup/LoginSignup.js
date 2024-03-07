@@ -8,18 +8,13 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function LoginSignup() {
-    const [action, setAction] = useState("Sign Up");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
     const signup = () => {
-        if (action === "Login") {
-            setAction("Sign Up");
-        }
-        
         // call backend API to sign up
-        else if (username && password) {
+        if (username && password && password.length >= 8) {
             axios.post('http://localhost:5555/auth/register/', { username, password })
             .then(response => {
                 console.log("Sign Up successful: ", response.data);
@@ -44,15 +39,15 @@ function LoginSignup() {
                 toast.error(error_message);
             });
         }
+        else {
+            // Password doesn't meet the minimum length requirement
+            toast.error("Password must be at least 8 characters long.");
+        }
     };
 
     const login = () => {
-        if (action === "Sign Up") {
-            setAction("Login");
-        } 
-
         // call backend API to log in
-        else if (username && password) {
+        if (username && password) {
             axios.post('http://localhost:5555/auth/login', { username, password })
             .then(response => {
                 console.log("Login successful: ", response.data);
@@ -74,31 +69,11 @@ function LoginSignup() {
         }
     };
 
-    const renderButtons = () => {
-        if (action === "Login") {
-            // For the Login page, change the order of buttons
-            return (
-                <>
-                    <div className="submit gray" onClick={login}>Login</div>
-                    <div className="submit" onClick={signup}>Create an Account</div>
-                </>
-            );
-        } else {
-            // For the Sign Up page, keep the original order
-            return (
-                <>
-                    <div className="submit" onClick={signup}>Sign Up</div>
-                    <div className="submit gray" onClick={login}>Login to Existing</div>
-                </>
-            );
-        }
-    };
-
     return (
         <div className='container'>
             {/* Will either say sign up or login based on current action */}
             <div className='header'>
-                <div className='text'>{action}</div>
+                <div className='text'>Account</div>
             </div>
 
             <div className="information">
@@ -126,7 +101,8 @@ function LoginSignup() {
 
                     {/* Either user is switching the action or choosing to login or sign up */}
                     <div className='submit-container'>
-                        {renderButtons()}
+                        <div className="submit" onClick={signup}>Sign Up</div>
+                        <div className="submit gray" onClick={login}>Login</div>
                     </div>
                 </div>
             </div>
