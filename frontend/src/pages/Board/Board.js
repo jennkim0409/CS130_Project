@@ -20,7 +20,6 @@ const Board = () => {
   const discoverRef = useRef(null);
 
   async function getBoardDetails() {
-    const loadingToast = toast.loading("Loading...");
     try {
       const response = await axios.get('http://localhost:5555/api/board/getBoard/', {
           params: { boardId },
@@ -30,12 +29,10 @@ const Board = () => {
       console.log("board details from Board.js: ");
       console.log(response.data);
       setBoardDetails(response.data);
-      toast.dismiss(loadingToast);
     } 
     catch (error) {
         console.error("Error getting board data: ", error);
         toast.error("Error getting board data: ", error);
-        toast.dismiss(loadingToast);
     }
   }
 
