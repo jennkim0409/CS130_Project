@@ -7,11 +7,12 @@ const boardRouter = express.Router();
 
 boardRouter.post('/addBoard', async (req, res) => {
     try {
-        const { bookId, bookTitle, bookAuthor, publicVisibility } = req.body;
-
+        const { bookId, bookTitle, bookAuthor, bookCover, publicVisibility } = req.body;
+  
         const newBoard = new Board({
             bookTitle,
             bookAuthor,
+            bookCover,
             publicVisibility,
         });
 
@@ -62,7 +63,7 @@ boardRouter.get('/getBoard', async (req,res) => {
         const {boardId} = req.query;
         const board = await Board.findById(boardId)
             .populate('items')
-            .select('bookTitle bookAuthor items publicVisibility');
+            .select('bookTitle bookAuthor bookCover items publicVisibility');
         if(!board){
             return res.status(404).json({ message: 'Board not found' });
         }
@@ -114,12 +115,12 @@ boardRouter.post('/removeItem', async (req, res) => {
     // (and add it to the Items table in DB)
 boardRouter.post('/addItem', async (req, res) => {
     try {
-        const {boardId, title, ordering_id, description, pin_size, quote, text_color} = req.body;
+        const {boardId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
 
-        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color });
+        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color, img_blob });
         const savedItem = await newItem.save();
 
-        const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true });
+        const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true }).populate('items');
         if(!board){
             return res.status(404).json({ message: 'Board not found' });
         }
@@ -129,5 +130,34 @@ boardRouter.post('/addItem', async (req, res) => {
         res.status(500).json({ message: 'Error adding item', error: error.message });
     }
 });
+
+boardRouter.post('/updateItem', async (req, res) => {
+    try{
+        const {itemId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
+        let updateItem = {};
+        
+        if (title !== null) updateItem.title = title;
+        if (ordering_id !== null) updateItem.ordering_id = ordering_id;
+        if (description !== null) updateItem.description = description;
+        if (pin_size !== null) updateItem.pin_size = pin_size;
+        if (quote !== null) updateItem.quote = quote;
+        if (text_color !== null) updateItem.text_color = text_color;
+        if (img_blob !== null) updateItem.img_blob = img_blob;
+
+        const updatedItem = await Item.findByIdAndUpdate(
+            itemId,
+            { $set: updateItem },
+            { new: true, runValidators: true, omitUndefined: true } // Return the updated document and run schema validators
+        );
+
+        if (!updatedItem) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({ message: 'Item updated successfully', item: updatedItem });
+    } catch(error){
+        res.status(500).json({ message: 'Error updating item', error: error.message });
+    }
+})
 
 export default boardRouter;
