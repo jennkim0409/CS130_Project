@@ -74,10 +74,6 @@ function LoginSignup() {
         }
     };
 
-    const forgot = () => {
-        // write code to redirect for forgetting password
-    }
-
     const renderButtons = () => {
         if (action === "Login") {
             // For the Login page, change the order of buttons
@@ -110,10 +106,6 @@ function LoginSignup() {
                     <div className="page-instructions">
                     Create or log-in to your account to save your bookpins!
                     </div>
-                    {
-                        action === "Login" && (
-                        <span className="forgot-password" onClick={forgot}>Forgot Password?</span>
-                    )}
                 </div>
                 <div className="rightSide">
                     {/* Inputs that should be entered by the user */}

@@ -104,7 +104,7 @@ function Account(props) {
                 <div className='account-input'>
                     <h4>Current Password</h4>
                     <input 
-                    type='text'
+                    type='password'
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     />
@@ -112,7 +112,7 @@ function Account(props) {
                 <div className='account-input'>
                     <h4 >New Password</h4>
                     <input 
-                    type='text'
+                    type='password'
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     />
@@ -120,7 +120,7 @@ function Account(props) {
                 <div className='account-input'>
                     <h4>Re-enter New Password</h4>
                     <input 
-                    type='text'
+                    type='password'
                     value={newPassword2}
                     onChange={(e) => setNewPassword2(e.target.value)}
                     />

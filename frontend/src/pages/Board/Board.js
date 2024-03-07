@@ -1,15 +1,19 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import './Board.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import ModalAndPin from '../../components/ModalAndPin/ModalAndPin';
 import { ReactComponent as BackIcon } from '../../assets/back.svg'; 
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Board = () => {
   const navigate = useNavigate();
   const { boardId } = useParams(); // This hooks into the router and gives you the dynamic part of the URL
+  const [boardDetails, setBoardDetails] = useState(null);
 
   async function getBoardDetails() {
+    const loadingToast = toast.loading("Loading...");
     try {
       const response = await axios.get('http://localhost:5555/api/board/getBoard/', {
           params: { boardId },
@@ -18,14 +22,24 @@ const Board = () => {
   
       console.log("board details from Board.js: ");
       console.log(response.data);
+      setBoardDetails(response.data);
+      toast.dismiss(loadingToast);
     } 
     catch (error) {
         console.error("Error getting board data: ", error);
+        toast.error("Error getting board data: ", error);
+        toast.dismiss(loadingToast);
     }
   }
 
   // get board details upon initialization
-  getBoardDetails();
+  useEffect(() => {
+    getBoardDetails();
+  }, [boardId]);
+
+  if (!boardDetails) {
+    return <div>Loading...</div>;
+  }
 
   // Here, you can fetch data based on boardId, or import a layout component and pass boardId to it
   return (
@@ -35,11 +49,14 @@ const Board = () => {
         <h3>Go Back</h3>
       </div> 
       <div className="boardInfo">
-        {/* 
-        keep in mind that we'll be using boardId, which is the unique ID, to fetch
-        information about the book including title, author, book cover 
-        => this area should be replaced with book cover, title, author
-        */}
+        <div className="book-cover">
+          {/* Assuming the boardDetails contains a bookCover property */}
+          <img src={boardDetails.bookCover} alt="Book Cover" />
+        </div>
+        <div className="book-details">
+          <div className="book-title">{boardDetails.bookTitle}</div>
+          <div className="book-author">{boardDetails.bookAuthor}</div>
+        </div>
       </div>
       <div className="modal">
         {/* Render your layout and data based on boardId */}
