@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "./Account.css";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -7,10 +7,18 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function Account(props) {
     const navigate = useNavigate();
-    const [name, updateName] = useState('');
+    const [nameInput, setNameInput] = useState('');
+    const [name, setName] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [newPassword2, setNewPassword2] = useState('');
+
+    useEffect(() => {
+        const storedName = localStorage.getItem('user_name');
+        if (storedName) {
+            setName(storedName);
+        }
+    }, []);
 
     const signout = () => {
         if (window.confirm("Are you sure you want to sign out?")) {
@@ -53,11 +61,11 @@ function Account(props) {
         }
     
         // update name in backend
-        if (name !== '') {
+        if (nameInput !== '') {
             const namePath = 'http://localhost:5555/api/user/set/' + localStorage.getItem("user_id").replace(/"/g, '');
             promises.push(
                 axios.patch(namePath,
-                    { name: name },
+                    { name: nameInput },
                     {
                         headers: {
                             Authorization: localStorage.getItem("user_token")
@@ -65,7 +73,8 @@ function Account(props) {
                     })
                     .then(response => {
                         console.log("Name saved successfully: ", response.data);
-                        localStorage.setItem('user_name', name);
+                        localStorage.setItem('user_name', nameInput);
+                        setName(nameInput);
                     })
                     .catch(error => {
                         throw error;
@@ -87,15 +96,15 @@ function Account(props) {
     return(
         <div className="account">
             <h2 style={{textAlign: "center"}}>Account</h2>
-            <h2 style={{margin: '0px'}}>Welcome Back, {localStorage.getItem('user_name')}!</h2>
+            <h2 style={{margin: '0px'}}>Welcome Back, {name}!</h2>
             <div className="update-name">
                 <h3 style={{textAlign: "center", paddingTop: '15px'}}>Update Name</h3>
                 <div className='account-input'>
                     <h4>Name</h4>
                     <input 
                     type='text'
-                    value={name}
-                    onChange={(e) => updateName(e.target.value)}
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
                     />
                 </div>
             </div>
