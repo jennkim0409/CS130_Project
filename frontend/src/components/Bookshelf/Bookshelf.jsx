@@ -34,6 +34,9 @@ const Bookshelf = () => {
 
   // starting shelf for a book that is moved
   const [startingShelf, setStartingShelf] = useState('');
+  const [startIndex, setStartIndex] = useState('');
+  const [endIndex, setEndIndex] = useState('');
+
   // Map items to an array of strings containing the ids
   const readingListIds = useMemo(() => items.readingList.map((item) => item.cover), [items.readingList]);
   const finishedListIds = useMemo(() => items.finishedList.map((item) => item.cover), [items.finishedList]);
@@ -140,6 +143,7 @@ const Bookshelf = () => {
     console.log(`Picked up draggable item ${event.active.id}.`);
     setActiveId(event.active.id);
     setStartingShelf(findContainer(event.active.id));
+    setStartIndex(items[findContainer(event.active.id)].findIndex(book => book.cover === event.active.id));
   }
 
   /* when user drags draggable over a droppable
@@ -147,10 +151,10 @@ const Bookshelf = () => {
   not super necessary to understand logic!  */
   function handleDragOver(event) {
     if (event.over.id) {
-      console.log(`Draggable item ${event.active.id} was moved over droppable area ${event.over.id}.`) ;
+      //console.log(`Draggable item ${event.active.id} was moved over droppable area ${event.over.id}.`) ;
     }
     else {
-      console.log(`Draggable item ${event.active.id} is no longer over a droppable area.`);
+      //console.log(`Draggable item ${event.active.id} is no longer over a droppable area.`);
     }
 
     // active is the dragging component
@@ -172,11 +176,6 @@ const Bookshelf = () => {
       return;
     }
 
-    const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
-    const overIndex = items[overContainer].findIndex(book => book.cover === overId);
-
-    console.log("active, over index:", activeIndex, overIndex);
-
     setItems((prev) => {
       const activeItems = prev[activeContainer];
       const overItems = prev[overContainer];
@@ -184,7 +183,7 @@ const Bookshelf = () => {
       // find the indexes for the items
       const activeIndex = activeItems.findIndex(book => book.cover === id);
       const overIndex = overItems.findIndex(book => book.cover === overId);
-      console.log("2 active, over index:", activeIndex, overIndex);
+
       let newIndex;
       if (overId in prev) {
         // we're at the root droppable of a container
@@ -242,6 +241,10 @@ const Bookshelf = () => {
     console.log("active, over index:", activeIndex, overIndex);
     // update backend of book movement
     const endingShelf = activeContainer;
+    
+    // TODO: use this starting index!!
+    console.log("starting index, shelf:", startIndex, startingShelf);
+    console.log("ending index, shelf:", overIndex, endingShelf);
 
     // if the shelves are different, insert at active index
       // NOTE: this code inserts the book at the place it is *supposed* to be inserted
