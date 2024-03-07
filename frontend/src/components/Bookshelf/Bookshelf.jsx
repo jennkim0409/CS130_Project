@@ -107,26 +107,28 @@ const Bookshelf = () => {
       onDragCancel={handleDragCancel}
     >
     {/* this div holds all page content */}
-      <div ref={readingListRef} style={{ minHeight: '100px', border: '1px dashed black' }}>
-        <SortableContext items={readingListIds} strategy={rectSortingStrategy}>
-        {/* can adjust the # of columns, but update .css accordingly */}
-          
-            {items.readingList.map((book, index) => (
-              <SortablePhoto key={book.cover} url={book.cover} index={index} />
-            ))}
-          
-        </SortableContext>
-      </div>
-      <br/><br/><br/><br/><br/>
-      <div ref={finishedListRef} style={{ minHeight: '100px', border: '1px dashed black' }}>
-        <SortableContext items={finishedListIds} strategy={rectSortingStrategy}>
-          
-            {items.finishedList.map((book, index) => (
-              <SortablePhoto key={book.cover} url={book.cover} index={index} />
-            ))}
-          
-        </SortableContext>
-      </div>
+      
+    <div>
+      <SortableContext items={items.readingList} strategy={rectSortingStrategy}>
+      {/* can adjust the # of columns, but update .css accordingly */}
+        <Grid title='Interested' columns={8}>
+          {items.readingList.map((book, index) => (
+            <SortablePhoto key={book.cover} url={book.cover} index={index} />
+          ))}
+        </Grid>
+      </SortableContext>
+    </div>
+    
+    <div>
+      <SortableContext items={items.finishedList} strategy={rectSortingStrategy}>
+        <Grid title='Finished' columns={8}>
+          {items.finishedList.map((book, index) => (
+            <SortablePhoto key={book.cover} url={book.cover} index={index} />
+          ))}
+        </Grid>
+      </SortableContext>
+    </div>
+      
 
       {/* handles overlay and smooth animation */}
       <DragOverlay adjustScale={true}>
