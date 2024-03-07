@@ -99,7 +99,7 @@ const Bookshelf = () => {
     {/* this div holds all page content */}
       
     <div>
-      <SortableContext items={items.readingList} strategy={rectSortingStrategy}>
+      <SortableContext items={readingListIds} strategy={rectSortingStrategy}>
       {/* can adjust the # of columns, but update .css accordingly */}
         <Grid title='Interested' columns={8}>
           {items.readingList.map((book, index) => (
@@ -110,7 +110,7 @@ const Bookshelf = () => {
     </div>
     
     <div>
-      <SortableContext items={items.finishedList} strategy={rectSortingStrategy}>
+      <SortableContext items={finishedListIds} strategy={rectSortingStrategy}>
         <Grid title='Finished' columns={8}>
           {items.finishedList.map((book, index) => (
             <SortablePhoto key={book.cover} url={book.cover} index={index} />
