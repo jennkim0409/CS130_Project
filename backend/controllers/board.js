@@ -94,6 +94,26 @@ boardRouter.get('/getBoardsByBook', async (req, res) => {
     }
 });
 
+boardRouter.post('/updateBoardVisibility', async (req, res) => {
+    try{
+        const {boardId, publicVisibility} = req.body;
+        const visibility = !!publicVisibility;
+
+        const board = await Board.findByIdAndUpdate(
+            boardId,
+            { $set: { publicVisibility: visibility } },
+            { new: true, runValidators: true }
+        ).populate('items');
+        if (!board) {
+            return res.status(404).json({ message: 'Board not found' });
+        }
+        res.status(200).json({ message: 'Board visibility updated successfully', board });
+    } catch(error){
+        console.error('Error updating board visibility:', error);
+        res.status(500).json({ message: 'Error updating board visibility', error: error.message });
+    }
+});
+
 // route: given board ID and ID of an item in that board, remove that item from the board's list of items
     // (and delete that item from the Items table in DB)
 boardRouter.post('/removeItem', async (req, res) => {
