@@ -43,6 +43,7 @@ const Board = () => {
     try {
       // code to get a list of other boards of the same book
       // use setDiscoverOptions to update what gets shown in dropdown
+      // once implemented, you can get rid of this example array ! just wanted to show what dropdown looks like
       const example = [
         { id: 1, name: 'jenn' },
         { id: 2, name: 'kaylee' },
