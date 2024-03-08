@@ -16,6 +16,7 @@ const Board = () => {
   const [boardDetails, setBoardDetails] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [discoverOptions, setDiscoverOptions] = useState([]);
+  const [discoverMessage, setDiscoverMessage] = useState("");
   const dropdownRef = useRef(null);
   const discoverRef = useRef(null);
 
@@ -50,8 +51,13 @@ const Board = () => {
 
       setDiscoverOptions(boardsList);
     } catch (error) {
-      console.error("Error fetching dropdown options: ", error);
-      toast.error("Error fetching dropdown options");
+      if (error.response.data.message === "No boards found for the given book") {
+        setDiscoverMessage("No other users have made boards for this book yet.");
+      }
+      else {
+        console.error("Error fetching dropdown options: ", error);
+        toast.error("Error fetching dropdown options");
+      }
     }
   }
 
@@ -104,6 +110,15 @@ const Board = () => {
     console.log("-----------------------")
   }
 
+  function handleDropDown() {
+    if (discoverMessage !== "") {
+      toast.info(discoverMessage);
+    }
+    else {
+      setShowDropdown(!showDropdown);
+    }
+  }
+
   if (!boardDetails) {
     return (
       <div className="loading-page">
@@ -121,7 +136,7 @@ const Board = () => {
         <BackIcon className="back_svg"/>
         <h3>Go Back</h3>
       </div> 
-      <div className="discover" ref={discoverRef} onClick={() => setShowDropdown(!showDropdown)} data-tooltip-id="my-tooltip-1">
+      <div className="discover" ref={discoverRef} onClick={() => handleDropDown()} data-tooltip-id="my-tooltip-1">
         Discover
       </div>
       {showDropdown && (
