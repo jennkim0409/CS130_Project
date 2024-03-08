@@ -90,7 +90,6 @@ const Recommendations = () => {
 
             Promise.all(insertionPromises)
                 .then(() => {
-                    toast.dismiss(recToast);
                     console.log("All book recommendation insertions completed!");
                     setRecommendedShelfBooks(newCurrRecBooks);
                 })
@@ -101,6 +100,7 @@ const Recommendations = () => {
         .catch(error => {
             console.error("Error getting recommendations: ", error);
         });
+        toast.dismiss(recToast);
       }
       // no need to calculate recommendations; just get current ones
       else {
