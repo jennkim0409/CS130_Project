@@ -3,6 +3,8 @@ import axios from 'axios';
 
 import {Photo} from '../Bookshelf/Photo';
 import '../LoginSignup/LoginSignup.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 /* 
 Recommendation logic overview:
@@ -39,10 +41,8 @@ const Recommendations = () => {
       // (happens upon creating new account OR when genre preferences change)
       // @ kaylee TO DO: (when account customization page exists): reset recommendations shelf each time a user changes genre prefs
       if (currRecBooks.length === 0) {
+        const recToast = toast.loading("Fetching book recommendations.. This may take a minute!");
         console.log("no current book recommendations! getting from DB...");
-        // @ charlene TO DO: this will take awhile, so you might want to include a "loading..." popup here
-        // see below (search ***) for my comment when the popup can be resolved
-        
         // get book recommendations
         const path = 'http://localhost:5555/api/recommend/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
         axios.post(path, {},
@@ -90,7 +90,7 @@ const Recommendations = () => {
 
             Promise.all(insertionPromises)
                 .then(() => {
-                    /// @ charlene TO DO: loading popup can be resolved here! ***
+                    toast.dismiss(recToast);
                     console.log("All book recommendation insertions completed!");
                     setRecommendedShelfBooks(newCurrRecBooks);
                 })
@@ -201,7 +201,6 @@ const Recommendations = () => {
           {items.recommendations.map((book, index) => (
             <div style= {recListStyle} key= {index}>
               {/* book cover */}
-              {/* @ charlene TO DO: plz update the photo dimensions LOL */} 
               <Photo key={book.cover} url={book.cover} index={index} height= '18vw' width= '12vw' />
               {/* book info */} 
               <div style= {{ marginLeft: '5%' }}>
@@ -212,11 +211,11 @@ const Recommendations = () => {
                 <h5 style= {{ width: '40vw' }}>Subjects: {book.subject.length > 10 ? book.subject.slice(0, 10).join(", ") : book.subject.join(", ")}</h5>
               </div>
               {/* save button */} 
-              {/* @ charlene TO DO: also button dimensions here */} 
               <div className="submit gray" style= {{ width: '10vw' }} onClick={() => saveBook(book)}>Save</div>
             </div>
           ))}
       </div>
+      <ToastContainer/>
     </div>
   );
 };

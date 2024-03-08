@@ -17,6 +17,7 @@ const Board = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [discoverOptions, setDiscoverOptions] = useState([]);
   const [username, updateUsername] = useState(localStorage.getItem('user_name'));
+  const [discoverMessage, setDiscoverMessage] = useState("");
   const dropdownRef = useRef(null);
   const discoverRef = useRef(null);
 
@@ -53,7 +54,13 @@ const Board = () => {
 
       setDiscoverOptions(boardsList);
     } catch (error) {
-      console.error("Error fetching dropdown options: ", error);
+      if (error.response.data.message === "No boards found for the given book") {
+        setDiscoverMessage("No other users have made boards for this book yet.");
+      }
+      else {
+        console.error("Error fetching dropdown options: ", error);
+        toast.error("Error fetching dropdown options");
+      }
     }
   }
 
@@ -104,6 +111,18 @@ const Board = () => {
     window.open(url, '_blank');
   }
 
+  function handleDropDown() {
+    if (discoverMessage !== "") {
+      toast.info(discoverMessage, {
+        autoClose: 2000,
+        pauseOnHover: false,
+      });
+    }
+    else {
+      setShowDropdown(!showDropdown);
+    }
+  }
+
   if (!boardDetails) {
     return (
       <div className="loading-page">
@@ -124,20 +143,16 @@ const Board = () => {
       {
         userId === localStorage.getItem('user_id') ? (
           <>
-            <div className="discover" ref={discoverRef} onClick={() => setShowDropdown(!showDropdown)} data-tooltip-id="my-tooltip-1">
+            <div className="discover" ref={discoverRef} onClick={() => handleDropDown()} data-tooltip-id="my-tooltip-1">
               Discover
             </div>
             {showDropdown && (
               <div className="dropdown-content" ref={dropdownRef}>
-                {discoverOptions.length > 0 ? (
-                  discoverOptions.map((option, index) => (
-                    <div key={index} className="dropdown-item" onClick={() => discoverBoard(option)}>
-                      {option.username}
-                    </div>
-                  ))
-                ) : (
-                  <h5 style={{textAlign: 'center'}}>Oops! It seems like no one has made a board for this book yet.</h5>
-                )}
+                {discoverOptions.map((option, index) => (
+                  <div key={index} className="dropdown-item" onClick={()=>discoverBoard(option)}>
+                    {option.username}
+                  </div>
+                ))}
               </div>
             )}
           </>
