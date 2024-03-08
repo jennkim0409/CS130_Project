@@ -2,22 +2,70 @@ import { React, useState } from "react";
 import "./Explore.css";
 import Recommendations from '../../components/Recommendations/Recommendations';
 import GenrePreferences from '../../components/GenrePreferences/GenrePreferences';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 function Explore() {
     const [genrePreferences, setGenrePreferences] = useState([]);
 
+    function saveGenrePrefs() {
+        // save genre preferences in backend
+        const genrePrefsArray = genrePreferences.map(pref => pref.value);
+        const path = 'http://localhost:5555/api/user/set/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
+        axios.patch(path,
+            { genrePrefs: genrePrefsArray },
+            {
+              headers: {
+                Authorization: localStorage.getItem("user_token")
+              }
+            }
+        )
+        .then(response => {
+            console.log("Genre preferences saved successfully: ", response.data);
+        })
+        .catch(error => {
+            console.error("Error saving genre preferences: ", error);
+            const error_message = error.response.data.message;
+            toast.error(error_message);
+            return;
+        });
+
+        // update recommended shelf to be empty
+        // when we reload the page, new recommendations will be fetched
+        axios.post('http://localhost:5555/api/handlebooks/clearBookshelf/', 
+            { userId: localStorage.getItem("user_id").replace(/"/g, ''), bookshelfType: "recommended" }, 
+            {
+            headers: {
+                Authorization: localStorage.getItem("user_token")
+            }
+        })
+        .then(response => {
+            console.log("Old recommended bookshelf cleared: ", response.data);
+        })
+        .catch(error => {
+            console.error("Error clearing old recommended bookshelf: ", error.response);
+            return;
+        });
+
+        toast.success("Genre preferences saved!");
+    }
+
     return(
         <div className="Explore">
-            <h2 style={{ textAlign: "center" }}>Explore</h2>
-            
-            <div style={{ display: "flex", flexDirection: "column", paddingLeft: "30%" }}>
-                <GenrePreferences return_genres={setGenrePreferences} />
-                <h5 style={{ paddingRight: "40%" }}>Optional: If you do not select from this list, we will quickly shuffle recommendations from your previous genre preferences!</h5>
+            <h2 style={{ textAlign: "center" }}>Explore</h2>      
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                <div style={{ display: "flex", flexDirection: "column", paddingLeft: "30%" }}>
+                    <GenrePreferences return_genres={setGenrePreferences} />
+                    <h5 style={{ paddingRight: "40%" }}>Optional: If you do not select from this list, we will quickly shuffle recommendations from your previous genre preferences!</h5>
+                </div>
+                {/* need help styling this so it goes right next to genre pref div */}
+                <div className="submit gray" style= {{ width: '5vw' }} onClick={saveGenrePrefs}>Save</div>
             </div>
             <br/><br/>
             <Recommendations/>
+            <ToastContainer/>
         </div>
-
     );
 }
 export default Explore;
