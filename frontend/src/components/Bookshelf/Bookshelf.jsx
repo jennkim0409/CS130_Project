@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import {
   DndContext,
@@ -8,6 +8,7 @@ import {
   DragOverlay,
   useSensor,
   useSensors,
+  useDroppable
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -15,12 +16,15 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 
+
 // components
 import {Grid} from './Grid';
 import {SortablePhoto} from './SortablePhoto';
 import {Photo} from './Photo';
 
+
 const Bookshelf = () => {
+
   // items imported from .json (links to images)
   // hash table into readingList and finishedList
   const [items, setItems] = useState({
@@ -30,7 +34,12 @@ const Bookshelf = () => {
 
   // starting shelf for a book that is moved
   const [startingShelf, setStartingShelf] = useState('');
+  const [startIndex, setStartIndex] = useState('');
 
+  // Map items to an array of strings containing the ids
+  const readingListIds = useMemo(() => items.readingList.map((item) => item.cover), [items.readingList]);
+  const finishedListIds = useMemo(() => items.finishedList.map((item) => item.cover), [items.finishedList]);
+  
   // runs when component mounts
   useEffect(() => {
     const fetchBookshelfData = async () => {
@@ -89,31 +98,32 @@ const Bookshelf = () => {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-    
     {/* this div holds all page content */}
-      <div>
-        <SortableContext items={items.readingList} strategy={rectSortingStrategy}>
-        {/* can adjust the # of columns, but update .css accordingly */}
-          <Grid title='Interested' columns={8}>
-            {items.readingList.map((book, index) => (
-              <SortablePhoto key={book.cover} url={book.cover} index={index} />
-            ))}
-          </Grid>
-        </SortableContext>
-      </div>
       
-      <div>
-        <SortableContext items={items.finishedList} strategy={rectSortingStrategy}>
-          <Grid title='Finished' columns={8}>
-            {items.finishedList.map((book, index) => (
-              <SortablePhoto key={book.cover} url={book.cover} index={index} />
-            ))}
-          </Grid>
-        </SortableContext>
-      </div>
+    <div>
+      <SortableContext items={readingListIds} strategy={rectSortingStrategy}>
+      {/* can adjust the # of columns, but update .css accordingly */}
+        <Grid title='Interested' columns={8}>
+          {items.readingList.map((book, index) => (
+            <SortablePhoto key={book.cover} url={book.cover} index={index} />
+          ))}
+        </Grid>
+      </SortableContext>
+    </div>
+    
+    <div>
+      <SortableContext items={finishedListIds} strategy={rectSortingStrategy}>
+        <Grid title='Finished' columns={8}>
+          {items.finishedList.map((book, index) => (
+            <SortablePhoto key={book.cover} url={book.cover} index={index} />
+          ))}
+        </Grid>
+      </SortableContext>
+    </div>
+      
 
       {/* handles overlay and smooth animation */}
-      <DragOverlay adjustScale={true}>
+      <DragOverlay>
         {/* only trigger when there is an active component, else display nothing */}
         {activeId ? (
           <div>
@@ -129,14 +139,23 @@ const Bookshelf = () => {
   /* when user starts dragging draggable component
   set this component to the active ID */
   function handleDragStart(event) {
+    console.log(`Picked up draggable item ${event.active.id}.`);
     setActiveId(event.active.id);
     setStartingShelf(findContainer(event.active.id));
+    setStartIndex(items[findContainer(event.active.id)].findIndex(book => book.cover === event.active.id));
   }
 
   /* when user drags draggable over a droppable
   should be able to hop between position and containers
   not super necessary to understand logic!  */
   function handleDragOver(event) {
+    if (event.over.id) {
+      //console.log(`Draggable item ${event.active.id} was moved over droppable area ${event.over.id}.`) ;
+    }
+    else {
+      //console.log(`Draggable item ${event.active.id} is no longer over a droppable area.`);
+    }
+
     // active is the dragging component
     // over is the position it is dragging over
     const { active, over, draggingRect } = event;
@@ -218,8 +237,13 @@ const Bookshelf = () => {
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
     const overIndex = items[overContainer].findIndex(book => book.cover === overId);
 
+    console.log("active, over index:", activeIndex, overIndex);
     // update backend of book movement
     const endingShelf = activeContainer;
+    
+    // TODO: use this starting index!!
+    console.log("starting index, shelf:", startIndex, startingShelf);
+    console.log("ending index, shelf:", overIndex, endingShelf);
 
     // if the shelves are different, insert at active index
       // NOTE: this code inserts the book at the place it is *supposed* to be inserted
@@ -233,7 +257,7 @@ const Bookshelf = () => {
       bookData.bookId = bookToMove._id;
       bookData.fromShelf = startingShelf === "readingList" ? "current" : "finished";
       bookData.toShelf = endingShelf === "readingList" ? "current" : "finished";
-      bookData.newOrder = activeIndex;
+      bookData.newOrder = overIndex;
 
       axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookData }, {
         headers: {
@@ -293,6 +317,9 @@ const Bookshelf = () => {
     if (id in items) {
       return id;
     }
+
+    if (id == "Interested") { return "readingList" };
+    if (id == "Finished") { return "finishedList" };
 
     // return name of bookshelf that contains the book corresponding to this id (cover url)
     return Object.keys(items).find((shelfName) => {
