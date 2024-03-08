@@ -38,7 +38,9 @@ function Account(props) {
         // update password in backend
         if (currentPassword !== '' && newPassword !== '' && newPassword2 !== '') {
             if (newPassword !== newPassword2) {
-                toast.error("The new passwords you provided do not match.");
+                toast.error("The new passwords you provided do not match.", {
+                    autoClose: 2000,
+                });
                 return;
             }
     
@@ -84,12 +86,17 @@ function Account(props) {
     
         Promise.all(promises)
             .then(() => {
-                toast.success("Account preferences successfully updated!");
+                toast.success("Account preferences successfully updated!", {
+                    autoClose: 2000,
+                    pauseOnHover: false,
+                });
             })
             .catch(error => {
                 console.error("Error during update: ", error);
                 const error_message = error.response.data.message;
-                toast.error(error_message);                
+                toast.error(error_message, {
+                    autoClose: 2000,
+                });             
             });
     };
 
