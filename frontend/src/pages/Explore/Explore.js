@@ -1,11 +1,11 @@
-import { React, useState } from "react";
+import React, { useState } from "react";
 import "./Explore.css";
 import Recommendations from '../../components/Recommendations/Recommendations';
 import GenrePreferences from '../../components/GenrePreferences/GenrePreferences';
 
 function Explore() {
     const [genrePreferences, setGenrePreferences] = useState([]);
-
+    
     return(
         <div className="Explore">
             <h2 style={{ textAlign: "center" }}>Explore</h2>

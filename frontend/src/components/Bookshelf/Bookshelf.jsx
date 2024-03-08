@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useMemo } from 'react';
+import expiredToken from '../ExpiredToken';
 import axios from 'axios';
 import {
   DndContext,
@@ -70,6 +71,10 @@ const Bookshelf = () => {
         console.log(itemsData)
       } catch (error) {
         console.error("Error fetching books:", error);
+        if (error.response.data.message === "Unauthorized- Invalid Token" || 
+          error.response.data.message === "Unauthorized- Missing token") {
+          expiredToken();
+        } 
       }
     };
 

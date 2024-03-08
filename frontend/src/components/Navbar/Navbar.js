@@ -34,7 +34,7 @@ export default function Navbar() {
                         <a href="/account">Account</a>
                     </div>
                     <div className="dot">
-                        <span class="dot"></span>
+                        <span className="dot"></span>
                     </div>
                 </div>
                 </>
