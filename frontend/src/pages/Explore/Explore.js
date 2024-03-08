@@ -55,18 +55,20 @@ function Explore() {
     return(
         <div className="Explore">
             <h2 style={{ textAlign: "center" }}>Explore</h2>      
-            <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
                 <div style={{ display: "flex", flexDirection: "column", paddingLeft: "30%" }}>
                     <GenrePreferences return_genres={setGenrePreferences} />
-                    <h5 style={{ paddingRight: "40%" }}>Optional: If you do not select from this list, we will quickly shuffle recommendations from your previous genre preferences!</h5>
+                    <h5 style={{ paddingRight: "40%" }}>Optional: Select above if you want to add additional genre preferences. Otherwise, we will use your previous history of them!</h5>
+                    <div style={{ display: "flex", justifyContent: "center", width: "42vw" }}>
+                        <div className="submit gray" style={{ width: "15vw" }} onClick={saveGenrePrefs}>Save</div>
+                    </div>
                 </div>
-                {/* need help styling this so it goes right next to genre pref div */}
-                <div className="submit gray" style= {{ width: '5vw' }} onClick={saveGenrePrefs}>Save</div>
             </div>
             <br/><br/>
             <Recommendations/>
             <ToastContainer/>
         </div>
+
     );
 }
 export default Explore;
