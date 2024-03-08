@@ -15,6 +15,12 @@ const boardSchema = new Schema({
     bookCover: {
         type: String
     },
+    username: {
+        type: String
+    },
+    userId: {
+        type: String
+    },
     items:
         [{
         type: Schema.Types.ObjectId,

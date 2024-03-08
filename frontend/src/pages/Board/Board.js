@@ -36,20 +36,19 @@ const Board = () => {
     }
   }
 
-  // todo @ kaylee : get a list of boards with user's name from backend
-  // also togglePublic stores whether a user wants board to be public or not
-  // so store this in backend as well!
   async function getDropdownOptions() {
     try {
-      // code to get a list of other boards of the same book
-      // use setDiscoverOptions to update what gets shown in dropdown
-      // once implemented, you can get rid of this example array ! just wanted to show what dropdown looks like
-      const example = [
-        { id: 1, name: 'jenn' },
-        { id: 2, name: 'kaylee' },
-        { id: 3, name: 'charlene' },
-      ];
-      setDiscoverOptions(example);
+      let boardsList = [];
+      if (boardDetails) {
+        const response = await axios.get('http://localhost:5555/api/board/getBoardsByBook/', {
+          params: { userId: localStorage.getItem("user_id").replace(/"/g, ''), bookTitle: boardDetails.bookTitle, bookAuthor: boardDetails.bookAuthor },
+          headers: { Authorization: localStorage.getItem("user_token") }
+        });
+        boardsList = response.data;
+        console.log("list of boards for this book: ", boardsList);
+      }
+
+      setDiscoverOptions(boardsList);
     } catch (error) {
       console.error("Error fetching dropdown options: ", error);
       toast.error("Error fetching dropdown options");
@@ -59,8 +58,30 @@ const Board = () => {
   // get board details and discover options upon initialization
   useEffect(() => {
     getBoardDetails();
-    getDropdownOptions();
   }, [boardId]);
+
+  // get dropdown options once board details is initialized properly
+  useEffect(() => {
+    getDropdownOptions();
+  }, [boardDetails]); 
+
+  // save board's visibility in backend
+  useEffect(() => {
+    async function updateVisibility() {
+      try {
+        const response = await axios.post('http://localhost:5555/api/board/updateBoardVisibility/', 
+        { boardId: boardId, publicVisibility: togglePublic }, 
+        {
+            headers: { Authorization: localStorage.getItem("user_token") }
+        });
+        console.log(response.data);
+      } 
+      catch (error) {
+          console.error("Error saving public toggle status in backend: ", error);
+      }
+    }
+    updateVisibility();
+  }, [togglePublic]);
 
   // handles allowing a user to click anywhere on page to get rid of 
   // discovery boards list
@@ -74,6 +95,14 @@ const Board = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []); 
+
+  // @ jenn here's rest of info you need!
+  function discoverBoard(board) {
+    console.log("DISCOVER BOARD: ");
+    console.log("board id: ", board.id);
+    console.log("user id: ", board.userId);
+    console.log("-----------------------")
+  }
 
   if (!boardDetails) {
     return (
@@ -98,8 +127,8 @@ const Board = () => {
       {showDropdown && (
           <div className="dropdown-content" ref={dropdownRef}>
             {discoverOptions.map((option, index) => (
-              <div key={index} className="dropdown-item" onClick={()=>console.log(option.name)}>
-                {option.name}
+              <div key={index} className="dropdown-item" onClick={()=>discoverBoard(option)}>
+                {option.username}
               </div>
             ))}
           </div>
@@ -119,7 +148,7 @@ const Board = () => {
           <h4 style={{margin: '5px'}}>Make Public?</h4>
             <Toggle
               defaultChecked={togglePublic}
-              onChange={() => setTogglePublic(!!togglePublic)}
+              onChange={() => setTogglePublic(!togglePublic)}
             />
         </label>
       </div>

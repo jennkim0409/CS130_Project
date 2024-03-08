@@ -82,6 +82,8 @@ function Boards() {
             boardData.bookTitle = selectedBook.title;
             boardData.bookAuthor = selectedBook.author;
             boardData.bookCover = selectedBook.cover;
+            boardData.username = localStorage.getItem('user_name');
+            boardData.userId = localStorage.getItem('user_id');
             boardData.publicVisibility = true; // update if we give user option to set boards private/public
 
             try {
