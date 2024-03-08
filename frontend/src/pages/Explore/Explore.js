@@ -49,6 +49,7 @@ function Explore() {
         });
 
         toast.success("Genre preferences saved!");
+        toast.info("Reload the page to get new book recommendations.")
     }
 
     return(
