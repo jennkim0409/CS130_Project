@@ -11,11 +11,12 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 const Board = () => {
   const navigate = useNavigate();
-  const { boardId } = useParams(); // This hooks into the router and gives you the dynamic part of the URL
+  const { userId, boardId } = useParams(); // This hooks into the router and gives you the dynamic part of the URL
   const [togglePublic, setTogglePublic] = useState(true);
   const [boardDetails, setBoardDetails] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [discoverOptions, setDiscoverOptions] = useState([]);
+  const [username, updateUsername] = useState(localStorage.getItem('user_name'));
   const dropdownRef = useRef(null);
   const discoverRef = useRef(null);
 
@@ -29,6 +30,8 @@ const Board = () => {
       console.log("board details from Board.js: ");
       console.log(response.data);
       setBoardDetails(response.data);
+      updateUsername(response.data.username);
+      setTogglePublic(response.data.publicVisibility);
     } 
     catch (error) {
         console.error("Error getting board data: ", error);
@@ -51,14 +54,13 @@ const Board = () => {
       setDiscoverOptions(boardsList);
     } catch (error) {
       console.error("Error fetching dropdown options: ", error);
-      toast.error("Error fetching dropdown options");
     }
   }
 
   // get board details and discover options upon initialization
   useEffect(() => {
     getBoardDetails();
-  }, [boardId]);
+  }, [boardId, userId]);
 
   // get dropdown options once board details is initialized properly
   useEffect(() => {
@@ -98,10 +100,8 @@ const Board = () => {
 
   // @ jenn here's rest of info you need!
   function discoverBoard(board) {
-    console.log("DISCOVER BOARD: ");
-    console.log("board id: ", board.id);
-    console.log("user id: ", board.userId);
-    console.log("-----------------------")
+    const url = `/boards/${board.userId}/${board.id}`;
+    window.open(url, '_blank');
   }
 
   if (!boardDetails) {
@@ -121,18 +121,32 @@ const Board = () => {
         <BackIcon className="back_svg"/>
         <h3>Go Back</h3>
       </div> 
-      <div className="discover" ref={discoverRef} onClick={() => setShowDropdown(!showDropdown)} data-tooltip-id="my-tooltip-1">
-        Discover
-      </div>
-      {showDropdown && (
-          <div className="dropdown-content" ref={dropdownRef}>
-            {discoverOptions.map((option, index) => (
-              <div key={index} className="dropdown-item" onClick={()=>discoverBoard(option)}>
-                {option.username}
+      {
+        userId === localStorage.getItem('user_id') ? (
+          <>
+            <div className="discover" ref={discoverRef} onClick={() => setShowDropdown(!showDropdown)} data-tooltip-id="my-tooltip-1">
+              Discover
+            </div>
+            {showDropdown && (
+              <div className="dropdown-content" ref={dropdownRef}>
+                {discoverOptions.length > 0 ? (
+                  discoverOptions.map((option, index) => (
+                    <div key={index} className="dropdown-item" onClick={() => discoverBoard(option)}>
+                      {option.username}
+                    </div>
+                  ))
+                ) : (
+                  <h5 style={{textAlign: 'center'}}>Oops! It seems like no one has made a board for this book yet.</h5>
+                )}
               </div>
-            ))}
-          </div>
-      )}
+            )}
+          </>
+        )
+        :
+        <div className="other-user">
+          {username}'s Board
+        </div>
+      }
       <div className="boardInfo">
         <div className="book-cover">
           {/* Assuming the boardDetails contains a bookCover property */}
@@ -143,18 +157,23 @@ const Board = () => {
           <div className="book-author">{boardDetails.bookAuthor}</div>
         </div>
       </div>
-      <div className="privacy">
-        <label>
-          <h4 style={{margin: '5px'}}>Make Public?</h4>
-            <Toggle
-              defaultChecked={togglePublic}
-              onChange={() => setTogglePublic(!togglePublic)}
-            />
-        </label>
-      </div>
+      {
+        userId == localStorage.getItem('user_id') ?
+          <div className="privacy">
+            <label>
+              <h4 style={{margin: '5px'}}>Make Public?</h4>
+                <Toggle
+                  defaultChecked={togglePublic}
+                  onChange={() => setTogglePublic(!togglePublic)}
+                />
+            </label>
+          </div>
+          :
+          null
+      }
       <div className="modal">
         {/* Render your layout and data based on boardId */}
-        <ModalAndPin boardId={boardId}/>
+        <ModalAndPin boardId={boardId} owner={userId === localStorage.getItem('user_id')}/>
       </div>
       <ReactTooltip
         id="my-tooltip-1"

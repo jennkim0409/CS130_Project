@@ -84,7 +84,7 @@
     background-color: white; 
     width: 30%; 
     min-width: 300px;
-    min-height: 200px;
+    min-height: 100px;
     justify-content: center;
     align-items: center;
     left: 50%; 
@@ -126,11 +126,16 @@
     justify-content: center;
     margin: auto;
     animation: spin 1s linear infinite; /* Animation applied here */
-  }
+}
   
-  @keyframes spin {
+@keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-  }
+}
 
+.other-user {
+    text-align: center;
+    font-size: 30px;
+    color: #154A14;
+}
   
