@@ -38,7 +38,7 @@ const Board = () => {
           error.response.data.message === "Unauthorized- Missing token") {
           expiredToken();
         }
-        toast.error("Error getting board data: ", error);
+        toast.error("Error getting board data");
     }
   }
 

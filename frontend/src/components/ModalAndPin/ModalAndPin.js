@@ -4,6 +4,7 @@ import Modal from '../Modal/Modal';
 import Pin from '../Pin/Pin';
 import add from '../../assets/add.svg';
 import axios from 'axios';
+import expiredToken from '../ExpiredToken';
 
 class ModalAndPin extends React.Component {
     constructor(props) {
@@ -84,6 +85,10 @@ class ModalAndPin extends React.Component {
             }));
         } catch (error) {
             console.error("Error adding pin: ", error);
+            if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                error.response.data.message === "Unauthorized- Missing token") {
+                expiredToken();
+            }
         }
     }
 
@@ -101,6 +106,10 @@ class ModalAndPin extends React.Component {
         } 
         catch (error) {
             console.error("Error updating pin: ", error);
+            if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                error.response.data.message === "Unauthorized- Missing token") {
+                expiredToken();
+            }
         }
         
         // update frontend
@@ -143,6 +152,10 @@ class ModalAndPin extends React.Component {
         } 
         catch (error) {
             console.error("Error removing pin: ", error);
+            if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                error.response.data.message === "Unauthorized- Missing token") {
+                expiredToken();
+            }
         }
     }
 
