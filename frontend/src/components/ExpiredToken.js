@@ -8,12 +8,15 @@ function expiredToken() {
     autoClose: 3000, // Auto close after 5 seconds
     hideProgressBar: false,
     closeOnClick: true,
-    pauseOnHover: true,
+    pauseOnHover: false,
+    onClose: () => {
+      // Remove the token from localStorage
+      localStorage.removeItem("user_token");
+      
+      // Redirect to the login page after the toast notification closes
+      window.location.href = '/';
+    }
   });
-
-  localStorage.removeItem("user_token");
-
-  window.location.href = '/';
 }
 
 export default expiredToken;

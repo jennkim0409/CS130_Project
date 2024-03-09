@@ -1,5 +1,6 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Explore from "./pages/Explore/Explore";
 import Boards from "./pages/Boards/Boards";
@@ -11,7 +12,10 @@ import LoginSignup from './components/LoginSignup/LoginSignup';
 import SignupPersonalize from './components/SignupPersonalize/SignupPersonalize';
 import { ToastContainer } from 'react-toastify';
 
-function App() {
+function App({ testRouterProps }) {
+  const isTestEnv = process.env.NODE_ENV === 'test';
+  const Router = isTestEnv ? MemoryRouter : BrowserRouter;
+
   // Determine if the user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("user_token"));
 
@@ -29,7 +33,7 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <Router {...testRouterProps}>
       <Routes>
         <Route element={<NavbarLayout/>}>
           <Route path="/" element={isLoggedIn ? <Navigate replace to="/explore" /> : <LoginSignup />} />
