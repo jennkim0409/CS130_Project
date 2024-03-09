@@ -105,7 +105,6 @@ const Board = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []); 
 
-  // @ jenn here's rest of info you need!
   function discoverBoard(board) {
     const url = `/boards/${board.userId}/${board.id}`;
     window.open(url, '_blank');
@@ -136,10 +135,15 @@ const Board = () => {
   // Here, you can fetch data based on boardId, or import a layout component and pass boardId to it
   return (
     <div className='board'>
-      <div onClick={() => navigate('/boards')} className="go_back">
-        <BackIcon className="back_svg"/>
-        <h3>Go Back</h3>
-      </div> 
+      {
+        userId === localStorage.getItem('user_id') ?
+          <div onClick={() => navigate('/boards')} className="go_back">
+            <BackIcon className="back_svg"/>
+            <h3>Go Back</h3>
+          </div>
+        :
+          null
+      } 
       {
         userId === localStorage.getItem('user_id') ? (
           <>
