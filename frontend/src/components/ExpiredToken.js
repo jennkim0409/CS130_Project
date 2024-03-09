@@ -9,11 +9,12 @@ function expiredToken() {
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
+    onClose: () => {
+      // This function is called after the toast is dismissed
+      localStorage.removeItem("user_token");
+      window.location.href = '/';
+  }
   });
-
-  localStorage.removeItem("user_token");
-
-  window.location.href = '/';
 }
 
 export default expiredToken;

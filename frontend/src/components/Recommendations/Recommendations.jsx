@@ -159,6 +159,10 @@ const Recommendations = () => {
     })
     .catch(error => {
         console.error("Error moving book to current shelf: ", error.response);
+        if (error.response.data.message === "Unauthorized- Invalid Token" || 
+          error.response.data.message === "Unauthorized- Missing token") {
+          expiredToken();
+        }
     });
   }
 

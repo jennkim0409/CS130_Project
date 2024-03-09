@@ -7,7 +7,8 @@ import Toggle from 'react-toggle'
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import expiredToken from '../../components/ExpiredToken';
 
 const Board = () => {
   const navigate = useNavigate();
@@ -33,6 +34,10 @@ const Board = () => {
     } 
     catch (error) {
         console.error("Error getting board data: ", error);
+        if (error.response.data.message === "Unauthorized- Invalid Token" || 
+          error.response.data.message === "Unauthorized- Missing token") {
+          expiredToken();
+        }
         toast.error("Error getting board data: ", error);
     }
   }
@@ -53,6 +58,10 @@ const Board = () => {
     } catch (error) {
       if (error.response.data.message === "No boards found for the given book") {
         setDiscoverMessage("No other users have made boards for this book yet.");
+      }
+      else if (error.response.data.message === "Unauthorized- Invalid Token" || 
+        error.response.data.message === "Unauthorized- Missing token") {
+        expiredToken();
       }
       else {
         console.error("Error fetching dropdown options: ", error);
