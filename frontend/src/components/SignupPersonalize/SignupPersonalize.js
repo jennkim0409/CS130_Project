@@ -171,6 +171,7 @@ function SignupPersonalize() {
                                 />
                             </div>
                             <div className="genre-select">
+                                <h4>Genre Preferences</h4>
                                 <GenrePreferences return_genres={setGenrePreferences}/>
                             </div>
                         </div>

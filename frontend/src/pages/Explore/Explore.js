@@ -54,16 +54,17 @@ function Explore() {
 
     return(
         <div className="Explore">
-            <h2 style={{ textAlign: "center" }}>Explore</h2>      
-            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ display: "flex", flexDirection: "column", paddingLeft: "30%" }}>
-                    <GenrePreferences return_genres={setGenrePreferences} />
-                    <h5 style={{ paddingRight: "40%" }}>Optional: Select above if you want to add additional genre preferences. Otherwise, we will use your previous history of them!</h5>
-                    <div style={{ display: "flex", justifyContent: "center", width: "42vw" }}>
-                        <div className="submit gray" style={{ width: "15vw" }} onClick={saveGenrePrefs}>Save</div>
-                    </div>
+            <h2 style={{ textAlign: "center" }}>Explore</h2>    
+            <h4 style={{ textAlign: "center" }}>Genre Preferences</h4>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <GenrePreferences return_genres={setGenrePreferences} />
+                <h5 style={{ width: "30vw", minWidth: '300px' }}>Optional: Select above if you want to add additional genre preferences. Otherwise, we will use your previous history of them!</h5>
+                <div style={{ display: "flex" }}>
+                    <div className="submit gray" style={{ width: "10vw", minWidth: "100px" }} onClick={saveGenrePrefs}>Save</div>
                 </div>
             </div>
+            
+
             <br/><br/>
             <Recommendations/>
             <ToastContainer/>

@@ -21,6 +21,7 @@ import {
 import {Grid} from './Grid';
 import {SortablePhoto} from './SortablePhoto';
 import {Photo} from './Photo';
+import remove from '../../assets/remove.png';
 
 
 const Bookshelf = () => {
@@ -76,6 +77,10 @@ const Bookshelf = () => {
     fetchBookshelfData();
   }, []);
 
+  const removeBook = async (opt) => {
+
+  };
+
   // activeId denotes what component is currently interacted with
   // setActiveId handles updating this ID
   // need to useState so that you can manage state 
@@ -100,12 +105,24 @@ const Bookshelf = () => {
     >
     {/* this div holds all page content */}
       
+
     <div>
       <SortableContext items={readingListIds} strategy={rectSortingStrategy}>
       {/* can adjust the # of columns, but update .css accordingly */}
         <Grid title='Interested' columns={8}>
           {items.readingList.map((book, index) => (
-            <SortablePhoto key={book.cover} url={book.cover} index={index} />
+            <div className="book-image-container" style={{height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
+              <SortablePhoto key={book.cover} url={book.cover} index={index} />
+              <div 
+                className="remove-button" 
+                onClick={() => {
+                    if (window.confirm("Are you sure you want to delete this book from your shelf?")) {
+                        removeBook(book.cover)
+                    }
+                }}>
+                <img src={remove} alt="Remove" />
+              </div>
+            </div>
           ))}
         </Grid>
       </SortableContext>
@@ -115,13 +132,23 @@ const Bookshelf = () => {
       <SortableContext items={finishedListIds} strategy={rectSortingStrategy}>
         <Grid title='Finished' columns={8}>
           {items.finishedList.map((book, index) => (
-            <SortablePhoto key={book.cover} url={book.cover} index={index} />
+            <div className="book-image-container" style={{height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
+              <SortablePhoto key={book.cover} url={book.cover} index={index} />
+              <div 
+                className="remove-button" 
+                onClick={() => {
+                    if (window.confirm("Are you sure you want to delete this book from your shelf?")) {
+                        removeBook(book.cover)
+                    }
+                }}>
+                <img src={remove} alt="Remove" />
+              </div>
+            </div>
           ))}
         </Grid>
       </SortableContext>
     </div>
       
-
       {/* handles overlay and smooth animation */}
       <DragOverlay>
         {/* only trigger when there is an active component, else display nothing */}
