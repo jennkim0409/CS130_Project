@@ -49,7 +49,6 @@ function GenrePreferences({ return_genres }) {
 
     return (
         <div className="genre">
-            <h4>Genre Preferences</h4>
             <Select
                 className='dropdown'
                 placeholder='Select up to 5...'
