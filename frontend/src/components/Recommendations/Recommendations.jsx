@@ -5,7 +5,6 @@ import {Photo} from '../Bookshelf/Photo';
 import '../LoginSignup/LoginSignup.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import expiredToken from '../ExpiredToken';
 
 /* 
 Recommendation logic overview:
@@ -30,73 +29,87 @@ const Recommendations = () => {
   // runs when component mounts
   useEffect(() => {
     const getRecommendationData = async () => {
-      try {
-        const response = await axios.get('http://localhost:5555/api/handlebooks/getBooks/', {
-          params: { userId: localStorage.getItem("user_id").replace(/"/g, ''), type: 'recommended' },
-          headers: { Authorization: localStorage.getItem("user_token") }
-        });
-  
-        const currRecBooks = response.data;
-        // Check if current recommendations exist
-        if (currRecBooks.length === 0) {
-          const recToast = toast.loading("Fetching book recommendations.. This may take a minute!");
-          const path = 'http://localhost:5555/api/recommend/' + localStorage.getItem("user_id").replace(/"/g, '');
-          
-          try {
-            const response = await axios.post(path, {}, {
-              headers: { Authorization: localStorage.getItem("user_token") }
-            });
-  
-            const recObjects = response.data;
-            let newCurrRecBooks = [];
-  
-            await Promise.all(recObjects.map(async (recObj) => {
-              const bookFields = recObj[0];
-              const bookToInsert = {
-                title: bookFields.title,
-                summary: bookFields.summary,
-                isbn: bookFields.isbn,
-                subject: bookFields.subject,
-                userId: localStorage.getItem("user_id").replace(/"/g, ''),
-                bookshelfType: 'recommended',
-                cover: bookFields.cover_url,
-                author: bookFields.author_name
-              };
-  
-              try {
-                const response = await axios.post('http://localhost:5555/api/handlebooks/addBook', bookToInsert, {
-                  headers: { Authorization: localStorage.getItem("user_token") }
-                });
-                newCurrRecBooks.push(response.data.book);
-              } catch (error) {
-                console.error("Error adding book to recommended shelf: ", error.response);
-                // Handle error (e.g., token invalidation) here
-              }
-            }));
-  
-            toast.dismiss(recToast);
-            console.log("All book recommendation insertions completed!");
-            setRecommendedShelfBooks(newCurrRecBooks);
+      // get books from recommended shelf
+      const response = await axios.get('http://localhost:5555/api/handlebooks/getBooks/', {
+            params: { userId: localStorage.getItem("user_id").replace(/"/g, ''), type: 'recommended' },
+            headers: { Authorization: localStorage.getItem("user_token") }
+          });
 
-          } catch (error) {
+      const currRecBooks = response.data;
+
+      // if no current recommendations exist, get them from DB
+      // (happens upon creating new account OR when genre preferences change)
+      // @ kaylee TO DO: (when account customization page exists): reset recommendations shelf each time a user changes genre prefs
+      if (currRecBooks.length === 0) {
+        const recToast = toast.loading("Fetching book recommendations.. This may take a minute!");
+        console.log("no current book recommendations! getting from DB...");
+        // get book recommendations
+        const path = 'http://localhost:5555/api/recommend/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
+        axios.post(path, {},
+            {
+              headers: {
+                Authorization: localStorage.getItem("user_token")
+              }
+            }
+        )
+        .then(response => {
+            const recObjects = response.data;
+            console.log("Successfully received recommendations: ", recObjects);
+  
+            let newCurrRecBooks = [];
+            const insertionPromises = [];
+
+            // insert book recommendations into recommended shelf
+            recObjects.forEach(recObj => {
+                const bookFields = recObj[0];
+                const bookToInsert = {
+                    title: bookFields.title,
+                    summary: bookFields.summary,
+                    isbn: bookFields.isbn,
+                    subject: bookFields.subject,
+                    userId: localStorage.getItem("user_id").replace(/"/g, ''),
+                    bookshelfType: 'recommended',
+                    cover: bookFields.cover_url,
+                    author: bookFields.author_name
+                };
+
+                insertionPromises.push(
+                    axios.post('http://localhost:5555/api/handlebooks/addBook', { ...bookToInsert }, {
+                        headers: {
+                            Authorization: localStorage.getItem("user_token")
+                        }
+                    })
+                    .then(response => {
+                        newCurrRecBooks.push(response.data.book);
+                    })
+                    .catch(error => {
+                        console.error("Error adding book to recommended shelf: ", error.response);
+                    })
+                );
+            });
+
+            Promise.all(insertionPromises)
+                .then(() => {
+                    console.log("All book recommendation insertions completed!");
+                    setRecommendedShelfBooks(newCurrRecBooks);
+                })
+                .catch(error => {
+                    console.error("One or more book recommendation insertions failed: ", error);
+                });
+        })
+        .catch(error => {
             console.error("Error getting recommendations: ", error);
-            toast.dismiss(recToast);
-          }
-        } else {
-          setRecommendedShelfBooks(currRecBooks);
-        }
-      } catch (error) {
-        console.error("Error fetching initial book data: ", error);
-        if (error.response.data.message === "Unauthorized- Invalid Token" || 
-          error.response.data.message === "Unauthorized- Missing token") {
-          expiredToken();
-        }
+        });
+        toast.dismiss(recToast);
+      }
+      // no need to calculate recommendations; just get current ones
+      else {
+        setRecommendedShelfBooks(currRecBooks);
       }
     };
-  
+
     getRecommendationData();
   }, []);
-  
 
   // when the recommendedShelfBooks variable is updated in getRecommendationData function
   // we will get current recommendations for the page
