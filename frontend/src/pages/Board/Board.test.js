@@ -32,7 +32,7 @@ describe('Board Pin Component', () => {
         username: 'Person 1',
         items: [
           {quote: "quote 1", id: "1", ordering_id: "pin-1", title: "text", img_blob: ""},
-          {quote: "", id: "2", ordering_id: "pin-2", title: "image", img_blob: "image"},
+          {quote: "", id: "2", ordering_id: "pin-2", title: "image", img_blob: "image", pin_size: "small"},
         ]
       }
     });
@@ -43,7 +43,10 @@ describe('Board Pin Component', () => {
   });
 
   it('displays saved pins from database to the modal', async () => {
-    render(<ModalAndPin boardId="123456789" />);
+    const isOwner = localStorage.getItem("user_id") === 'thisisatest';
+
+    // isOwner is true
+    render(<ModalAndPin boardId="123456789" owner={isOwner}/>);
 
     // Wait for the pins to be fetched and displayed
     await waitFor(() => expect(screen.getByText("text")).toBeInTheDocument());
@@ -60,7 +63,10 @@ describe('Board Pin Component', () => {
   });
 
   it('can add a pin and display it on modal', async () => {
-    render(<ModalAndPin boardId="123456789" />);
+    const isOwner = localStorage.getItem("user_id") === 'thisisatest';
+
+    // isOwner is true
+    render(<ModalAndPin boardId="123456789" owner={isOwner}/>);
     
     // simulate user creating an image pin
     userEvent.click(screen.getByAltText("add_pin"));
@@ -96,7 +102,7 @@ describe('Board Component - Viewing Another User\'s Board', () => {
     axios.post.mockClear();
 
     localStorage.setItem("user_token", '987654321');
-    localStorage.setItem("user_id", 'user1');
+    localStorage.setItem("user_id", 'differentperson');
 
     // Mock the axios get request to return board details not owned by the current user
     axios.get.mockResolvedValue({
@@ -108,18 +114,17 @@ describe('Board Component - Viewing Another User\'s Board', () => {
         username: 'Person 2',
         items: [
           {quote: "quote 1", id: "1", ordering_id: "pin-1", title: "text", img_blob: ""},
-          {quote: "", id: "2", ordering_id: "pin-2", title: "image", img_blob: "image"},
+          {quote: "", id: "2", ordering_id: "pin-2", title: "image", img_blob: "image", pin_size: "small"},
         ]
       }
     });
   });
 
   it('should not be able to edit pins if on other user\'s board', async () => {
-    render(
-      <Router>
-        <ModalAndPin boardId="123456789" />
-      </Router>
-    );
+    const isOwner = localStorage.getItem("user_id") === 'thisisatest';
+
+    // isOwner is false
+    render(<ModalAndPin boardId="123456789" owner={isOwner}/>);
 
     // Since the current user does not own the board, the remove option should not be visible
     // Wait for the pins to be fetched and displayed first
@@ -127,9 +132,10 @@ describe('Board Component - Viewing Another User\'s Board', () => {
     const pinImage = screen.getByAltText('pin_image');
     userEvent.click(pinImage);
 
-    /* await waitFor(() => {
-      expect(screen.getAllByAltText('remove')).toHaveLength(0);
-    }); */
-
+    // user shouldn't be given option to edit this board
+    await waitFor(() => {
+      const removeIcons = screen.queryAllByAltText('remove');
+      expect(removeIcons).toHaveLength(0);
+    });
   });
 });

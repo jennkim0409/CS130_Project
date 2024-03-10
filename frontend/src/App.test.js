@@ -22,7 +22,7 @@ describe('App Component Navigation Success', () => {
         localStorage.setItem("user_token", '123456789');
         localStorage.setItem("user_id", 'thisisatest');
         render(<App />);
-        const exploreElement = await screen.findByText(/Select above if you want to add additional genre preferences/i);
+        const exploreElement = await screen.findByText(/Shuffle/i);
         expect(exploreElement).toBeInTheDocument();
     });
 
@@ -55,7 +55,7 @@ describe('App Component Navigation Failure', () => {
     it('should not redirect to Explore page when not logged in', async () => {
         Storage.prototype.getItem.mockReturnValue(null); // Simulate logged out user
         render(<App />);
-        const exploreElement = screen.queryByText(/Select above if you want to add additional genre preferences/i);
+        const exploreElement = screen.queryByText(/Shuffle/i);
         expect(exploreElement).not.toBeInTheDocument();
     });
 

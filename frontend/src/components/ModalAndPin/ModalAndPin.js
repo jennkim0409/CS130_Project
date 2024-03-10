@@ -62,7 +62,8 @@ class ModalAndPin extends React.Component {
             // we use the length of the state pins since this keeps increasing with every new pin
             pins.forEach((pinDetails) => {
                 new_pins.push(
-                    <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} removePin={this.remove_pin} editPin={this.editPin}/>
+                    <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} 
+                    removePin={this.remove_pin} editPin={this.editPin} owner={this.state.owner}/>
                 )
             });
             this.setState({
@@ -92,7 +93,8 @@ class ModalAndPin extends React.Component {
             // update state with new pin and the lastId
             this.setState(prevState => ({
                 lastId: nextId, // Update lastId here instead of a separate setState call
-                pins: [...prevState.pins, <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} removePin={this.remove_pin} editPin={this.editPin}/>],
+                pins: [...prevState.pins, <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} 
+                    removePin={this.remove_pin} editPin={this.editPin} owner={this.state.owner}/>],
                 show_modal: false,
                 editPinDetails: null,
             }));
