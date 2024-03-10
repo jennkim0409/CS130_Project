@@ -175,12 +175,10 @@ const Recommendations = () => {
     })
     .then(response => {
         console.log("Book successfully moved to current shelf: ", response);
-        toast.success("Recommendation saved successfully!");
         setAddedBooks(prev => ({ ...prev, [bookToInsert.isbn]: true }));
     })
     .catch(error => {
         console.error("Error moving book to current shelf: ", error.response);
-        toast.error("Saving recommendation failed. Try again later.");
     });
   }
 
