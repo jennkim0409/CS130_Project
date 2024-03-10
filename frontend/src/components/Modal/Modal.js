@@ -348,13 +348,17 @@ function Modal(props) {
                             color={pinDetails.text_color}
                             onChangeComplete={(color) => setPinDetails({ ...pinDetails, text_color: color.hex })}
                         />
-                        <div className="submit" onClick={() => update_pin_text(pinDetails, props.change_pin)}>Update</div>
+                        {props.owner ?
+                            <div className="submit" onClick={() => update_pin_text(pinDetails, props.change_pin)}>Update</div>
+                            :
+                            null
+                        }
                     </div>
                     :
                     <div className="add_pin_details_image">
                         <div className="side" id="left_side">
                             <div className="section1">
-                                { imageUploaded ? 
+                                { imageUploaded && props.owner ? 
                                     <div className="pint_mock_icon_container" data-tooltip-id="my-tooltip-1" onClick={() => remove_image(pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded)}>
                                         <img src={remove} alt="remove" className="pint_mock_icon_remove" /> 
                                     </div>
@@ -408,7 +412,10 @@ function Modal(props) {
                             <div className="section2">
                                 <input placeholder="Add a title" type="text" className="new_pin_input" id="pin_title" value={pinDetails.title} onChange={(e) => setPinDetails({ ...pinDetails, title: e.target.value })}/>
                                 <textarea placeholder="What is this pin about?" type="text" className="new_pin_input" id="pin_description" value={pinDetails.description} onChange={(e) => setPinDetails({ ...pinDetails, description: e.target.value })}/>
-                                <div className="update_pin" onClick={() => update_pin(pinDetails, props.change_pin)}>Update</div>
+                                { props.owner ?
+                                    <div className="update_pin" onClick={() => update_pin(pinDetails, props.change_pin)}>Update</div>
+                                    : null
+                                }   
                             </div>
                         </div>
                     </div>

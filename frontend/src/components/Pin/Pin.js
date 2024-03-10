@@ -35,6 +35,7 @@ function downloadImage(imageSrc) {
 
 
 function Pin(props) {
+    const canEdit = props.owner;
 
     const handleDownloadClick = () => {
         const imageSrc = props.pinDetails.img_blob;
@@ -51,19 +52,25 @@ function Pin(props) {
             <div className="pin_title">{props.pinDetails.title}</div>
 
             <div className="pin_modal" onClick={() => props.editPin(props.pinDetails)}>
-                <div className="modal_head">
-                    <div className="pint_mock_icon_container" onClick={(event) => {
-                        event.stopPropagation(); // so edit mode doesn't show up when clicking remove
-                        if (window.confirm("Are you sure you want to delete this pin?")) {
-                            props.removePin(props.pinDetails.ordering_id);
-                        }
-                    }}>
-                        <img src={remove} alt="remove" className="pint_mock_icon_remove" />
+                {canEdit ?
+                    <div className="modal_head">
+                        <div className="pint_mock_icon_container" onClick={(event) => {
+                            event.stopPropagation(); // so edit mode doesn't show up when clicking remove
+                            if (window.confirm("Are you sure you want to delete this pin?")) {
+                                props.removePin(props.pinDetails.ordering_id);
+                            }
+                        }}>
+                            <img src={remove} alt="remove" className="pint_mock_icon_remove" />
+                        </div>
                     </div>
-                </div>
+                    : null
+                }
                 <div className="modal_foot">
                     { (props.pinDetails.quote === '') ? 
-                        <div className="pint_mock_icon_container" onClick={handleDownloadClick}>
+                        <div className="pint_mock_icon_container" onClick={(event) => {
+                            event.stopPropagation();
+                            handleDownloadClick();
+                        }}>
                             <img src={download} alt="download" className="pint_mock_icon" /> 
                         </div>
                         :

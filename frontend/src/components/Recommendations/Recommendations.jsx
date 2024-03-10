@@ -159,7 +159,7 @@ const Recommendations = () => {
     bookToInsert.userId = localStorage.getItem("user_id");
     bookToInsert.fromShelf = 'recommended';
     bookToInsert.toShelf = 'current';
-    bookToInsert.bookId = bookToInsert.id;
+    bookToInsert.bookId = bookToInsert._id;
 
     axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookToInsert }, {
         headers: {
