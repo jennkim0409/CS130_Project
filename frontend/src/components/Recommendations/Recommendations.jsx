@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-
+import './Recommendations.css'
 import {Photo} from '../Bookshelf/Photo';
 import '../LoginSignup/LoginSignup.css';
 import { toast, ToastContainer } from 'react-toastify';
@@ -23,7 +23,7 @@ const Recommendations = () => {
   const [items, setItems] = useState({
     recommendations: [],
   })
-
+  const [addedBooks, setAddedBooks] = useState({});
   const [recommendedShelfBooks, setRecommendedShelfBooks] = useState([]);
 
   // runs when component mounts
@@ -92,15 +92,20 @@ const Recommendations = () => {
                 .then(() => {
                     console.log("All book recommendation insertions completed!");
                     setRecommendedShelfBooks(newCurrRecBooks);
+                    toast.dismiss(recToast);
+                    toast.success("Successfully fetched remommendations!");
                 })
                 .catch(error => {
                     console.error("One or more book recommendation insertions failed: ", error);
+                    toast.dismiss(recToast);
+                    toast.error("Fetching recommendations failed. Try again later.");
                 });
         })
         .catch(error => {
             console.error("Error getting recommendations: ", error);
+            toast.dismiss(recToast);
+            toast.error("Fetching recommendations failed. Try again later.");
         });
-        toast.dismiss(recToast);
       }
       // no need to calculate recommendations; just get current ones
       else {
@@ -154,12 +159,14 @@ const Recommendations = () => {
     return indices.slice(0, numIndices);
   }
 
+  
   // move saved book from recommended shelf to current shelf
   const saveBook = (bookToInsert) => {
     bookToInsert.userId = localStorage.getItem("user_id");
     bookToInsert.fromShelf = 'recommended';
     bookToInsert.toShelf = 'current';
     bookToInsert.bookId = bookToInsert._id;
+    bookToInsert.newOrder = 0;
 
     axios.post('http://localhost:5555/api/handlebooks/moveBook', { ...bookToInsert }, {
         headers: {
@@ -168,10 +175,12 @@ const Recommendations = () => {
     })
     .then(response => {
         console.log("Book successfully moved to current shelf: ", response);
-        // @ charlene TO DO: once this is complete, disable the save button for this book
+        toast.success("Recommendation saved successfully!");
+        setAddedBooks(prev => ({ ...prev, [bookToInsert.isbn]: true }));
     })
     .catch(error => {
         console.error("Error moving book to current shelf: ", error.response);
+        toast.error("Saving recommendation failed. Try again later.");
     });
   }
 
@@ -211,7 +220,11 @@ const Recommendations = () => {
                 <h5 style= {{ width: '40vw' }}>Subjects: {book.subject.length > 10 ? book.subject.slice(0, 10).join(", ") : book.subject.join(", ")}</h5>
               </div>
               {/* save button */} 
-              <div className="submit gray" style= {{ width: '10vw' }} onClick={() => saveBook(book)}>Save</div>
+              <div 
+                className={addedBooks[book.isbn] ? 'button-saved' : 'button-save'}
+                onClick={() => saveBook(book)}>
+                    {addedBooks[book.isbn] ? "Saved" : "Save"}
+              </div>
             </div>
           ))}
       </div>

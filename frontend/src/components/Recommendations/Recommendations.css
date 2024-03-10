@@ -1,0 +1,35 @@
+.button-save {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 10vw;
+	height: 35px;
+	color: #ffff;
+	font-size: 18px;
+	background: #337032;
+	border-radius: 30px;
+	cursor: pointer;
+	background: #f0abfb;
+	color: #605063;
+}
+
+.button-save:hover {
+	background-color: #ec98fa;
+	cursor: pointer;
+}
+
+.button-saved {
+	cursor: not-allowed;
+	pointer-events: none;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 10vw;
+	height: 35px;
+	color: #ffff;
+	font-size: 18px;
+	border-radius: 30px;
+	cursor: pointer;
+	background: #f9d4ff;
+}
