@@ -54,9 +54,11 @@ function LoginSignup() {
             
                 const token = response.data.token;
                 const user_id = response.data.user_id;
+                const name = response.data.name;
 
                 localStorage.setItem('user_token', token);
                 localStorage.setItem('user_id', user_id);
+                localStorage.setItem('user_name', name);
                 navigate("/explore"); // *** eventually pass User object here
             })
             .catch(error => {
