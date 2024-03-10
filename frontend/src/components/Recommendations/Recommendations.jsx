@@ -5,6 +5,7 @@ import {Photo} from '../Bookshelf/Photo';
 import '../LoginSignup/LoginSignup.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import expiredToken from '../../components/ExpiredToken';
 
 /* 
 Recommendation logic overview:
@@ -104,6 +105,10 @@ const Recommendations = () => {
         .catch(error => {
             console.error("Error getting recommendations: ", error);
             toast.dismiss();
+            if (error.response.data.message === "Unauthorized- Invalid Token" || 
+              error.response.data.message === "Unauthorized- Missing token") {
+              expiredToken();
+            }
             toast.error("Fetching recommendations failed. Try again later.");
         });
       }
@@ -179,6 +184,10 @@ const Recommendations = () => {
     })
     .catch(error => {
         console.error("Error moving book to current shelf: ", error.response);
+        if (error.response.data.message === "Unauthorized- Invalid Token" || 
+          error.response.data.message === "Unauthorized- Missing token") {
+          expiredToken();
+        }
     });
   }
 
