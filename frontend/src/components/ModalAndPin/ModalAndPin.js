@@ -15,10 +15,24 @@ class ModalAndPin extends React.Component {
             boardId: props.boardId, // refer to using this.state.boardId
             editPinDetails: null,
             lastId: 0,
+            owner: props.owner,
         };
     }
 
-    async componentDidMount() {
+    componentDidUpdate(prevProps) {
+        // Check if boardId has changed
+        if (prevProps.boardId !== this.props.boardId) {
+            this.setState({ boardId: this.props.boardId }, () => {
+                this.fetchPins();
+            });
+        }
+    }
+
+    componentDidMount() {
+        this.fetchPins();
+    }
+
+    async fetchPins() {
         try {
             const response = await axios.get('http://localhost:5555/api/board/getBoard/', {
                 params: { boardId: this.state.boardId },
@@ -118,7 +132,8 @@ class ModalAndPin extends React.Component {
             const updated = _state.pins.map(pinElement => {
                 if (pinElement.props.pinId === pinDetails.ordering_id) {
                     // return new pin with updated details
-                    return <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} removePin={this.remove_pin} editPin={this.editPin}/>;
+                    return <Pin pinDetails={pinDetails} key={pinDetails.ordering_id} pinId={pinDetails.ordering_id} 
+                        removePin={this.remove_pin} editPin={this.editPin} owner={this.state.owner}/>;
                 } else {
                     return pinElement;
                 }
@@ -173,9 +188,13 @@ class ModalAndPin extends React.Component {
         return (
             <div className="modal_and_pin">
                 <div className="navigation_bar">
-                    <div onClick={() => this.setState({show_modal: true})} className="pint_mock_icon_container add_pin">
-                        <img src={add} alt="add_pin" className="pint_mock_icon" /> 
-                    </div> 
+                    { this.state.owner ? 
+                        <div onClick={() => this.setState({show_modal: true})} className="pint_mock_icon_container add_pin">
+                            <img src={add} alt="add_pin" className="pint_mock_icon" /> 
+                        </div> 
+                        :
+                        null
+                    }
                 </div>
 
                 <div className="pin_container">
@@ -189,7 +208,8 @@ class ModalAndPin extends React.Component {
                 >
                     {
                         this.state.show_modal ? 
-                        <Modal add_pin={this.add_pin} editPinDetails={this.state.editPinDetails} change_pin={this.change_pin}/> : null
+                        <Modal add_pin={this.add_pin} editPinDetails={this.state.editPinDetails} 
+                        change_pin={this.change_pin} owner={this.state.owner}/> : null
                     }
                 </div>
             </div>
