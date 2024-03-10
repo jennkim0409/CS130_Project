@@ -148,7 +148,7 @@ function Account(props) {
 
     return(
         <div style={{display: 'flex', justifyContent: 'center'}}>
-            <div style={{width: "60vw"}}>
+            <div style={{width: "60vw", minWidth: "600px"}}>
                 <h2 style={{textAlign: "center"}}>Account</h2>
                 <h2 style={{margin: '0px', textAlign: "center"}}>Welcome Back, {name}!</h2>
                 <br/><br/>
