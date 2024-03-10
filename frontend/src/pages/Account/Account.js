@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import expiredToken from '../../components/ExpiredToken';
 import GenrePreferences from '../../components/GenrePreferences/GenrePreferences';
 
 
@@ -103,7 +104,12 @@ function Account(props) {
                         console.log("Password saved successfully: ", response.data);
                     })
                     .catch(error => {
+                        if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                            error.response.data.message === "Unauthorized- Missing token") {
+                            expiredToken();
+                        } else {
                         throw error;
+                        }
                     })
             );
         }
@@ -125,7 +131,12 @@ function Account(props) {
                         setName(nameInput);
                     })
                     .catch(error => {
+                        if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                            error.response.data.message === "Unauthorized- Missing token") {
+                            expiredToken();
+                        } else {
                         throw error;
+                        }
                     })
             );
         }

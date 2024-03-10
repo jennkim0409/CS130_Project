@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import React, { useState } from "react";
 import "./Explore.css";
 import Recommendations from '../../components/Recommendations/Recommendations';
 import { toast, ToastContainer } from 'react-toastify';

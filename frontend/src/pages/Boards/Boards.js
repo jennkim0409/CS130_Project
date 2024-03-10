@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select';
 import remove from '../../assets/remove.png';
+import expiredToken from '../../components/ExpiredToken';
 
 /* Idea is that this array is already created and utilized by the 
     Reading bookshelf in Shelves. And every time a book already has a pinterest board,
@@ -56,6 +57,10 @@ function Boards() {
                 setSelectedBooks(updatedSelectedBooks);
             } catch (error) {
                 console.error("Error fetching boards data: ", error);
+                if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                    error.response.data.message === "Unauthorized- Missing token") {
+                    expiredToken();
+                }
             }
         };
         fetchBoardsData();
@@ -96,6 +101,10 @@ function Boards() {
             } 
             catch (error) {
                 console.error("Error creating board: ", error);
+                if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                    error.response.data.message === "Unauthorized- Missing token") {
+                    expiredToken();
+                }
             }
         }
         // reset selection so that the select dropbox goes back to default look
@@ -121,6 +130,10 @@ function Boards() {
         } 
         catch (error) {
             console.error("Error removing board: ", error);
+            if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                error.response.data.message === "Unauthorized- Missing token") {
+                expiredToken();
+            }
         }
     };
 

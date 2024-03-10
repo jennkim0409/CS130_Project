@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useMemo } from 'react';
+import expiredToken from '../ExpiredToken';
 import axios from 'axios';
 import {
   DndContext,
@@ -71,6 +72,10 @@ const Bookshelf = () => {
         console.log(itemsData)
       } catch (error) {
         console.error("Error fetching books:", error);
+        if (error.response.data.message === "Unauthorized- Invalid Token" || 
+          error.response.data.message === "Unauthorized- Missing token") {
+          expiredToken();
+        } 
       }
     };
 
@@ -296,6 +301,11 @@ const Bookshelf = () => {
       })
       .catch(error => {
           console.error("Error moving book across shelves: ", error.response);
+          if (error.response.data.message === "Unauthorized- Invalid Token" || 
+            error.response.data.message === "Unauthorized- Missing token") {
+            expiredToken();
+          }
+          
       });
     }
     // if shelves are the same, insert at the over index
@@ -319,6 +329,10 @@ const Bookshelf = () => {
       })
       .catch(error => {
           console.error("Error moving book within the shelf: ", error.response);
+          if (error.response.data.message === "Unauthorized- Invalid Token" || 
+            error.response.data.message === "Unauthorized- Missing token") {
+            expiredToken();
+          }
       });
     }
     
