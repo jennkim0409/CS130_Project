@@ -92,18 +92,18 @@ const Recommendations = () => {
                 .then(() => {
                     console.log("All book recommendation insertions completed!");
                     setRecommendedShelfBooks(newCurrRecBooks);
-                    toast.dismiss(recToast);
+                    toast.dismiss();
                     toast.success("Successfully fetched remommendations!");
                 })
                 .catch(error => {
                     console.error("One or more book recommendation insertions failed: ", error);
-                    toast.dismiss(recToast);
+                    toast.dismiss();
                     toast.error("Fetching recommendations failed. Try again later.");
                 });
         })
         .catch(error => {
             console.error("Error getting recommendations: ", error);
-            toast.dismiss(recToast);
+            toast.dismiss();
             toast.error("Fetching recommendations failed. Try again later.");
         });
       }
