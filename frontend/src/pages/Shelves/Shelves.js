@@ -5,6 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SearchBooks from '../../components/SearchBooks/SearchBooks';
+import expiredToken from '../../components/ExpiredToken';
 
 function Shelves() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -54,6 +55,10 @@ function Shelves() {
 
             // error message
             const error_message = error.response.data.message;
+            if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                error.response.data.message === "Unauthorized- Missing token") {
+                expiredToken();
+            }
             toast.error(error_message);
             toast.dismiss(loadingToast);
         });
@@ -79,6 +84,10 @@ function Shelves() {
                 
                 // error message
                 const error_message = error.response.data.message;
+                if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                    error.response.data.message === "Unauthorized- Missing token") {
+                    expiredToken();
+                }
                 toast.error(error_message);
             });
     }

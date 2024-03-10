@@ -101,6 +101,10 @@ function Boards() {
             } 
             catch (error) {
                 console.error("Error creating board: ", error);
+                if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                    error.response.data.message === "Unauthorized- Missing token") {
+                    expiredToken();
+                }
             }
         }
         // reset selection so that the select dropbox goes back to default look
@@ -126,6 +130,10 @@ function Boards() {
         } 
         catch (error) {
             console.error("Error removing board: ", error);
+            if (error.response.data.message === "Unauthorized- Invalid Token" || 
+                error.response.data.message === "Unauthorized- Missing token") {
+                expiredToken();
+            }
         }
     };
 

@@ -10,6 +10,7 @@ function expiredToken() {
     closeOnClick: true,
     pauseOnHover: false,
     onClose: () => {
+    // This function is called after the toast is dismissed
       // Remove the token from localStorage
       localStorage.removeItem("user_token");
       
