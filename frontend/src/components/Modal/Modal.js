@@ -300,7 +300,7 @@ function Modal(props) {
                                     </div>
                                     <input onChange=
                                         {event => upload_img(event, pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded)}
-                                        type="file" name="upload_img" id="upload_img" value=""
+                                        data-testid="upload_img" type="file" name="upload_img" id="upload_img" value="" 
                                     />
                                 </label>
                                 
