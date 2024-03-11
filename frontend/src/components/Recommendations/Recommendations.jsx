@@ -81,7 +81,9 @@ const Recommendations = () => {
                         }
                     })
                     .then(response => {
-                        newCurrRecBooks.push(response.data.book);
+                        const newBook = response.data.book;
+                        newBook._id = newBook.id;
+                        newCurrRecBooks.push(newBook);
                     })
                     .catch(error => {
                         console.error("Error adding book to recommended shelf: ", error.response);

@@ -83,7 +83,33 @@ const Bookshelf = () => {
   }, []);
 
   const removeBook = async (opt) => {
+    let bookshelfType = "";
+    if (items.readingList.some(book => book._id === opt._id)) {
+      bookshelfType = 'current';
+    }
+    else {
+      bookshelfType = 'finished';
+    }
 
+    axios.post('http://localhost:5555/api/handlebooks/removeBook', 
+    { userId: localStorage.getItem("user_id").replace(/"/g, ''), bookshelfType: bookshelfType, bookId: opt._id }, 
+    {
+        headers: {
+            Authorization: localStorage.getItem("user_token")
+        }
+      })
+      .then(response => {
+          console.log("Book successfully removed: ", response.data);
+          // @ charlene TO DO: remove book from list in frontend/re-render the shelf
+          // (currently refreshing the page shows the book is removed)
+      })
+      .catch(error => {
+          console.error("Error removing book: ", error.response);
+          if (error.response.data.message === "Unauthorized- Invalid Token" || 
+            error.response.data.message === "Unauthorized- Missing token") {
+            expiredToken();
+          }
+      });
   };
 
   // activeId denotes what component is currently interacted with
@@ -122,7 +148,7 @@ const Bookshelf = () => {
                 className="remove-button" 
                 onClick={() => {
                     if (window.confirm("Are you sure you want to delete this book from your shelf?")) {
-                        removeBook(book.cover)
+                        removeBook(book)
                     }
                 }}>
                 <img src={remove} alt="Remove" />
@@ -143,7 +169,7 @@ const Bookshelf = () => {
                 className="remove-button" 
                 onClick={() => {
                     if (window.confirm("Are you sure you want to delete this book from your shelf?")) {
-                        removeBook(book.cover)
+                        removeBook(book)
                     }
                 }}>
                 <img src={remove} alt="Remove" />
@@ -267,7 +293,7 @@ const Bookshelf = () => {
     }
 
     const activeIndex = items[activeContainer].findIndex(book => book.cover === active.id);
-    const overIndex = items[overContainer].findIndex(book => book.cover === overId);
+    let overIndex = items[overContainer].findIndex(book => book.cover === overId);
 
     console.log("active, over index:", activeIndex, overIndex);
     // update backend of book movement
@@ -276,6 +302,10 @@ const Bookshelf = () => {
     // TODO: use this starting index!!
     console.log("starting index, shelf:", startIndex, startingShelf);
     console.log("ending index, shelf:", overIndex, endingShelf);
+    
+    if (overIndex === -1) {
+      overIndex = 0;
+    }
 
     // if the shelves are different, insert at active index
       // NOTE: this code inserts the book at the place it is *supposed* to be inserted
