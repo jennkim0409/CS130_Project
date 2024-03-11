@@ -26,6 +26,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Install dependencies for outermost directory
+        run: npm ci
+        
       - name: Install dependencies for frontend
         run: npm ci
         working-directory: frontend
