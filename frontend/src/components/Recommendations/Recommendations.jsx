@@ -126,30 +126,31 @@ const Recommendations = () => {
   // when the recommendedShelfBooks variable is updated in getRecommendationData function
   // we will get current recommendations for the page
   useEffect(() => {
-    // get current, randomized recommendations from the recommendation shelf
-    function getCurrentRecommendations() {
-      const itemsData = {};
-      itemsData.recommendations = [];
-  
-      // if the number of desired displayable recs is equal to or more than the number of recs we have
-      // then just display the recs that we have
-      const numDisplayableRecs = 10;
-      if (numDisplayableRecs >= recommendedShelfBooks.length) {
-        itemsData.recommendations = recommendedShelfBooks;
-        setItems(itemsData);
-      } else {
-        // get randomized books from the recommendation shelf
-        const randomIndices = generateRandomIndices(recommendedShelfBooks.length, numDisplayableRecs);
-        const currBookRecs = randomIndices.map(index => recommendedShelfBooks[index]);
-        console.log("curr book recs are: ", currBookRecs);
-        itemsData.recommendations = currBookRecs;
-        setItems(itemsData);
-      }
-    }
-    // Call the getCurrentRecommendations function when recommendedShelfBooks changes
     getCurrentRecommendations();
   }, [recommendedShelfBooks]);
-  
+
+  // get current, randomized recommendations from the recommendation shelf
+  function getCurrentRecommendations() {
+    const itemsData = {};
+    itemsData.recommendations = [];
+
+    // if number of desired displayable recs is equal to or more than the number of recs we have
+    // then just display the recs that we have
+    const numDisplayableRecs = 10;
+    if (numDisplayableRecs >= recommendedShelfBooks.length) {
+      itemsData.recommendations = recommendedShelfBooks;
+      setItems(itemsData);
+    }
+    else {
+      // get randomized books from recommendation shelf
+      const randomIndices = generateRandomIndices(recommendedShelfBooks.length, numDisplayableRecs);
+
+      const currBookRecs = randomIndices.map(index => recommendedShelfBooks[index]);
+      console.log("curr book recs are: ", currBookRecs);
+      itemsData.recommendations = currBookRecs;
+      setItems(itemsData);
+    }
+  }
 
   function generateRandomIndices(arrayLength, numIndices) {
     // create array with indices from 0 to arrayLength - 1
