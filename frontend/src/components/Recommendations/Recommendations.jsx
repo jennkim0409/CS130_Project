@@ -96,7 +96,7 @@ const Recommendations = () => {
                     console.log("All book recommendation insertions completed!");
                     setRecommendedShelfBooks(newCurrRecBooks);
                     toast.dismiss();
-                    toast.success("Successfully fetched remommendations!");
+                    toast.success("Successfully fetched recommendations!");
                 })
                 .catch(error => {
                     console.error("One or more book recommendation insertions failed: ", error);
