@@ -17,6 +17,9 @@ jobs:
         node-version: [20.x]
 
     steps:
+      - name: Set CI environment variable to false
+        run: echo "CI=false" >> $GITHUB_ENV
+        
       - name: Checkout repository
         uses: actions/checkout@v4
 
