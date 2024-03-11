@@ -64,7 +64,7 @@ function Boards() {
             }
         };
         fetchBoardsData();
-    }, [reading, selectedBooks]);
+    }, []);
 
     // remove later
     useEffect(() => {
