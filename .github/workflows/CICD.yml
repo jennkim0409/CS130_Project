@@ -52,12 +52,4 @@ jobs:
         run: npm test
         working-directory: backend
 
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    needs: build_and_test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Deploy to production
-        # deployment steps
+# TODO: deployment steps
