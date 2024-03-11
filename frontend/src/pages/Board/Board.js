@@ -187,15 +187,15 @@ const Board = () => {
       </div>
       {
         userId == localStorage.getItem('user_id') ?
-          <div className="privacy">
-            <label>
-              <h4 style={{margin: '5px'}}>Make Public?</h4>
-                <Toggle
-                  defaultChecked={togglePublic}
-                  onChange={() => setTogglePublic(!togglePublic)}
-                />
-            </label>
-          </div>
+        <div className="privacy">
+        <label>
+          <h4 style={{margin: '5px'}}>Make Public?</h4>
+          <Toggle
+            defaultChecked={togglePublic}
+            onChange={() => setTogglePublic(!togglePublic)}
+          />
+        </label>
+      </div>
           :
           null
       }

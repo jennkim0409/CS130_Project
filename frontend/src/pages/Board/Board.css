@@ -68,6 +68,14 @@
     position: relative;
 }
 
+.privacy {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    margin: auto;
+}
+
 .privacy label{
     display: flex;
     flex-direction: column;
