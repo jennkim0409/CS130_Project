@@ -27,7 +27,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies for outermost directory
-        run: npm ci
+        run: npm install
         
       - name: Install dependencies for frontend
         run: npm ci
