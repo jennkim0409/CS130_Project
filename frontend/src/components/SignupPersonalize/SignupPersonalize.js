@@ -5,7 +5,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import SearchBooks from '../SearchBooks/SearchBooks';
 import axios from 'axios';
-import { set } from 'mongoose';
 import GenrePreferences from '../GenrePreferences/GenrePreferences';
 
 // overriding leftSide style
@@ -17,20 +16,20 @@ const leftSideStyle = {
 function SignupPersonalize() {
     const [bookName, setBookName] = useState('');
     const [matchedBooks, setMatchedBooks] = useState([]);
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [addedBooks, setAddedBooks] = useState({});
     const [genrePreferences, setGenrePreferences] = useState([]);
     const [additionalGenres, setAdditionalGenres] = useState([]);
     const [name, setName] = useState('');
 
-  useEffect(() => {
-    function handleResize() {
-      setWindowWidth(window.innerWidth);
-    }
+//   useEffect(() => {
+//     function handleResize() {
+//       setWindowWidth(window.innerWidth);
+//     }
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+//     window.addEventListener('resize', handleResize);
+//     return () => window.removeEventListener('resize', handleResize);
+//   }, []);
 
     const navigate = useNavigate();
 

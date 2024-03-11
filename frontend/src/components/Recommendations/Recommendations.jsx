@@ -42,7 +42,7 @@ const Recommendations = () => {
       // (happens upon creating new account OR when genre preferences change)
       // @ kaylee TO DO: (when account customization page exists): reset recommendations shelf each time a user changes genre prefs
       if (currRecBooks.length === 0) {
-        const recToast = toast.loading("Fetching book recommendations.. This may take a minute!");
+        toast.loading("Fetching book recommendations.. This may take a minute!");
         console.log("no current book recommendations! getting from DB...");
         // get book recommendations
         const path = 'http://localhost:5555/api/recommend/' + localStorage.getItem("user_id").replace(/"/g, ''); // gets rid of double quotes in user_id
@@ -127,7 +127,7 @@ const Recommendations = () => {
   // we will get current recommendations for the page
   useEffect(() => {
     getCurrentRecommendations();
-  }, [recommendedShelfBooks]);
+  }, [recommendedShelfBooks, getCurrentRecommendations]);
 
   // get current, randomized recommendations from the recommendation shelf
   function getCurrentRecommendations() {

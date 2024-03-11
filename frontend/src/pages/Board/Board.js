@@ -76,12 +76,12 @@ const Board = () => {
   // get board details and discover options upon initialization
   useEffect(() => {
     getBoardDetails();
-  }, [boardId, userId]);
+  }, [boardId, userId, getBoardDetails]);
 
   // get dropdown options once board details is initialized properly
   useEffect(() => {
     getDropdownOptions();
-  }, [boardDetails]); 
+  }, [boardDetails, getDropdownOptions]); 
 
   // save board's visibility in backend
   useEffect(() => {
@@ -99,7 +99,7 @@ const Board = () => {
       }
     }
     updateVisibility();
-  }, [togglePublic]);
+  }, [togglePublic, boardId]);
 
   // handles allowing a user to click anywhere on page to get rid of 
   // discovery boards list
@@ -186,7 +186,7 @@ const Board = () => {
         </div>
       </div>
       {
-        userId == localStorage.getItem('user_id') ?
+        userId === localStorage.getItem('user_id') ?
           <div className="privacy">
             <label>
               <h4 style={{margin: '5px'}}>Make Public?</h4>

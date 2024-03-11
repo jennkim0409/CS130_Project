@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect} from 'react'
 import './Modal.css';
 import remove from '../../assets/remove.png';
 import upload from '../../assets/cloud-computing.png';
@@ -244,7 +244,7 @@ function Modal(props) {
                 setImageUploaded(props.editPinDetails.img_blob ? true : false);
             }
         }
-    }, [props.editPinDetails]);
+    }, [props.editPinDetails, props.editPinDetails.text_color]);
 
     return (
         <div className="add_pin_modal">

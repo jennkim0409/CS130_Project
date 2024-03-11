@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Explore.css";
 import Recommendations from '../../components/Recommendations/Recommendations';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
 
 function Explore() {
 

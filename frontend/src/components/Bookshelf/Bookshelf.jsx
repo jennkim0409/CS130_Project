@@ -8,8 +8,7 @@ import {
   TouchSensor,
   DragOverlay,
   useSensor,
-  useSensors,
-  useDroppable
+  useSensors
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -320,7 +319,7 @@ const Bookshelf = () => {
       // NOTE: this code inserts the book at the place it is *supposed* to be inserted
       // -> in other words, it disregards the current visual bug where the book is inserted one index AFTER it is supposed to be
       // -> ultimately, once that visual bug is fixed, this code will line up with visuals
-    if (startingShelf != endingShelf) {
+    if (startingShelf !== endingShelf) {
       const bookToMove = items[endingShelf].find(book => book.cover === id);
 
       let bookData = {};
@@ -398,8 +397,8 @@ const Bookshelf = () => {
       return id;
     }
 
-    if (id == "Interested") { return "readingList" };
-    if (id == "Finished") { return "finishedList" };
+    if (id === "Interested") { return "readingList" };
+    if (id === "Finished") { return "finishedList" };
 
     // return name of bookshelf that contains the book corresponding to this id (cover url)
     return Object.keys(items).find((shelfName) => {
