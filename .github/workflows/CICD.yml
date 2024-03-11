@@ -49,7 +49,7 @@ jobs:
         working-directory: backend
 
       - name: Build backend
-        run: npm run build
+        run: npm run dev
         working-directory: backend
 
       - name: Run tests for backend
