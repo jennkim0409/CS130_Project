@@ -76,12 +76,12 @@ const Board = () => {
   // get board details and discover options upon initialization
   useEffect(() => {
     getBoardDetails();
-  }, [boardId, userId, getBoardDetails]);
+  }, [boardId, userId]);
 
   // get dropdown options once board details is initialized properly
   useEffect(() => {
     getDropdownOptions();
-  }, [boardDetails, getDropdownOptions]); 
+  }, [boardDetails]); 
 
   // save board's visibility in backend
   useEffect(() => {

@@ -244,7 +244,7 @@ function Modal(props) {
                 setImageUploaded(props.editPinDetails.img_blob ? true : false);
             }
         }
-    }, [props.editPinDetails, props.editPinDetails.text_color]);
+    }, [props.editPinDetails, pinDetails.text_color]);
 
     return (
         <div className="add_pin_modal">
