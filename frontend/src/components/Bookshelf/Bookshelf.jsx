@@ -111,8 +111,6 @@ const Bookshelf = () => {
       })
       .then(response => {
           console.log("Book successfully removed: ", response.data);
-          // @ charlene TO DO: remove book from list in frontend/re-render the shelf
-          // (currently refreshing the page shows the book is removed)
       })
       .catch(error => {
           console.error("Error removing book: ", error.response);
