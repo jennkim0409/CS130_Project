@@ -1,7 +1,8 @@
 import express from "express";
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import cors from "cors"
 
+import connectDB from "./mongoDB.js"
 import { PORT, mongodbURL } from "./config.js";
 import loginRouter from "./controllers/login.js"
 import boardRouter from "./controllers/board.js"
@@ -16,16 +17,18 @@ const app = express();
 
 // DB connection
 
-mongoose.connect(mongodbURL)
-    .then(() => {
-        console.log('Connected to DB');
-        app.get('/', (request, response) => {
-            console.log(request)
-            return response.status(250).send()
-        });
-    }).catch((error) => {
-        console.log(error);
-    });
+connectDB(mongodbURL);
+
+// mongoose.connect(mongodbURL)
+//     .then(() => {
+//         console.log('Connected to DB');
+//         app.get('/', (request, response) => {
+//             console.log(request)
+//             return response.status(250).send()
+//         });
+//     }).catch((error) => {
+//         console.log(error);
+//     });
 
 app.use(cors());
 app.use(express.json());
@@ -42,3 +45,5 @@ app.use('/api/board', boardRouter);
 app.listen(PORT, () => {
     console.log(`App listening to port: ${PORT}`)
 });
+
+export default app;
