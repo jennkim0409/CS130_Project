@@ -1,0 +1,63 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies for frontend
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Run tests for frontend
+        run: npm test
+        working-directory: frontend
+
+      - name: Install dependencies for backend
+        run: npm ci
+        working-directory: backend
+
+      - name: Build backend
+        run: npm run build
+        working-directory: backend
+
+      - name: Run tests for backend
+        run: npm test
+        working-directory: backend
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Deploy to production
+        # Deployment steps
