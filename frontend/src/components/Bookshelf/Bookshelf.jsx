@@ -142,7 +142,7 @@ const Bookshelf = () => {
       {/* can adjust the # of columns, but update .css accordingly */}
         <Grid title='Interested' columns={8}>
           {items.readingList.map((book, index) => (
-            <div className="book-image-container" style={{height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
+            <div className="book-image-container" style={{overflow: "visible", height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
               <SortablePhoto key={book.cover} url={book.cover} index={index} />
               <div 
                 className="remove-button" 
@@ -163,7 +163,7 @@ const Bookshelf = () => {
       <SortableContext items={finishedListIds} strategy={rectSortingStrategy}>
         <Grid title='Finished' columns={8}>
           {items.finishedList.map((book, index) => (
-            <div className="book-image-container" style={{height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
+            <div className="book-image-container" style={{overflow: "visible", height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
               <SortablePhoto key={book.cover} url={book.cover} index={index} />
               <div 
                 className="remove-button" 
