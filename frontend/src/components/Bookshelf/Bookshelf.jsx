@@ -83,13 +83,24 @@ const Bookshelf = () => {
   }, []);
 
   const removeBook = async (opt) => {
+    let updatedItems = { ...items };
     let bookshelfType = "";
+    let bookshelfName = 'finishedList';
+    
     if (items.readingList.some(book => book._id === opt._id)) {
       bookshelfType = 'current';
+      bookshelfName = 'readingList';
     }
     else {
       bookshelfType = 'finished';
+      bookshelfName = 'finishedList';
     }
+
+    // Remove the book from the appropriate bookshelf
+    updatedItems[bookshelfName] = items[bookshelfName].filter(book => book._id !== opt._id);
+
+    // Update the state with the new items
+    setItems(updatedItems);
 
     axios.post('http://localhost:5555/api/handlebooks/removeBook', 
     { userId: localStorage.getItem("user_id").replace(/"/g, ''), bookshelfType: bookshelfType, bookId: opt._id }, 
