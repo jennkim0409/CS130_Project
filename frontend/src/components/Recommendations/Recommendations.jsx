@@ -81,7 +81,9 @@ const Recommendations = () => {
                         }
                     })
                     .then(response => {
-                        newCurrRecBooks.push(response.data.book);
+                        const newBook = response.data.book;
+                        newBook._id = newBook.id;
+                        newCurrRecBooks.push(newBook);
                     })
                     .catch(error => {
                         console.error("Error adding book to recommended shelf: ", error.response);
@@ -94,7 +96,7 @@ const Recommendations = () => {
                     console.log("All book recommendation insertions completed!");
                     setRecommendedShelfBooks(newCurrRecBooks);
                     toast.dismiss();
-                    toast.success("Successfully fetched remommendations!");
+                    toast.success("Successfully fetched recommendations!");
                 })
                 .catch(error => {
                     console.error("One or more book recommendation insertions failed: ", error);
