@@ -13,13 +13,10 @@ handlebooksRouter.post('/addBook', async (req, res) => {
 
     if (userId && bookshelfType) {
       // Find the bookshelf
-      const bookshelf = await Bookshelf.findOne({ userId: userId, type: bookshelfType }).populate('books.bookId');
-
-      if (!bookshelf) {
-        return res.status(404).json({ message: 'Bookshelf not found' });
-      }
-
-      const isDuplicate = bookshelf.books.some(({ bookId }) => bookId && bookId.title === title && bookId.cover === cover && bookId.author === author);
+      const bookshelves = await Bookshelf.find({ userId: userId }).populate('books.bookId');
+      const isDuplicate = bookshelves.some(bookshelf => bookshelf.books.some(({ bookId }) => 
+        bookId && bookId.title === title && bookId.cover === cover && bookId.author === author
+      ));
 
       if (isDuplicate) {
         return res.status(400).json({ message: 'Book already exists in the bookshelf' });
@@ -35,13 +32,18 @@ handlebooksRouter.post('/addBook', async (req, res) => {
       });
       const savedBook = await newBook.save();
 
-      const maxOrder = bookshelf.books.reduce((max, { order }) => Math.max(max, order), -1) + 1;
+      const specificBookshelf = bookshelves.find(bookshelf => bookshelf.type === bookshelfType);
+      if (!specificBookshelf) {
+        return res.status(404).json({ message: `Bookshelf of type ${bookshelfType} not found` });
+      }
+
+      const maxOrder = specificBookshelf.books.reduce((max, { order }) => Math.max(max, order), -1) + 1;
 
       // Add the new book with the next order value
-      bookshelf.books.push({ bookId: savedBook._id, order: maxOrder });
-      await bookshelf.save();
+      specificBookshelf.books.push({ bookId: savedBook._id, order: maxOrder });
+      await specificBookshelf.save();
 
-      res.status(201).json({ message: 'Book added successfully', book: savedBook, bookshelf: bookshelf });
+      res.status(201).json({ message: 'Book added successfully', book: savedBook, bookshelf: specificBookshelf });
     } else {
       return res.status(400).json({ message: 'UserId and bookshelfType are required' });
     }
