@@ -10,31 +10,32 @@ const handlebooksRouter = express.Router();
 handlebooksRouter.post('/addBook', async (req, res) => {
   try {
     const { userId, bookshelfType, title, cover, author, summary, isbn, subject } = req.body;
-    const newBook = new Book({
-      title,
-      cover,
-      author,
-      summary,
-      isbn,
-      subject
-    });
-    const savedBook = await newBook.save();
 
     if (userId && bookshelfType) {
       // Find the bookshelf
-      const bookshelf = await Bookshelf.findOne({ userId: userId, type: bookshelfType });
+      const bookshelf = await Bookshelf.findOne({ userId: userId, type: bookshelfType }).populate('books.bookId');
 
       if (!bookshelf) {
         return res.status(404).json({ message: 'Bookshelf not found' });
       }
 
-      // Determine the next order value
-      let maxOrder = 0;
-      bookshelf.books.forEach(book => {
-        if (book.order >= maxOrder) {
-          maxOrder = book.order + 1;
-        }
+      const isDuplicate = bookshelf.books.some(({ bookId }) => bookId && bookId.title === title && bookId.cover === cover && bookId.author === author);
+
+      if (isDuplicate) {
+        return res.status(400).json({ message: 'Book already exists in the bookshelf' });
+      }
+
+      const newBook = new Book({
+        title,
+        cover,
+        author,
+        summary,
+        isbn,
+        subject
       });
+      const savedBook = await newBook.save();
+
+      const maxOrder = bookshelf.books.reduce((max, { order }) => Math.max(max, order), -1) + 1;
 
       // Add the new book with the next order value
       bookshelf.books.push({ bookId: savedBook._id, order: maxOrder });
@@ -58,7 +59,7 @@ handlebooksRouter.post('/moveBook', async (req, res) => {
         if (!sourceShelf) {
           return res.status(404).json({ message: 'Source bookshelf not found' });
         }
-        const bookToRemoveIndex = sourceShelf.books.findIndex(book => book.bookId.equals(bookId));
+        const bookToRemoveIndex = sourceShelf.books.findIndex(book => book.bookId && book.bookId.equals(bookId));
         if (bookToRemoveIndex === -1) {
           return res.status(404).json({ message: 'Book not found on shelf' });
         }
@@ -241,10 +242,20 @@ handlebooksRouter.get('/getBooks', async (req, res) => {
     if (!bookshelf) {
       return res.status(404).json({ message: 'Bookshelf not found' });
     }
-    const sortedBooks = bookshelf.books.sort((a, b) => a.order - b.order).map(book => ({
-      ...book.bookId._doc,
-      order: book.order // Include the order in the response
-    }));
+    const sortedBooks = bookshelf.books
+    .sort((a, b) => a.order - b.order)
+    .map(book => {
+      if (!book.bookId) {
+        // Handle the case where bookId is not populated or undefined
+        console.error('BookId is undefined for order:', book.order);
+        return null; // or an appropriate fallback value
+      }
+      return {
+        ...book.bookId._doc,
+        order: book.order // Include the order in the response
+      };
+    })
+    .filter(book => book !== null);
     
     res.json(sortedBooks);
   } catch (error) {
