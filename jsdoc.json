@@ -1,0 +1,28 @@
+{
+    "source": {
+      "include": [
+        "backend/controllers",
+        "frontend/src/components/Bookshelf",
+        "frontend/src/components/GenrePreferences",
+        "frontend/src/components/LoginSignup/LoginSignup.js",
+        "frontend/src/components/Modal/Modal.js",
+        "frontend/src/components/ModalAndPin/ModalAndPin.js",
+        "frontend/src/components/Pin/Pin.js",
+        "frontend/src/components/Recommendations/Recommendations.jsx",
+        "frontend/src/components/SearchBooks/SearchBooks.js",
+        "frontend/src/components/SignupPersonalize/SignupPersonalize.js",
+        "frontend/src/pages/Account/Account.js",
+        "frontend/src/pages/Board/Board.js",
+        "frontend/src/pages/Boards/Boards.js",
+        "frontend/src/pages/Explore/Explore.js",
+        "frontend/src/pages/Shelves/Shelves.js"
+      ],
+      "includePattern": ".+\\.js(doc)?$",
+      "excludePattern": "(node_modules/|docs)"
+    },
+    "opts": {
+      "recurseDepth": 10,
+      "destination": "./docs"
+    }
+  }
+  
