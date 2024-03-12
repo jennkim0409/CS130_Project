@@ -21,3 +21,5 @@ but if you want to see both the frontend & backend logs, do this:
 2. open up another terminal, cd into backend, run "export SECRET=hello" and then run "npm run dev"
 
 hope this makes things a little smoother! =)
+
+Link to Presentation + Project Demo: https://youtu.be/6Jw7WGwPdZU 
