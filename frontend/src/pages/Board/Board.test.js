@@ -5,13 +5,12 @@ import axios from 'axios';
 import ModalAndPin from '../../components/ModalAndPin/ModalAndPin';
 import Board from './Board';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter as Router } from 'react-router-dom';
 
 jest.mock('axios');
 
 jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'), // This pattern preserves other exports from react-router-dom
-    useNavigate: () => jest.fn() // Mock implementation of useNavigate
+    ...jest.requireActual('react-router-dom'), 
+    useNavigate: () => jest.fn() 
   }));
 
 describe('Board Pin Component', () => {
@@ -48,7 +47,7 @@ describe('Board Pin Component', () => {
     // isOwner is true
     render(<ModalAndPin boardId="123456789" owner={isOwner}/>);
 
-    // Wait for the pins to be fetched and displayed
+    // wait for the pins to be fetched and displayed
     await waitFor(() => expect(screen.getByText("text")).toBeInTheDocument());
     expect(screen.getByText("text")).toBeInTheDocument();
     expect(screen.getByAltText("pin_image")).toBeInTheDocument();
@@ -104,13 +103,13 @@ describe('Board Component - Viewing Another User\'s Board', () => {
     localStorage.setItem("user_token", '987654321');
     localStorage.setItem("user_id", 'differentperson');
 
-    // Mock the axios get request to return board details not owned by the current user
+    // mock axios get request to return board details not owned by the current user
     axios.get.mockResolvedValue({
       data: {
         bookTitle: 'Book 1',
         bookAuthor: 'Author 1',
-        id: '123456789', // Board ID
-        userId: 'user2', // Board owner ID, different from 'anotheruser'
+        id: '123456789', 
+        userId: 'user2',
         username: 'Person 2',
         items: [
           {quote: "quote 1", id: "1", ordering_id: "pin-1", title: "text", img_blob: ""},
@@ -126,8 +125,7 @@ describe('Board Component - Viewing Another User\'s Board', () => {
     // isOwner is false
     render(<ModalAndPin boardId="123456789" owner={isOwner}/>);
 
-    // Since the current user does not own the board, the remove option should not be visible
-    // Wait for the pins to be fetched and displayed first
+    // since the current user does not own the board, the remove option should not be visible
     await waitFor(() => expect(screen.getByAltText("pin_image")).toBeInTheDocument());
     const pinImage = screen.getByAltText('pin_image');
     userEvent.click(pinImage);
