@@ -1,9 +1,18 @@
+/**
+ * @namespace Pin
+ */
+
 import React from 'react';
 import './Pin.css';
 import download from '../../assets/downloads.png';
 import remove from '../../assets/remove.png';
 import TextSize from '../TextSize/TextSize';
 
+/**
+ * Function to check the size of an image and adjust its dimensions accordingly.
+ * @param {Event} event - The image load event.
+ * @memberof Pin
+ */
 function check_size(event) {
     const image = event.target;
     image.classList.add('pin_max_width');
@@ -20,6 +29,11 @@ function check_size(event) {
     image.style.opacity = 1;
 }
 
+/**
+ * Function to download an image.
+ * @param {string} imageSrc - The source URL of the image.
+ * @memberof Pin
+ */
 function downloadImage(imageSrc) {
     const imageName = prompt("Enter the file name:", "image");
     if (imageName) { // Check if user entered a name
@@ -33,7 +47,16 @@ function downloadImage(imageSrc) {
     }
 }
 
-
+/**
+ * Functional component representing a Pin.
+ * @param {Object} props - Component props.
+ * @param {Object} props.pinDetails - Details of the pin.
+ * @param {boolean} props.owner - Indicates if the user owns the pin.
+ * @param {Function} props.editPin - Function to edit the pin.
+ * @param {Function} props.removePin - Function to remove the pin.
+ * @returns {JSX.Element} The Pin component.
+ * @memberof Pin
+ */
 function Pin(props) {
     const canEdit = props.owner;
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Namespace: recommendationRouter</title>
+    <title>JSDoc: Namespace: Recommendations</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Namespace: recommendationRouter</h1>
+    <h1 class="page-title">Namespace: Recommendations</h1>
 
     
 
@@ -28,8 +28,7 @@
 
 <header>
     
-        <h2>
-            <span class="ancestors"><a href="module-routers_recommendation.html">routers/recommendation</a>~</span>recommendationRouter</h2>
+        <h2>Recommendations</h2>
         
     
 </header>
@@ -37,8 +36,6 @@
 <article>
     <div class="container-overview">
     
-        
-            <div class="description">Express router to mount Recommendation related functions on</div>
         
 
         
@@ -73,7 +70,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="backend_controllers_recommendationRouter.js.html">backend/controllers/recommendationRouter.js</a>, <a href="backend_controllers_recommendationRouter.js.html#line10">line 10</a>
+        <a href="frontend_src_components_Recommendations_Recommendations.jsx.html">frontend/src/components/Recommendations/Recommendations.jsx</a>, <a href="frontend_src_components_Recommendations_Recommendations.jsx.html#line1">line 1</a>
     </li></ul></dd>
     
 
@@ -112,7 +109,7 @@
     
 
     
-    <h4 class="name" id=".searchBookByGenre"><span class="type-signature">(static) </span>searchBookByGenre<span class="signature">(genre)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;object>>}</span></h4>
+    <h4 class="name" id=".Recommendations"><span class="type-signature">(static) </span>Recommendations<span class="signature">()</span><span class="type-signature"> &rarr; {JSX.Element}</span></h4>
     
 
     
@@ -120,7 +117,117 @@
 
 
 <div class="description">
-    Searches for books by genre.
+    Functional component representing the Recommendations page.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="frontend_src_components_Recommendations_Recommendations.jsx.html">frontend/src/components/Recommendations/Recommendations.jsx</a>, <a href="frontend_src_components_Recommendations_Recommendations.jsx.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The Recommendations component.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">JSX.Element</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".generateRandomIndices"><span class="type-signature">(static) </span>generateRandomIndices<span class="signature">(arrayLength, numIndices)</span><span class="type-signature"> &rarr; {Array.&lt;number>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Function to generate random indices for book recommendations.
 </div>
 
 
@@ -156,13 +263,13 @@
 
         <tr>
             
-                <td class="name"><code>genre</code></td>
+                <td class="name"><code>arrayLength</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -172,7 +279,30 @@
 
             
 
-            <td class="description last">The genre of books to search for.</td>
+            <td class="description last">The length of the array.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>numIndices</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of random indices to generate.</td>
         </tr>
 
     
@@ -213,7 +343,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="backend_controllers_recommendationRouter.js.html">backend/controllers/recommendationRouter.js</a>, <a href="backend_controllers_recommendationRouter.js.html#line102">line 102</a>
+        <a href="frontend_src_components_Recommendations_Recommendations.jsx.html">frontend/src/components/Recommendations/Recommendations.jsx</a>, <a href="frontend_src_components_Recommendations_Recommendations.jsx.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -236,42 +366,13 @@
 
 
 
-<h5>Throws:</h5>
-
-        
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        - Throws an error if there's an issue fetching data.
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-
-    
 
 
 <h5>Returns:</h5>
 
         
 <div class="param-desc">
-    - Array of books with details.
+    An array of random indices.
 </div>
 
 
@@ -282,7 +383,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;Array.&lt;object>></span>
+<span class="param-type">Array.&lt;number></span>
 
 
     </dd>
@@ -300,7 +401,7 @@
     
 
     
-    <h4 class="name" id=".searchBookByName"><span class="type-signature">(static) </span>searchBookByName<span class="signature">(title)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;object>>}</span></h4>
+    <h4 class="name" id=".saveBook"><span class="type-signature">(static) </span>saveBook<span class="signature">(bookToInsert)</span><span class="type-signature"></span></h4>
     
 
     
@@ -308,7 +409,7 @@
 
 
 <div class="description">
-    Searches for books by title.
+    Function to save a book from the recommended shelf to the current shelf.
 </div>
 
 
@@ -344,13 +445,13 @@
 
         <tr>
             
-                <td class="name"><code>title</code></td>
+                <td class="name"><code>bookToInsert</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Object</span>
 
 
             
@@ -360,7 +461,7 @@
 
             
 
-            <td class="description last">The title of the book to search for.</td>
+            <td class="description last">The book object to be saved.</td>
         </tr>
 
     
@@ -401,7 +502,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="backend_controllers_recommendationRouter.js.html">backend/controllers/recommendationRouter.js</a>, <a href="backend_controllers_recommendationRouter.js.html#line18">line 18</a>
+        <a href="frontend_src_components_Recommendations_Recommendations.jsx.html">frontend/src/components/Recommendations/Recommendations.jsx</a>, <a href="frontend_src_components_Recommendations_Recommendations.jsx.html#line193">line 193</a>
     </li></ul></dd>
     
 
@@ -424,59 +525,8 @@
 
 
 
-<h5>Throws:</h5>
-
-        
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        - Throws an error if there's an issue fetching data.
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
 
 
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-
-    
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    - Array of books with details.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;Array.&lt;object>></span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -488,7 +538,7 @@
     
 
     
-    <h4 class="name" id="~POST/:userId"><span class="type-signature">(inner) </span>POST /:userId<span class="signature">(userId)</span><span class="type-signature"> &rarr; {Array.&lt;object>|Error|Error}</span></h4>
+    <h4 class="name" id=".shuffleBooks"><span class="type-signature">(static) </span>shuffleBooks<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -496,7 +546,7 @@
 
 
 <div class="description">
-    Route for recommending books based on user preferences.
+    Function to shuffle the recommended books.
 </div>
 
 
@@ -505,55 +555,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>userId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The ID of the user for whom recommendations are requested.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -589,7 +590,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="backend_controllers_recommendationRouter.js.html">backend/controllers/recommendationRouter.js</a>, <a href="backend_controllers_recommendationRouter.js.html#line141">line 141</a>
+        <a href="frontend_src_components_Recommendations_Recommendations.jsx.html">frontend/src/components/Recommendations/Recommendations.jsx</a>, <a href="frontend_src_components_Recommendations_Recommendations.jsx.html#line222">line 222</a>
     </li></ul></dd>
     
 
@@ -614,68 +615,6 @@
 
 
 
-<h5>Returns:</h5>
-<ul>
-        <li>
-<div class="param-desc">
-    200 - Array of recommended books.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array.&lt;object></span>
-
-
-    </dd>
-</dl>
-</li>
-    
-        <li>
-<div class="param-desc">
-    404 - User not found.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Error</span>
-
-
-    </dd>
-</dl>
-</li>
-    
-        <li>
-<div class="param-desc">
-    500 - Internal server error.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Error</span>
-
-
-    </dd>
-</dl>
-</li>
-    </ul>
 
 
 

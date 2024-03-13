@@ -1,4 +1,32 @@
-import React, {useState, useEffect, useMemo } from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/components/Bookshelf/Bookshelf.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/components/Bookshelf/Bookshelf.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, {useState, useEffect, useMemo } from 'react';
 import expiredToken from '../ExpiredToken';
 import axios from 'axios';
 import {
@@ -158,7 +186,7 @@ const Bookshelf = () => {
 
   return (
     // all DND components must be within DndContext component
-    <DndContext
+    &lt;DndContext
       // attach sensors
       sensors={sensors}
       // collision detection algorithm (closestCenter most suitable for sorted)
@@ -172,61 +200,61 @@ const Bookshelf = () => {
     {/* this div holds all page content */}
       
 
-    <div>
-      <SortableContext items={readingListIds} strategy={rectSortingStrategy}>
+    &lt;div>
+      &lt;SortableContext items={readingListIds} strategy={rectSortingStrategy}>
       {/* can adjust the # of columns, but update .css accordingly */}
-        <Grid title='Interested' columns={8}>
+        &lt;Grid title='Interested' columns={8}>
           {items.readingList.map((book, index) => (
-            <div className="book-image-container" style={{overflow: "visible", height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
-              <SortablePhoto key={book.cover} url={book.cover} index={index} />
-              <div 
+            &lt;div className="book-image-container" style={{overflow: "visible", height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
+              &lt;SortablePhoto key={book.cover} url={book.cover} index={index} />
+              &lt;div 
                 className="remove-button" 
                 onClick={() => {
                     if (window.confirm("Are you sure you want to delete this book from your shelf?")) {
                         removeBook(book)
                     }
                 }}>
-                <img src={remove} alt="Remove" />
-              </div>
-            </div>
+                &lt;img src={remove} alt="Remove" />
+              &lt;/div>
+            &lt;/div>
           ))}
-        </Grid>
-      </SortableContext>
-    </div>
+        &lt;/Grid>
+      &lt;/SortableContext>
+    &lt;/div>
     
-    <div>
-      <SortableContext items={finishedListIds} strategy={rectSortingStrategy}>
-        <Grid title='Finished' columns={8}>
+    &lt;div>
+      &lt;SortableContext items={finishedListIds} strategy={rectSortingStrategy}>
+        &lt;Grid title='Finished' columns={8}>
           {items.finishedList.map((book, index) => (
-            <div className="book-image-container" style={{overflow: "visible", height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
-              <SortablePhoto key={book.cover} url={book.cover} index={index} />
-              <div 
+            &lt;div className="book-image-container" style={{overflow: "visible", height: `calc(10vw * 3/2 * 0.8)`, width: `calc(10vw * 0.8)`, borderRadius:"0px"}}>
+              &lt;SortablePhoto key={book.cover} url={book.cover} index={index} />
+              &lt;div 
                 className="remove-button" 
                 onClick={() => {
                     if (window.confirm("Are you sure you want to delete this book from your shelf?")) {
                         removeBook(book)
                     }
                 }}>
-                <img src={remove} alt="Remove" />
-              </div>
-            </div>
+                &lt;img src={remove} alt="Remove" />
+              &lt;/div>
+            &lt;/div>
           ))}
-        </Grid>
-      </SortableContext>
-    </div>
+        &lt;/Grid>
+      &lt;/SortableContext>
+    &lt;/div>
       
       {/* handles overlay and smooth animation */}
-      <DragOverlay>
+      &lt;DragOverlay>
         {/* only trigger when there is an active component, else display nothing */}
         {activeId ? (
-          <div>
+          &lt;div>
             {/* create overlay based on same active component */}
-            <Photo url={activeId} />
-          </div>
+            &lt;Photo url={activeId} />
+          &lt;/div>
         ) : null}
-      </DragOverlay>
+      &lt;/DragOverlay>
       
-    </DndContext>
+    &lt;/DndContext>
   );
 
   /**
@@ -289,8 +317,8 @@ const Bookshelf = () => {
         newIndex = overItems.length + 1;
       } else {
         const isBelowLastItem =
-          over &&
-          overIndex === overItems.length - 1 &&
+          over &amp;&amp;
+          overIndex === overItems.length - 1 &amp;&amp;
           draggingRect > over.rect + over.rect.height;
 
         const modifier = isBelowLastItem ? 1 : 0;
@@ -457,3 +485,26 @@ const Bookshelf = () => {
 };
 
 export default Bookshelf;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routers_board.html">routers/board</a></li><li><a href="module-routers_handle_books.html">routers/handle_books</a></li><li><a href="module-routers_login.html">routers/login</a></li><li><a href="module-routers_recommendation.html">routers/recommendation</a></li><li><a href="module-routers_register.html">routers/register</a></li><li><a href="module-routers_user.html">routers/user</a></li></ul><h3>Namespaces</h3><ul><li><a href="Bookshelf.html">Bookshelf</a></li><li><a href="LoginSignup.html">LoginSignup</a></li><li><a href="Modal.html">Modal</a></li><li><a href="ModalAndPin.html">ModalAndPin</a></li><li><a href="Pin.html">Pin</a></li><li><a href="Recommendations.html">Recommendations</a></li><li><a href="SignupPersonalize.html">SignupPersonalize</a></li><li><a href="module-routers_board-boardRouter.html">boardRouter</a></li><li><a href="module-routers_handle_books-handleBooksRouter.html">handleBooksRouter</a></li><li><a href="module-routers_login-loginRouter.html">loginRouter</a></li><li><a href="module-routers_recommendation-recommendationRouter.html">recommendationRouter</a></li><li><a href="module-routers_register-registerRouter.html">registerRouter</a></li><li><a href="module-routers_user-userRouter.html">userRouter</a></li></ul><h3>Classes</h3><ul><li><a href="ModalAndPin.ModalAndPin.html">ModalAndPin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Mar 12 2024 21:37:57 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
