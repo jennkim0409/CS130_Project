@@ -17,6 +17,11 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 
+// components
+import {Grid} from './Grid';
+import {SortablePhoto} from './SortablePhoto';
+import {Photo} from './Photo';
+import remove from '../../assets/remove.png';
 
 /**
  * Namespace containing functions related to the Bookshelf component.
