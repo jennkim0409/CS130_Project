@@ -1,3 +1,7 @@
+/**
+ * @namespace SignupPersonalize
+ */
+
 import React, { useState, useEffect } from "react";
 import './SignupPersonalize.css'
 import { toast, ToastContainer } from 'react-toastify';
@@ -5,7 +9,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import SearchBooks from '../SearchBooks/SearchBooks';
 import axios from 'axios';
-import { set } from 'mongoose';
 import GenrePreferences from '../GenrePreferences/GenrePreferences';
 
 // overriding leftSide style
@@ -14,6 +17,11 @@ const leftSideStyle = {
     justifyContent: 'flex-end', 
 };
 
+/**
+ * SignupPersonalize component.
+ * @memberof SignupPersonalize
+ * @returns {JSX.Element} SignupPersonalize component
+ */
 function SignupPersonalize() {
     const [bookName, setBookName] = useState('');
     const [matchedBooks, setMatchedBooks] = useState([]);
@@ -40,6 +48,12 @@ function SignupPersonalize() {
         }
     }, [matchedBooks]);
 
+    /**
+     * Search for books.
+     * @param {string} name - The name of the book to search for.
+     * @memberof SignupPersonalize
+     * @returns {void}
+     */
     const search = (name) => {
         const loadingToast = toast.loading("Loading...");
 
@@ -75,7 +89,12 @@ function SignupPersonalize() {
         });
     };
 
-    /* save the book(s) that a user "Add"s from the list of matched books */
+    /**
+     * Save a book.
+     * @param {Object} bookToInsert - The book to save.
+     * @memberof SignupPersonalize
+     * @returns {void}
+     */
     const save_book = (bookToInsert) => {
         bookToInsert.userId = localStorage.getItem("user_id");
         bookToInsert.bookshelfType = 'current';
@@ -104,7 +123,11 @@ function SignupPersonalize() {
             });
     }
 
-    /* Save the genre preferences and name */
+    /**
+     * Save genre preferences and name.
+     * @memberof SignupPersonalize
+     * @returns {void}
+     */
     const save = () => {
         // This is an array of the additional genres retrieved from their selected books (3 max per book)
         const condensedAdditionalGenres = [...new Set(additionalGenres.flat())];

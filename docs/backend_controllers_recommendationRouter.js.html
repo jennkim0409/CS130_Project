@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/controllers/recommendationRouter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/controllers/recommendationRouter.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import express from 'express';
+import fetch from 'node-fetch';
+import User from '../models/user.js';
+
+/** Express router providing Recommendation related routes
+ * @module routers/recommendation
+ * @requires express
+ */
+
+/**
+ * Express router to mount Recommendation related functions on
+ * @type {object}
+ * @const
+ * @namespace recommendationRouter
+ */
+const recommendationRouter = express.Router();
+
+/**
+ * Searches for books by title.
+ * @name searchBookByName
+ * @function
+ * @memberof module:routers/recommendation~recommendationRouter
+ * @param {string} title - The title of the book to search for.
+ * @returns {Promise&lt;object[]>} - Array of books with details.
+ * @throws {Error} - Throws an error if there's an issue fetching data.
+ */
+const searchBookByName = async (title) => {
+    const baseUrl = 'https://openlibrary.org/search.json';
+    const query = encodeURIComponent(title);
+    const limit = 1;
+    const url = `${baseUrl}?q=${query}&amp;limit=${limit}`;
+    console.log(`Searching for title: ${title}`);
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const requiredFields = ['key', 'title', 'author_name','isbn', 'subject'];
+        
+        let filteredBooks = data.docs.filter(book => 
+            requiredFields.every(field => 
+                book[field] !== undefined &amp;&amp; book[field] !== null &amp;&amp; (Array.isArray(book[field]) ? book[field].length > 0 : true))
+        )
+    
+        filteredBooks = filteredBooks.map(book => ({
+            ...book,
+            author_name: Array.isArray(book.author_name) ? book.author_name[0] : book.author_name,
+        }));
+    
+        const booksWithDetailsAndCovers = await Promise.all(filteredBooks.map(async (book) => {
+            let coverFound = false;
+            let description = null;
+    
+            for (const isbn of book.isbn) {
+                const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
+                try {
+                    const coverResponse = await fetch(coverUrl);
+                    if (coverResponse.ok) {
+                        book.cover_url = coverUrl;
+                        coverFound = true;
+                        break;
+                    }
+                } catch (error) {
+                    console.log(`No cover found for ISBN ${isbn}`);
+                }
+            }
+    
+            if (!coverFound) {
+                book.cover_url = "";
+            }
+    
+            if (book.key) {
+                const detailsUrl = `https://openlibrary.org${book.key}.json`;
+                try {
+                    const detailsResponse = await fetch(detailsUrl);
+                    if (detailsResponse.ok) {
+                        const detailsData = await detailsResponse.json();
+                        description = detailsData.description ? (typeof detailsData.description === 'string' ? detailsData.description : detailsData.description.value) : null;
+                    }
+                } catch (error) {
+                    console.log(`Failed to fetch details for book with key ${book.key}:`, error);
+                }
+            }
+    
+            return {
+                key: book.key,
+                title: book.title,
+                cover_url: book.cover_url, 
+                author_name: book.author_name,
+                summary: description,
+                isbn: book.isbn,
+                subject: book.subject,
+            };
+        }));
+    
+        const completeBooks = booksWithDetailsAndCovers.filter(book => book.summary !== null).slice(0, 5);
+        return completeBooks
+    
+    } catch (error) {
+        console.error('Error fetching book by title', error);
+    }
+};
+
+/**
+ * Searches for books by genre.
+ * @name searchBookByGenre
+ * @function
+ * @memberof module:routers/recommendation~recommendationRouter
+ * @param {string} genre - The genre of books to search for.
+ * @returns {Promise&lt;object[]>} - Array of books with details.
+ * @throws {Error} - Throws an error if there's an issue fetching data.
+ */
+const searchBookByGenre = async (genre) => {
+    const baseURL = 'https://openlibrary.org/subjects';
+    const limit = 10;
+    const url = `${baseURL}/${genre}.json?limit=${limit}`;
+    console.log(`Searching for books in genre: ${genre}`);
+    const book_details = [];
+    try{
+        const response = await fetch(url);
+        const data = await response.json();
+        const recommendedBooks = data.works.map(work => ({
+            title: work.title,
+        }));
+
+        // console.log("This is recommendedBooks", recommendedBooks)
+        let book_details =[]
+        for (let book of recommendedBooks) {
+            console.log("book title", book.title);
+            const details = await searchBookByName(book.title);
+            if((details.length === 0)){
+                continue;
+            }
+            book_details.push(details)
+        }
+
+        return book_details;
+    } catch(error){
+        console.error(`Error searching for books in genre ${genre}:`, error.message);
+    }
+};
+
+/**
+ * Route for recommending books based on user preferences.
+ * @name POST /:userId
+ * @function
+ * @memberof module:routers/recommendation~recommendationRouter
+ * @inner
+ * @param {string} userId - The ID of the user for whom recommendations are requested.
+ * @returns {object[]} 200 - Array of recommended books.
+ * @returns {Error} 404 - User not found.
+ * @returns {Error} 500 - Internal server error.
+ */
+recommendationRouter.post('/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    try{
+        const user = await User.findById(userId)
+        if(!user){
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const genrePrefs = user.genrePrefs;
+        const genrePromises = genrePrefs.map(genre => searchBookByGenre(genre));
+        const genreBooks = await Promise.all(genrePromises);
+
+        const recommendedBooks = genreBooks.flat();
+        console.log(recommendedBooks.length)
+        res.json(recommendedBooks)
+
+    } catch(error){
+        console.error('Error fetching user or searching for books:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+export default recommendationRouter;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routers_board.html">routers/board</a></li><li><a href="module-routers_handle_books.html">routers/handle_books</a></li><li><a href="module-routers_login.html">routers/login</a></li><li><a href="module-routers_recommendation.html">routers/recommendation</a></li><li><a href="module-routers_register.html">routers/register</a></li><li><a href="module-routers_user.html">routers/user</a></li></ul><h3>Namespaces</h3><ul><li><a href="Bookshelf.html">Bookshelf</a></li><li><a href="LoginSignup.html">LoginSignup</a></li><li><a href="Modal.html">Modal</a></li><li><a href="ModalAndPin.html">ModalAndPin</a></li><li><a href="Pin.html">Pin</a></li><li><a href="Recommendations.html">Recommendations</a></li><li><a href="SignupPersonalize.html">SignupPersonalize</a></li><li><a href="module-routers_board-boardRouter.html">boardRouter</a></li><li><a href="module-routers_handle_books-handleBooksRouter.html">handleBooksRouter</a></li><li><a href="module-routers_login-loginRouter.html">loginRouter</a></li><li><a href="module-routers_recommendation-recommendationRouter.html">recommendationRouter</a></li><li><a href="module-routers_register-registerRouter.html">registerRouter</a></li><li><a href="module-routers_user-userRouter.html">userRouter</a></li></ul><h3>Classes</h3><ul><li><a href="ModalAndPin.ModalAndPin.html">ModalAndPin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Mar 12 2024 21:37:57 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

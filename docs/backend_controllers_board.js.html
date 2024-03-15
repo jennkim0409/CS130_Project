@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/controllers/board.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/controllers/board.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import express from 'express';
+import Board from "../models/board.js";
+import Book from '../models/book.js';
+import Item from '../models/item.js';
+
+/** Express router providing Board &amp; Item related routes
+ * @module routers/board
+ * @requires express
+ */
+
+/**
+ * Express router to mount Board related functions on
+ * @type {object}
+ * @const
+ * @namespace boardRouter
+ */
+const boardRouter = express.Router();
+
+/**
+ * Route for adding a board.
+ * @name POST /addBoard
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} [bookId] - ID of the associated book (optional)
+ * @param {string} bookTitle - Title of the book (required)
+ * @param {string} bookAuthor - Author of the book (required)
+ * @param {string} bookCover - Cover image URL of the book (required)
+ * @param {string} username - Username of the board creator (required)
+ * @param {string} userId - ID of the board creator (required)
+ * @param {boolean} [publicVisibility] - Public visibility status of the board (optional)
+ * @returns {object} 201 - Newly created board object
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.post('/addBoard', async (req, res) => {
+    try {
+        const { bookId, bookTitle, bookAuthor, bookCover, username, userId, publicVisibility } = req.body;
+  
+        const newBoard = new Board({
+            bookTitle,
+            bookAuthor,
+            bookCover,
+            username,
+            userId,
+            publicVisibility,
+        });
+
+        const savedBoard = await newBoard.save();
+
+        if (bookId) {
+            await Book.findByIdAndUpdate(
+                bookId,
+                { $set: { boardId: savedBoard._id } }, 
+                { new: true }
+            );
+        }
+
+        res.status(201).json({ message: 'Board added successfully', board: savedBoard});
+    }
+    catch (error) {
+        console.error('Error adding board:', error);
+        res.status(500).json({ message: 'Failed to add board', error: error.message });
+    }
+});
+
+/**
+ * Route for removing a board and its associated items.
+ * @name POST /removeBoard
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to be removed
+ * @returns {object} 200 - Success message
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.post('/removeBoard', async(req, res) => {
+    try{
+        const {boardId} = req.body;
+        const board = await Board.findById(boardId);
+        if (!board) {
+            return res.status(404).json({ message: 'Board not found' });
+        }
+        await Book.updateMany(
+            { boardId: boardId },
+            { $unset: { boardId: "" } } // Remove the boardId field
+        );
+        await Item.deleteMany({ _id: { $in: board.items } });
+        await Board.findByIdAndDelete(boardId);
+
+        res.status(200).json({ message: 'Board and all associated items have been removed successfully' });
+    }
+    catch(error){
+        console.error('Error removing board:', error);
+        res.status(500).json({ message: 'Error removing board', error: error.message });
+    }
+});
+
+/**
+ * Route for retrieving a board by its ID.
+ * @name GET /getBoard
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to be retrieved
+ * @returns {object} 200 - Board object
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.get('/getBoard', async (req,res) => {
+    try {
+        const {boardId} = req.query;
+        const board = await Board.findById(boardId)
+            .populate('items')
+            .select('bookTitle bookAuthor bookCover username userId items publicVisibility');
+        if(!board){
+            return res.status(404).json({ message: 'Board not found' });
+        }
+        res.json(board);
+    }
+    catch(error){
+        res.status(500).json({ message: 'Error fetching board', error: error.message });
+    }
+});
+
+/**
+ * Route for retrieving boards by book details.
+ * @name GET /getBoardsByBook
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} userId - ID of the user requesting the boards
+ * @param {string} bookTitle - Title of the book
+ * @param {string} bookAuthor - Author of the book
+ * @returns {object} 200 - Array of board objects
+ * @returns {Error} 404 - No boards found for the given book
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.get('/getBoardsByBook', async (req, res) => {
+    try{
+        const {userId, bookTitle, bookAuthor} = req.query;
+        const boards = await Board.find({
+            userId: { $ne: userId }, // Exclude boards that belong to the user
+            bookTitle: bookTitle,
+            bookAuthor: bookAuthor,
+            publicVisibility: true
+        }).populate('items');
+
+        if (!boards || boards.length === 0) {
+            return res.status(404).json({ message: 'No boards found for the given book' });
+        }
+        res.json(boards);
+    } catch(error){
+        res.status(500).json({ message: 'Error getting boards', error: error.message });
+    }
+});
+
+/**
+ * Route for updating the visibility status of a board.
+ * @name POST /updateBoardVisibility
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to be updated
+ * @param {boolean} publicVisibility - New visibility status
+ * @returns {object} 200 - Success message with updated board object
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.post('/updateBoardVisibility', async (req, res) => {
+    try{
+        const {boardId, publicVisibility} = req.body;
+        const visibility = !!publicVisibility;
+
+        const board = await Board.findByIdAndUpdate(
+            boardId,
+            { $set: { publicVisibility: visibility } },
+            { new: true, runValidators: true }
+        ).populate('items');
+        if (!board) {
+            return res.status(404).json({ message: 'Board not found' });
+        }
+        res.status(200).json({ message: 'Board visibility updated successfully', board });
+    } catch(error){
+        console.error('Error updating board visibility:', error);
+        res.status(500).json({ message: 'Error updating board visibility', error: error.message });
+    }
+});
+
+/**
+ * Route for removing an item from a board.
+ * @name POST /removeItem
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board from which the item will be removed
+ * @param {string} itemId - ID of the item to be removed
+ * @returns {object} 200 - Success message
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.post('/removeItem', async (req, res) => {
+    try {
+        const { boardId, itemId } = req.body;
+        const board = await Board.findByIdAndUpdate(boardId, { $pull: { items: itemId } }, { new: true });
+        if (!board) {
+            return res.status(404).json({ message: 'Board not found' });
+        }
+        await Item.findByIdAndDelete(itemId);
+        res.status(200).json({ message: 'Item removed successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error removing item', error: error.message });
+    }
+});
+
+/**
+ * Route for adding an item to a board.
+ * @name POST /addItem
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to which the item will be added
+ * @param {string} title - Title of the item
+ * @param {number} ordering_id - Ordering ID of the item
+ * @param {string} description - Description of the item
+ * @param {string} pin_size - Size of the item's pin
+ * @param {string} quote - Quote associated with the item
+ * @param {string} text_color - Color of the text
+ * @param {string} img_blob - Image blob URL
+ * @returns {object} 200 - Success message with updated board object
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.post('/addItem', async (req, res) => {
+    try {
+        const {boardId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
+
+        const newItem = new Item({ title, ordering_id, description, pin_size, quote, text_color, img_blob });
+        const savedItem = await newItem.save();
+
+        const board = await Board.findByIdAndUpdate(boardId, { $addToSet: { items: savedItem._id } }, { new: true }).populate('items');
+        if(!board){
+            return res.status(404).json({ message: 'Board not found' });
+        }
+        res.status(200).json({ message: 'Item added successfully', board });
+    }
+    catch(error){
+        res.status(500).json({ message: 'Error adding item', error: error.message });
+    }
+});
+
+/**
+ * Route for updating an item on a board.
+ * @name POST /updateItem
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} itemId - ID of the item to be updated
+ * @param {string} title - New title of the item (optional)
+ * @param {number} ordering_id - New ordering ID of the item (optional)
+ * @param {string} description - New description of the item (optional)
+ * @param {string} pin_size - New size of the item's pin (optional)
+ * @param {string} quote - New quote associated with the item (optional)
+ * @param {string} text_color - New color of the text (optional)
+ * @param {string} img_blob - New image blob URL (optional)
+ * @returns {object} 200 - Success message with updated item object
+ * @returns {Error} 404 - Item not found
+ * @returns {Error} 500 - Internal server error
+ */
+boardRouter.post('/updateItem', async (req, res) => {
+    try{
+        const {itemId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
+        let updateItem = {};
+        
+        if (title !== null) updateItem.title = title;
+        if (ordering_id !== null) updateItem.ordering_id = ordering_id;
+        if (description !== null) updateItem.description = description;
+        if (pin_size !== null) updateItem.pin_size = pin_size;
+        if (quote !== null) updateItem.quote = quote;
+        if (text_color !== null) updateItem.text_color = text_color;
+        if (img_blob !== null) updateItem.img_blob = img_blob;
+
+        const updatedItem = await Item.findByIdAndUpdate(
+            itemId,
+            { $set: updateItem },
+            { new: true, runValidators: true, omitUndefined: true } // Return the updated document and run schema validators
+        );
+
+        if (!updatedItem) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({ message: 'Item updated successfully', item: updatedItem });
+    } catch(error){
+        res.status(500).json({ message: 'Error updating item', error: error.message });
+    }
+})
+
+export default boardRouter;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routers_board.html">routers/board</a></li><li><a href="module-routers_handle_books.html">routers/handle_books</a></li><li><a href="module-routers_login.html">routers/login</a></li><li><a href="module-routers_recommendation.html">routers/recommendation</a></li><li><a href="module-routers_register.html">routers/register</a></li><li><a href="module-routers_user.html">routers/user</a></li></ul><h3>Namespaces</h3><ul><li><a href="Bookshelf.html">Bookshelf</a></li><li><a href="LoginSignup.html">LoginSignup</a></li><li><a href="Modal.html">Modal</a></li><li><a href="ModalAndPin.html">ModalAndPin</a></li><li><a href="Pin.html">Pin</a></li><li><a href="Recommendations.html">Recommendations</a></li><li><a href="SignupPersonalize.html">SignupPersonalize</a></li><li><a href="module-routers_board-boardRouter.html">boardRouter</a></li><li><a href="module-routers_handle_books-handleBooksRouter.html">handleBooksRouter</a></li><li><a href="module-routers_login-loginRouter.html">loginRouter</a></li><li><a href="module-routers_recommendation-recommendationRouter.html">recommendationRouter</a></li><li><a href="module-routers_register-registerRouter.html">registerRouter</a></li><li><a href="module-routers_user-userRouter.html">userRouter</a></li></ul><h3>Classes</h3><ul><li><a href="ModalAndPin.ModalAndPin.html">ModalAndPin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Mar 12 2024 21:37:57 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

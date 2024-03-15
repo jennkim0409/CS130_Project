@@ -1,3 +1,7 @@
+/**
+ * @namespace ModalAndPin
+ */
+
 import './ModalAndPin.css';
 import React from 'react';
 import Modal from '../Modal/Modal';
@@ -6,7 +10,17 @@ import add from '../../assets/add.svg';
 import axios from 'axios';
 import expiredToken from '../ExpiredToken';
 
+/**
+ * Class representing the Modal and Pin component.
+ * @extends React.Component
+ * @memberof ModalAndPin
+ */
 class ModalAndPin extends React.Component {
+    /**
+     * Constructor for ModalAndPin component.
+     * @param {Object} props - Component props.
+     * @memberof ModalAndPin
+     */
     constructor(props) {
         super(props);
         this.state={
@@ -19,6 +33,11 @@ class ModalAndPin extends React.Component {
         };
     }
 
+    /**
+     * Updates the component when props change.
+     * @param {Object} prevProps - Previous props.
+     * @memberof ModalAndPin
+     */
     componentDidUpdate(prevProps) {
         // Check if boardId has changed
         if (prevProps.boardId !== this.props.boardId) {
@@ -28,10 +47,18 @@ class ModalAndPin extends React.Component {
         }
     }
 
+    /**
+     * Fetches pins data.
+     * @memberof ModalAndPin
+     */
     componentDidMount() {
         this.fetchPins();
     }
 
+    /**
+     * Fetches pins data from the backend.
+     * @memberof ModalAndPin
+     */
     async fetchPins() {
         try {
             const response = await axios.get('http://localhost:5555/api/board/getBoard/', {
@@ -76,6 +103,11 @@ class ModalAndPin extends React.Component {
         }
     }
 
+    /**
+     * Adds a new pin.
+     * @param {Object} pinDetails - Details of the new pin.
+     * @memberof ModalAndPin
+     */
     add_pin = async (pinDetails) => {
         // compute next id
         const nextId = this.state.lastId + 1;
@@ -108,7 +140,11 @@ class ModalAndPin extends React.Component {
         }
     }
 
-    // function to account for updating a pin
+    /**
+     * Updates an existing pin.
+     * @param {Object} pinDetails - Details of the pin to update.
+     * @memberof ModalAndPin
+     */
     change_pin = async pinDetails => {
         // update backend
         pinDetails.itemId = pinDetails.id;
@@ -150,6 +186,11 @@ class ModalAndPin extends React.Component {
         });
     }
 
+    /**
+     * Removes a pin.
+     * @param {string} orderingId - The ID of the pin to remove.
+     * @memberof ModalAndPin
+     */
     remove_pin = async (orderingId) => {
         const pinRemoveData = this.state.pins.filter(pinElement => pinElement.props.pinDetails.ordering_id === orderingId);
         const pinToRemove = pinRemoveData.length > 0 ? pinRemoveData[0].props.pinDetails : null;
@@ -176,8 +217,11 @@ class ModalAndPin extends React.Component {
         }
     }
 
-    // function used when pin is clicked
-    // we know that we want to edit/view this pin, so update to show modal and also set in editing view
+    /**
+     * Sets pin details for editing.
+     * @param {Object} pinDetails - Details of the pin to edit.
+     * @memberof ModalAndPin
+     */
     editPin = (pinDetails) => {
         // Set state with pinDetails to edit and make modal visible
         this.setState({
@@ -186,6 +230,11 @@ class ModalAndPin extends React.Component {
         });
     };
 
+    /**
+     * Renders the component.
+     * @returns {JSX.Element} The ModalAndPin component.
+     * @memberof ModalAndPin
+     */
     render() {
         return (
             <div className="modal_and_pin">

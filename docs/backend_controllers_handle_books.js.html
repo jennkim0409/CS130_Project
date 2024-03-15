@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/controllers/handle_books.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/controllers/handle_books.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import express from 'express';
+import fetch from 'node-fetch';
+import Bookshelf from '../models/bookshelf.js';
+import Book from '../models/book.js';
+
+/** Express router providing Book related routes
+ * @module routers/handle_books
+ * @requires express
+ */
+
+/**
+ * Express router to mount Book related functions on
+ * @type {object}
+ * @const
+ * @namespace handleBooksRouter
+ */
+const handlebooksRouter = express.Router();
+
+/**
+ * Route for adding a book.
+ * @name POST /addBook
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user adding the book
+ * @param {string} bookshelfType - Type of the bookshelf to which the book will be added
+ * @param {string} title - Title of the book (required)
+ * @param {string} cover - Cover image URL of the book (required)
+ * @param {string} author - Author of the book (required)
+ * @param {string} [summary] - Summary of the book (optional)
+ * @param {string} [isbn] - ISBN of the book (optional)
+ * @param {string} [subject] - Subject of the book (optional)
+ * @returns {object} 201 - Newly created book object and associated bookshelf
+ * @returns {Error} 400 - Book already exists in the bookshelf or missing parameters
+ * @returns {Error} 404 - Bookshelf not found
+ * @returns {Error} 500 - Internal server error
+ */
+handlebooksRouter.post('/addBook', async (req, res) => {
+  try {
+    const { userId, bookshelfType, title, cover, author, summary, isbn, subject } = req.body;
+
+    if (userId &amp;&amp; bookshelfType) {
+      // Find the bookshelf
+      const bookshelves = await Bookshelf.find({ userId: userId }).populate('books.bookId');
+      const isDuplicate = bookshelves.some(bookshelf => bookshelf.books.some(({ bookId }) => 
+        bookId &amp;&amp; bookId.title === title &amp;&amp; bookId.cover === cover &amp;&amp; bookId.author === author
+      ));
+
+      if (isDuplicate) {
+        return res.status(400).json({ message: 'Book already exists in the bookshelf' });
+      }
+
+      const newBook = new Book({
+        title,
+        cover,
+        author,
+        summary,
+        isbn,
+        subject
+      });
+      const savedBook = await newBook.save();
+
+      const specificBookshelf = bookshelves.find(bookshelf => bookshelf.type === bookshelfType);
+      if (!specificBookshelf) {
+        return res.status(404).json({ message: `Bookshelf of type ${bookshelfType} not found` });
+      }
+
+      const maxOrder = specificBookshelf.books.reduce((max, { order }) => Math.max(max, order), -1) + 1;
+
+      // Add the new book with the next order value
+      specificBookshelf.books.push({ bookId: savedBook._id, order: maxOrder });
+      await specificBookshelf.save();
+
+      res.status(201).json({ message: 'Book added successfully', book: savedBook, bookshelf: specificBookshelf });
+    } else {
+      return res.status(400).json({ message: 'UserId and bookshelfType are required' });
+    }
+  } catch (error) {
+    console.error('Error adding book:', error);
+    res.status(500).json({ message: 'Failed to add book', error: error.message });
+  }
+});
+
+/**
+ * Route for moving a book from one shelf to another.
+ * @name POST /moveBook
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user moving the book
+ * @param {string} bookId - ID of the book to be moved
+ * @param {string} fromShelf - Type of the source bookshelf
+ * @param {string} toShelf - Type of the target bookshelf
+ * @param {number} newOrder - New order of the book in the target bookshelf
+ * @returns {object} 200 - Success message and details of source and target bookshelf
+ * @returns {Error} 404 - Source or target bookshelf not found, or book not found on source shelf
+ * @returns {Error} 500 - Internal server error
+ */
+handlebooksRouter.post('/moveBook', async (req, res) => {
+    try {
+        const { userId, bookId, fromShelf, toShelf, newOrder } = req.body;
+
+        const sourceShelf = await Bookshelf.findOne({ userId, type: fromShelf });
+        if (!sourceShelf) {
+          return res.status(404).json({ message: 'Source bookshelf not found' });
+        }
+        const bookToRemoveIndex = sourceShelf.books.findIndex(book => book.bookId &amp;&amp; book.bookId.equals(bookId));
+        if (bookToRemoveIndex === -1) {
+          return res.status(404).json({ message: 'Book not found on shelf' });
+        }
+        const bookToRemoveOrder = sourceShelf.books[bookToRemoveIndex].order;
+    
+        sourceShelf.books.splice(bookToRemoveIndex, 1);
+    
+        // Adjust the orders of the remaining books
+        sourceShelf.books.forEach(book => {
+          if (book.order > bookToRemoveOrder) {
+            book.order -= 1;
+          }
+        });
+        await sourceShelf.save();
+
+
+        const targetShelf = await Bookshelf.findOne({ userId, type: toShelf });
+        if (!targetShelf) {
+          return res.status(404).json({ message: 'Target bookshelf not found' });
+        }
+        targetShelf.books.forEach(book => {
+          if (book.order >= newOrder) {
+            book.order += 1;
+          }
+        });
+    
+        // Sort books by the updated order to maintain consistency
+        targetShelf.books.sort((a, b) => a.order - b.order);
+    
+        // Add the new book at its designated order
+        targetShelf.books.push({ bookId, order: newOrder });
+    
+        await targetShelf.save();
+        res.status(200).json({ message: 'Book moved successfully', fromShelf: sourceShelf, toShelf: targetShelf });
+      } catch (error) {
+        console.error('Error moving book:', error);
+        res.status(500).json({ message: 'Failed to move book', error: error.message });
+      }
+});
+
+/**
+ * Route for removing a book from a bookshelf.
+ * @name POST /removeBook
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user removing the book
+ * @param {string} bookshelfType - Type of the bookshelf from which the book will be removed
+ * @param {string} bookId - ID of the book to be removed
+ * @returns {object} 200 - Success message and updated bookshelf details
+ * @returns {Error} 404 - Bookshelf not found, or book not found on shelf
+ * @returns {Error} 500 - Internal server error
+ */
+handlebooksRouter.post('/removeBook', async (req, res) => {
+  try{
+    const {userId, bookshelfType, bookId} = req.body;
+
+    const bookshelf = await Bookshelf.findOne({ userId: userId, type: bookshelfType });
+    if (!bookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found' });
+    }
+
+    // Find and remove the book from the bookshelf, and remember its order
+    const bookIndex = bookshelf.books.findIndex(b => b.bookId.toString() === bookId);
+    if (bookIndex === -1) {
+      return res.status(404).json({ message: 'Book not found on shelf' });
+    }
+    const removedBookOrder = bookshelf.books[bookIndex].order;
+    bookshelf.books.splice(bookIndex, 1);
+
+    // Adjust the order of the remaining books
+    bookshelf.books.forEach(book => {
+      if (book.order > removedBookOrder) {
+        book.order -= 1;
+      }
+    });
+
+    await bookshelf.save();
+    res.status(200).json({ message: 'Book removed successfully', bookshelf: bookshelf });
+  }
+  catch(error){
+    console.error('Error deleting book:', error);
+    res.status(500).json({ message: 'Failed to remove book', error: error.message });
+  }
+});
+
+/**
+ * Route for clearing a bookshelf.
+ * @name POST /clearBookshelf
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user clearing the bookshelf
+ * @param {string} bookshelfType - Type of the bookshelf to be cleared
+ * @returns {object} 200 - Success message and updated bookshelf details
+ * @returns {Error} 404 - Bookshelf not found
+ * @returns {Error} 500 - Internal server error
+ */
+handlebooksRouter.post('/clearBookshelf', async (req, res) => {
+  try{
+    const {userId, bookshelfType} = req.body;
+    const updatedBookshelf = await Bookshelf.findOneAndUpdate(
+      { userId: userId, type: bookshelfType },
+      { $set: { books: [] } }, 
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedBookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found' });
+    }
+    res.status(200).json({ message: 'Bookshelf cleared successfully', bookshelf: updatedBookshelf });
+  } catch(error){
+    console.error('Error clearing bookshelf:', error);
+    res.status(500).json({ message: 'Failed to clear bookshelf', error: error.message });
+  }
+});
+
+/**
+ * Route for searching books by title.
+ * @name GET /searchBooksName
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} q:title - Query parameter for book title search
+ * @returns {object[]} 200 - Array of books matching the search criteria
+ * @returns {Error} 500 - Internal server error
+ */
+handlebooksRouter.get('/searchBooksName', async (req, res) => {
+  const {q:title} = req.query; // Assuming the title is passed as a query parameter
+  const baseUrl = 'https://openlibrary.org/search.json';
+  const query = encodeURIComponent(title);
+  const limit = 50;
+  const url = `${baseUrl}?q=${query}&amp;limit=${limit}`;
+  console.log(`Searching for title: ${title}`);
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const requiredFields = ['key', 'title', 'author_name','isbn', 'subject'];
+    
+    let filteredBooks = data.docs.filter(book => 
+      requiredFields.every(field => 
+        book[field] !== undefined &amp;&amp; book[field] !== null &amp;&amp; (Array.isArray(book[field]) ? book[field].length > 0 : true))
+    )
+
+    filteredBooks = filteredBooks.map(book => ({
+      ...book,
+      author_name: Array.isArray(book.author_name) ? book.author_name[0] : book.author_name,
+    }));
+
+    const booksWithDetailsAndCovers = await Promise.all(filteredBooks.map(async (book) => {
+      let coverFound = false;
+      let description = null;
+
+      for (const isbn of book.isbn) {
+        const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
+        try {
+          const coverResponse = await fetch(coverUrl);
+          if (coverResponse.ok) {
+            book.cover_url = coverUrl;
+            coverFound = true;
+            break;
+          }
+        } catch (error) {
+          console.log(`No cover found for ISBN ${isbn}`);
+        }
+      }
+
+      if (!coverFound) {
+        book.cover_url = "";
+      }
+
+      if (book.key) {
+        const detailsUrl = `https://openlibrary.org${book.key}.json`;
+        try {
+          const detailsResponse = await fetch(detailsUrl);
+          if (detailsResponse.ok) {
+            const detailsData = await detailsResponse.json();
+            description = detailsData.description ? (typeof detailsData.description === 'string' ? detailsData.description : detailsData.description.value) : null;
+          }
+        } catch (error) {
+          console.log(`Failed to fetch details for book with key ${book.key}:`, error);
+        }
+      }
+
+      return {
+        key: book.key,
+        title: book.title,
+        cover_url: book.cover_url, // Add the cover URL, whether it's blank or a found one
+        author_name: book.author_name,
+        summary: description,
+        isbn: book.isbn,
+        subject: book.subject
+      };
+    }));
+
+    const completeBooks = booksWithDetailsAndCovers.filter(book => book.summary !== null).slice(0, 5);
+    res.json(completeBooks);
+
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    res.status(500).json({ message: 'Failed to fetch books', error: error.message });
+  }
+});
+
+/**
+ * Route for getting books from a specific bookshelf.
+ * @name GET /getBooks
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user retrieving the books
+ * @param {string} type - Type of the bookshelf from which books will be retrieved
+ * @returns {object[]} 200 - Array of books from the specified bookshelf
+ * @returns {Error} 404 - Bookshelf not found
+ * @returns {Error} 500 - Internal server error
+ */
+handlebooksRouter.get('/getBooks', async (req, res) => {
+  const { userId, type } = req.query;
+  try {
+    const bookshelf = await Bookshelf.findOne({ userId, type })
+      .populate({
+        path: 'books.bookId',
+        model: 'Book'
+      }); // Assuming 'books' is a field that references book documents
+    if (!bookshelf) {
+      return res.status(404).json({ message: 'Bookshelf not found' });
+    }
+    const sortedBooks = bookshelf.books
+    .sort((a, b) => a.order - b.order)
+    .map(book => {
+      if (!book.bookId) {
+        // Handle the case where bookId is not populated or undefined
+        console.error('BookId is undefined for order:', book.order);
+        return null; // or an appropriate fallback value
+      }
+      return {
+        ...book.bookId._doc,
+        order: book.order // Include the order in the response
+      };
+    })
+    .filter(book => book !== null);
+    
+    res.json(sortedBooks);
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    res.status(500).json({ message: 'Failed to fetch books', error: error.message });
+  }
+});
+
+export default handlebooksRouter;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routers_board.html">routers/board</a></li><li><a href="module-routers_handle_books.html">routers/handle_books</a></li><li><a href="module-routers_login.html">routers/login</a></li><li><a href="module-routers_recommendation.html">routers/recommendation</a></li><li><a href="module-routers_register.html">routers/register</a></li><li><a href="module-routers_user.html">routers/user</a></li></ul><h3>Namespaces</h3><ul><li><a href="Bookshelf.html">Bookshelf</a></li><li><a href="LoginSignup.html">LoginSignup</a></li><li><a href="Modal.html">Modal</a></li><li><a href="ModalAndPin.html">ModalAndPin</a></li><li><a href="Pin.html">Pin</a></li><li><a href="Recommendations.html">Recommendations</a></li><li><a href="SignupPersonalize.html">SignupPersonalize</a></li><li><a href="module-routers_board-boardRouter.html">boardRouter</a></li><li><a href="module-routers_handle_books-handleBooksRouter.html">handleBooksRouter</a></li><li><a href="module-routers_login-loginRouter.html">loginRouter</a></li><li><a href="module-routers_recommendation-recommendationRouter.html">recommendationRouter</a></li><li><a href="module-routers_register-registerRouter.html">registerRouter</a></li><li><a href="module-routers_user-userRouter.html">userRouter</a></li></ul><h3>Classes</h3><ul><li><a href="ModalAndPin.ModalAndPin.html">ModalAndPin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Mar 12 2024 21:37:57 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

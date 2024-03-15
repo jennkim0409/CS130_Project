@@ -3,10 +3,38 @@ import fetch from 'node-fetch';
 import Bookshelf from '../models/bookshelf.js';
 import Book from '../models/book.js';
 
+/** Express router providing Book related routes
+ * @module routers/handle_books
+ * @requires express
+ */
+
+/**
+ * Express router to mount Book related functions on
+ * @type {object}
+ * @const
+ * @namespace handleBooksRouter
+ */
 const handlebooksRouter = express.Router();
 
-
-//if the isbn is already stored, send error
+/**
+ * Route for adding a book.
+ * @name POST /addBook
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user adding the book
+ * @param {string} bookshelfType - Type of the bookshelf to which the book will be added
+ * @param {string} title - Title of the book (required)
+ * @param {string} cover - Cover image URL of the book (required)
+ * @param {string} author - Author of the book (required)
+ * @param {string} [summary] - Summary of the book (optional)
+ * @param {string} [isbn] - ISBN of the book (optional)
+ * @param {string} [subject] - Subject of the book (optional)
+ * @returns {object} 201 - Newly created book object and associated bookshelf
+ * @returns {Error} 400 - Book already exists in the bookshelf or missing parameters
+ * @returns {Error} 404 - Bookshelf not found
+ * @returns {Error} 500 - Internal server error
+ */
 handlebooksRouter.post('/addBook', async (req, res) => {
   try {
     const { userId, bookshelfType, title, cover, author, summary, isbn, subject } = req.body;
@@ -53,6 +81,21 @@ handlebooksRouter.post('/addBook', async (req, res) => {
   }
 });
 
+/**
+ * Route for moving a book from one shelf to another.
+ * @name POST /moveBook
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user moving the book
+ * @param {string} bookId - ID of the book to be moved
+ * @param {string} fromShelf - Type of the source bookshelf
+ * @param {string} toShelf - Type of the target bookshelf
+ * @param {number} newOrder - New order of the book in the target bookshelf
+ * @returns {object} 200 - Success message and details of source and target bookshelf
+ * @returns {Error} 404 - Source or target bookshelf not found, or book not found on source shelf
+ * @returns {Error} 500 - Internal server error
+ */
 handlebooksRouter.post('/moveBook', async (req, res) => {
     try {
         const { userId, bookId, fromShelf, toShelf, newOrder } = req.body;
@@ -102,6 +145,19 @@ handlebooksRouter.post('/moveBook', async (req, res) => {
       }
 });
 
+/**
+ * Route for removing a book from a bookshelf.
+ * @name POST /removeBook
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user removing the book
+ * @param {string} bookshelfType - Type of the bookshelf from which the book will be removed
+ * @param {string} bookId - ID of the book to be removed
+ * @returns {object} 200 - Success message and updated bookshelf details
+ * @returns {Error} 404 - Bookshelf not found, or book not found on shelf
+ * @returns {Error} 500 - Internal server error
+ */
 handlebooksRouter.post('/removeBook', async (req, res) => {
   try{
     const {userId, bookshelfType, bookId} = req.body;
@@ -135,6 +191,18 @@ handlebooksRouter.post('/removeBook', async (req, res) => {
   }
 });
 
+/**
+ * Route for clearing a bookshelf.
+ * @name POST /clearBookshelf
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user clearing the bookshelf
+ * @param {string} bookshelfType - Type of the bookshelf to be cleared
+ * @returns {object} 200 - Success message and updated bookshelf details
+ * @returns {Error} 404 - Bookshelf not found
+ * @returns {Error} 500 - Internal server error
+ */
 handlebooksRouter.post('/clearBookshelf', async (req, res) => {
   try{
     const {userId, bookshelfType} = req.body;
@@ -154,7 +222,16 @@ handlebooksRouter.post('/clearBookshelf', async (req, res) => {
   }
 });
 
-
+/**
+ * Route for searching books by title.
+ * @name GET /searchBooksName
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} q:title - Query parameter for book title search
+ * @returns {object[]} 200 - Array of books matching the search criteria
+ * @returns {Error} 500 - Internal server error
+ */
 handlebooksRouter.get('/searchBooksName', async (req, res) => {
   const {q:title} = req.query; // Assuming the title is passed as a query parameter
   const baseUrl = 'https://openlibrary.org/search.json';
@@ -233,6 +310,18 @@ handlebooksRouter.get('/searchBooksName', async (req, res) => {
   }
 });
 
+/**
+ * Route for getting books from a specific bookshelf.
+ * @name GET /getBooks
+ * @function
+ * @memberof module:routers/handle_books~handleBooksRouter
+ * @inner
+ * @param {string} userId - ID of the user retrieving the books
+ * @param {string} type - Type of the bookshelf from which books will be retrieved
+ * @returns {object[]} 200 - Array of books from the specified bookshelf
+ * @returns {Error} 404 - Bookshelf not found
+ * @returns {Error} 500 - Internal server error
+ */
 handlebooksRouter.get('/getBooks', async (req, res) => {
   const { userId, type } = req.query;
   try {

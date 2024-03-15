@@ -1,3 +1,7 @@
+/**
+ * @namespace Recommendations
+ */
+
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import './Recommendations.css'
@@ -18,6 +22,12 @@ Recommendation logic overview:
       A: each time a user updates genre preference, we will empty out recommendation shelf in backend,
       forcing the frontend to fetch recommendations again
 */
+
+/**
+ * Functional component representing the Recommendations page.
+ * @returns {JSX.Element} The Recommendations component.
+ * @memberof Recommendations
+ */
 const Recommendations = () => {
   // items imported from .json (links to images)
   // hash table into readingList and recommendedList
@@ -152,6 +162,13 @@ const Recommendations = () => {
     }
   }
 
+  /**
+   * Function to generate random indices for book recommendations.
+   * @param {number} arrayLength - The length of the array.
+   * @param {number} numIndices - The number of random indices to generate.
+   * @returns {number[]} An array of random indices.
+   * @memberof Recommendations
+   */
   function generateRandomIndices(arrayLength, numIndices) {
     // create array with indices from 0 to arrayLength - 1
     let indices = Array.from({ length: arrayLength }, (_, index) => index);
@@ -168,6 +185,11 @@ const Recommendations = () => {
 
   
   // move saved book from recommended shelf to current shelf
+  /**
+   * Function to save a book from the recommended shelf to the current shelf.
+   * @param {Object} bookToInsert - The book object to be saved.
+   * @memberof Recommendations
+   */
   const saveBook = (bookToInsert) => {
     bookToInsert.userId = localStorage.getItem("user_id");
     bookToInsert.fromShelf = 'recommended';
@@ -193,6 +215,10 @@ const Recommendations = () => {
     });
   }
 
+  /**
+   * Function to shuffle the recommended books.
+   * @memberof Recommendations
+   */
   function shuffleBooks() {
     if (recommendedShelfBooks.length !== 0) {
       getCurrentRecommendations();

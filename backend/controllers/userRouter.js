@@ -2,9 +2,30 @@ import express from "express";
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 
+/** Express router providing User related routes
+ * @module routers/user
+ * @requires express
+ */
+
+/**
+ * Express router to mount User related functions on
+ * @type {object}
+ * @const
+ * @namespace userRouter
+ */
 const userRouter = express.Router();
 
-// route to add a set of genres and name 
+/**
+ * Route to add a set of genres and name.
+ * @name PATCH /set/:user_id
+ * @function
+ * @memberof module:routers/user~userRouter
+ * @inner
+ * @param {string} user_id - ID of the user
+ * @param {string} [name] - Name of the user (optional)
+ * @param {Array<string>} [genrePrefs] - Array of genre preferences to add (optional)
+ * @returns {object} 201 - Message and updated user object
+ */
 userRouter.patch("/set/:user_id", async (request, response) => {
     const user_id = request.params.user_id
     const { name, genrePrefs } = request.body;
@@ -28,7 +49,16 @@ userRouter.patch("/set/:user_id", async (request, response) => {
     response.status(201).json({ message: 'User Prefs added successfully', user});
 })
 
-// route to delete a set of genres
+/**
+ * Route to delete a set of genres.
+ * @name PATCH /delete-genres/:user_id
+ * @function
+ * @memberof module:routers/user~userRouter
+ * @inner
+ * @param {string} user_id - ID of the user
+ * @param {Array<string>} genresToDelete - Array of genre preferences to delete
+ * @returns {object} 201 - Message and updated user object
+ */
 userRouter.patch("/delete-genres/:user_id", async (request, response) => {
     const user_id = request.params.user_id;
     const { genresToDelete } = request.body;
@@ -46,6 +76,22 @@ userRouter.patch("/delete-genres/:user_id", async (request, response) => {
     response.status(201).json({ message: 'Genres deleted successfully', user });
 });
 
+/**
+ * Route to reset user password.
+ * @name PATCH /resetpass/:user_id
+ * @function
+ * @memberof module:routers/user~userRouter
+ * @inner
+ * @param {string} user_id - ID of the user
+ * @param {string} currentPassword - Current password of the user
+ * @param {string} newPassword - New password for the user
+ * @param {string} re_newPassword - Re-entered new password for the user
+ * @returns {object} 201 - Message and updated user object
+ * @returns {Error} 400 - User ID, current password, new password, and re-entered new password are required
+ * @returns {Error} 401 - Invalid current password or passwords do not match
+ * @returns {Error} 404 - User not found
+ * @returns {Error} 500 - Internal server error
+ */
 userRouter.patch("/resetpass/:user_id", async (request, response) => {
     const user_id = request.params.user_id
     const { currentPassword, newPassword, re_newPassword} = request.body

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: userRouter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: userRouter.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import express from "express";
+import User from "../models/user.js";
+import bcrypt from "bcrypt";
+
+/** Express router providing User related routes
+ * @module routers/user
+ * @requires express
+ */
+
+/**
+ * Express router to mount User related functions on
+ * @type {object}
+ * @const
+ * @namespace userRouter
+ */
+const userRouter = express.Router();
+
+/**
+ * Route to add a set of genres and name.
+ * @name PATCH /set/:user_id
+ * @function
+ * @memberof module:routers/user~userRouter
+ * @inner
+ * @param {string} user_id - ID of the user
+ * @param {string} [name] - Name of the user (optional)
+ * @param {Array&lt;string>} [genrePrefs] - Array of genre preferences to add (optional)
+ * @returns {object} 201 - Message and updated user object
+ */
+userRouter.patch("/set/:user_id", async (request, response) => {
+    const user_id = request.params.user_id
+    const { name, genrePrefs } = request.body;
+    let updateObject = {};
+
+    // For the first time when name is provided 
+    if (name) {
+        updateObject.name = name;
+    }
+
+    if (genrePrefs &amp;&amp; genrePrefs.length > 0) {
+        updateObject.$addToSet = { genrePrefs: { $each: genrePrefs } };
+    }
+    
+    const user = await User.findOneAndUpdate(
+        { _id: user_id }, 
+        updateObject,
+        { new: true, runValidators: true }
+    );
+    
+    response.status(201).json({ message: 'User Prefs added successfully', user});
+})
+
+/**
+ * Route to delete a set of genres.
+ * @name PATCH /delete-genres/:user_id
+ * @function
+ * @memberof module:routers/user~userRouter
+ * @inner
+ * @param {string} user_id - ID of the user
+ * @param {Array&lt;string>} genresToDelete - Array of genre preferences to delete
+ * @returns {object} 201 - Message and updated user object
+ */
+userRouter.patch("/delete-genres/:user_id", async (request, response) => {
+    const user_id = request.params.user_id;
+    const { genresToDelete } = request.body;
+    // console.log(genresToDelete)
+    
+    const user = await User.findOneAndUpdate(
+        { _id: user_id }, 
+        { $pullAll: { 
+            "genrePrefs": genresToDelete 
+            } 
+        },
+        { new: true, runValidators: true }
+    );
+    
+    response.status(201).json({ message: 'Genres deleted successfully', user });
+});
+
+/**
+ * Route to reset user password.
+ * @name PATCH /resetpass/:user_id
+ * @function
+ * @memberof module:routers/user~userRouter
+ * @inner
+ * @param {string} user_id - ID of the user
+ * @param {string} currentPassword - Current password of the user
+ * @param {string} newPassword - New password for the user
+ * @param {string} re_newPassword - Re-entered new password for the user
+ * @returns {object} 201 - Message and updated user object
+ * @returns {Error} 400 - User ID, current password, new password, and re-entered new password are required
+ * @returns {Error} 401 - Invalid current password or passwords do not match
+ * @returns {Error} 404 - User not found
+ * @returns {Error} 500 - Internal server error
+ */
+userRouter.patch("/resetpass/:user_id", async (request, response) => {
+    const user_id = request.params.user_id
+    const { currentPassword, newPassword, re_newPassword} = request.body
+
+    try {
+        if(!user_id || !currentPassword|| !newPassword || !re_newPassword){
+            return response.status(400)
+                .json({message: "user ID, current password, new password and re-entered new password are required"});
+          }
+    
+        const user = await User.findOne({ _id: user_id });
+
+        if(!user){
+            return response.status(404).json({message: "User not found"});
+        }
+        
+        const passwordCorrect = user === null
+          ? false
+          : await bcrypt.compare(currentPassword, user.passwordHash);
+
+        if(!passwordCorrect){
+            return response.status(401).json({
+                message: 'Entered Invalid Current Password',
+                error: 'Invalid password'
+            });
+        }
+
+        const matchPasswords = newPassword == re_newPassword
+
+        if(!matchPasswords){
+            return response.status(401).json({ 
+                message: 'Passwords do not match', 
+                error: 'Passwords do not match'
+            });
+        }
+        
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const updated_user = await User.findOneAndUpdate(
+                    { _id: user_id},
+                    { $set: {passwordHash: hashedPassword}},
+                    {new: true}
+            );
+
+        return response.status(201).json({ message: 'Changed Password Successfully', updated_user});
+    } catch(error){
+        console.log(error)
+        return response.status(500).json({message: "Server Error"})
+    }
+    
+})
+
+export default userRouter;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routers_board.html">routers/board</a></li><li><a href="module-routers_handle_books.html">routers/handle_books</a></li><li><a href="module-routers_login.html">routers/login</a></li><li><a href="module-routers_recommendation.html">routers/recommendation</a></li><li><a href="module-routers_register.html">routers/register</a></li><li><a href="module-routers_user.html">routers/user</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-routers_board-boardRouter.html">boardRouter</a></li><li><a href="module-routers_handle_books-handleBooksRouter.html">handleBooksRouter</a></li><li><a href="module-routers_login-loginRouter.html">loginRouter</a></li><li><a href="module-routers_recommendation-recommendationRouter.html">recommendationRouter</a></li><li><a href="module-routers_register-registerRouter.html">registerRouter</a></li><li><a href="module-routers_user-userRouter.html">userRouter</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Mar 12 2024 20:31:42 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

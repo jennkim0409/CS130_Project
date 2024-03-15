@@ -3,8 +3,35 @@ import Board from "../models/board.js";
 import Book from '../models/book.js';
 import Item from '../models/item.js';
 
+/** Express router providing Board & Item related routes
+ * @module routers/board
+ * @requires express
+ */
+
+/**
+ * Express router to mount Board related functions on
+ * @type {object}
+ * @const
+ * @namespace boardRouter
+ */
 const boardRouter = express.Router();
 
+/**
+ * Route for adding a board.
+ * @name POST /addBoard
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} [bookId] - ID of the associated book (optional)
+ * @param {string} bookTitle - Title of the book (required)
+ * @param {string} bookAuthor - Author of the book (required)
+ * @param {string} bookCover - Cover image URL of the book (required)
+ * @param {string} username - Username of the board creator (required)
+ * @param {string} userId - ID of the board creator (required)
+ * @param {boolean} [publicVisibility] - Public visibility status of the board (optional)
+ * @returns {object} 201 - Newly created board object
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.post('/addBoard', async (req, res) => {
     try {
         const { bookId, bookTitle, bookAuthor, bookCover, username, userId, publicVisibility } = req.body;
@@ -36,6 +63,17 @@ boardRouter.post('/addBoard', async (req, res) => {
     }
 });
 
+/**
+ * Route for removing a board and its associated items.
+ * @name POST /removeBoard
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to be removed
+ * @returns {object} 200 - Success message
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.post('/removeBoard', async(req, res) => {
     try{
         const {boardId} = req.body;
@@ -58,8 +96,17 @@ boardRouter.post('/removeBoard', async(req, res) => {
     }
 });
 
-
-// route: given board ID, get that board
+/**
+ * Route for retrieving a board by its ID.
+ * @name GET /getBoard
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to be retrieved
+ * @returns {object} 200 - Board object
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.get('/getBoard', async (req,res) => {
     try {
         const {boardId} = req.query;
@@ -76,7 +123,19 @@ boardRouter.get('/getBoard', async (req,res) => {
     }
 });
 
-
+/**
+ * Route for retrieving boards by book details.
+ * @name GET /getBoardsByBook
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} userId - ID of the user requesting the boards
+ * @param {string} bookTitle - Title of the book
+ * @param {string} bookAuthor - Author of the book
+ * @returns {object} 200 - Array of board objects
+ * @returns {Error} 404 - No boards found for the given book
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.get('/getBoardsByBook', async (req, res) => {
     try{
         const {userId, bookTitle, bookAuthor} = req.query;
@@ -96,6 +155,18 @@ boardRouter.get('/getBoardsByBook', async (req, res) => {
     }
 });
 
+/**
+ * Route for updating the visibility status of a board.
+ * @name POST /updateBoardVisibility
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to be updated
+ * @param {boolean} publicVisibility - New visibility status
+ * @returns {object} 200 - Success message with updated board object
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.post('/updateBoardVisibility', async (req, res) => {
     try{
         const {boardId, publicVisibility} = req.body;
@@ -116,8 +187,18 @@ boardRouter.post('/updateBoardVisibility', async (req, res) => {
     }
 });
 
-// route: given board ID and ID of an item in that board, remove that item from the board's list of items
-    // (and delete that item from the Items table in DB)
+/**
+ * Route for removing an item from a board.
+ * @name POST /removeItem
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board from which the item will be removed
+ * @param {string} itemId - ID of the item to be removed
+ * @returns {object} 200 - Success message
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.post('/removeItem', async (req, res) => {
     try {
         const { boardId, itemId } = req.body;
@@ -132,9 +213,24 @@ boardRouter.post('/removeItem', async (req, res) => {
     }
 });
 
-
-// route: given board id and ID of an item, insert that item in the board's list of items
-    // (and add it to the Items table in DB)
+/**
+ * Route for adding an item to a board.
+ * @name POST /addItem
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} boardId - ID of the board to which the item will be added
+ * @param {string} title - Title of the item
+ * @param {number} ordering_id - Ordering ID of the item
+ * @param {string} description - Description of the item
+ * @param {string} pin_size - Size of the item's pin
+ * @param {string} quote - Quote associated with the item
+ * @param {string} text_color - Color of the text
+ * @param {string} img_blob - Image blob URL
+ * @returns {object} 200 - Success message with updated board object
+ * @returns {Error} 404 - Board not found
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.post('/addItem', async (req, res) => {
     try {
         const {boardId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;
@@ -153,6 +249,24 @@ boardRouter.post('/addItem', async (req, res) => {
     }
 });
 
+/**
+ * Route for updating an item on a board.
+ * @name POST /updateItem
+ * @function
+ * @memberof module:routers/board~boardRouter
+ * @inner
+ * @param {string} itemId - ID of the item to be updated
+ * @param {string} title - New title of the item (optional)
+ * @param {number} ordering_id - New ordering ID of the item (optional)
+ * @param {string} description - New description of the item (optional)
+ * @param {string} pin_size - New size of the item's pin (optional)
+ * @param {string} quote - New quote associated with the item (optional)
+ * @param {string} text_color - New color of the text (optional)
+ * @param {string} img_blob - New image blob URL (optional)
+ * @returns {object} 200 - Success message with updated item object
+ * @returns {Error} 404 - Item not found
+ * @returns {Error} 500 - Internal server error
+ */
 boardRouter.post('/updateItem', async (req, res) => {
     try{
         const {itemId, title, ordering_id, description, pin_size, quote, text_color, img_blob} = req.body;

@@ -7,11 +7,20 @@ import key_icon from '../../assets/key.png'
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+/**
+ * Namespace containing functions related to the LoginSignup component.
+ * @namespace LoginSignup
+ */
 function LoginSignup() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
+    /**
+     * Handles the sign up action.
+     * @memberof LoginSignup
+     * @function signup
+     */
     const signup = () => {
         // call backend API to sign up
         if (username && password && password.length >= 8) {
@@ -45,6 +54,11 @@ function LoginSignup() {
         }
     };
 
+    /**
+     * Handles the login action.
+     * @memberof LoginSignup
+     * @function login
+     */
     const login = () => {
         // call backend API to log in
         if (username && password) {

@@ -5,8 +5,32 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import Bookshelf from "../models/bookshelf.js";
 
+/** Express router providing Register related routes
+ * @module routers/register
+ * @requires express
+ */
+
+/**
+ * Express router to mount Register related functions on
+ * @type {object}
+ * @const
+ * @namespace registerRouter
+ */
 const registerRouter = express.Router();
 
+/**
+ * Route for user registration.
+ * @name POST /
+ * @function
+ * @memberof module:routers/register~registerRouter
+ * @inner
+ * @param {string} username - Username of the user (required)
+ * @param {string} password - Password of the user (required)
+ * @returns {object} 201 - Message, user object, and token
+ * @returns {Error} 400 - Username and password required
+ * @returns {Error} 400 - Username is already taken
+ * @returns {Error} 500 - Internal server error
+ */
 registerRouter.post('/', async (req, res) => {
     try {
       const { username, password} = req.body

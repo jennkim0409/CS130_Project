@@ -17,33 +17,58 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 
-
 // components
 import {Grid} from './Grid';
 import {SortablePhoto} from './SortablePhoto';
 import {Photo} from './Photo';
 import remove from '../../assets/remove.png';
 
-
+/**
+ * Namespace containing functions related to the Bookshelf component.
+ * @namespace Bookshelf
+ */
 const Bookshelf = () => {
 
-  // items imported from .json (links to images)
-  // hash table into readingList and finishedList
+  /**
+   * State hook to manage items in the reading and finished lists.
+   * @memberof Bookshelf
+   */
   const [items, setItems] = useState({
     readingList: [],
     finishedList: [],
   });
 
-  // starting shelf for a book that is moved
+  /**
+   * State hook to manage the starting shelf for a book that is moved.
+   * @memberof Bookshelf
+   */
   const [startingShelf, setStartingShelf] = useState('');
+  
+  /**
+   * State hook to manage the starting index for a book that is moved.
+   * @memberof Bookshelf
+   */
   const [startIndex, setStartIndex] = useState('');
 
-  // Map items to an array of strings containing the ids
+  /**
+   * Memoized array of reading list item ids.
+   * @memberof Bookshelf
+   */
   const readingListIds = useMemo(() => items.readingList.map((item) => item.cover), [items.readingList]);
+  
+  /**
+   * Memoized array of finished list item ids.
+   * @memberof Bookshelf
+   */
   const finishedListIds = useMemo(() => items.finishedList.map((item) => item.cover), [items.finishedList]);
   
-  // runs when component mounts
+
   useEffect(() => {
+    /**
+     * Fetches bookshelf data when the component mounts.
+     * @memberof Bookshelf
+     * @function fetchBookshelfData
+     */
     const fetchBookshelfData = async () => {
       try {
         const shelves = ["current", "finished"];
@@ -82,6 +107,12 @@ const Bookshelf = () => {
     fetchBookshelfData();
   }, []);
 
+  /**
+   * Removes a book from the reading or finished list.
+   * @memberof Bookshelf
+   * @function removeBook
+   * @param {Object} opt - The book to be removed.
+   */
   const removeBook = async (opt) => {
     let updatedItems = { ...items };
     let bookshelfType = "";
@@ -121,10 +152,10 @@ const Bookshelf = () => {
       });
   };
 
-  // activeId denotes what component is currently interacted with
-  // setActiveId handles updating this ID
-  // need to useState so that you can manage state 
-  // (or, preserve values between function calls)
+  /**
+   * State hook to manage the ID of the active component.
+   * @memberof Bookshelf
+   */
   const [activeId, setActiveId] = useState(null);
 
   // books activated by mouse and touch sensors
@@ -203,8 +234,12 @@ const Bookshelf = () => {
     </DndContext>
   );
 
-  /* when user starts dragging draggable component
-  set this component to the active ID */
+  /**
+   * Handles the start of a drag operation.
+   * @memberof Bookshelf
+   * @function handleDragStart
+   * @param {Object} event - The drag event object.
+   */
   function handleDragStart(event) {
     console.log(`Picked up draggable item ${event.active.id}.`);
     setActiveId(event.active.id);
@@ -212,9 +247,12 @@ const Bookshelf = () => {
     setStartIndex(items[findContainer(event.active.id)].findIndex(book => book.cover === event.active.id));
   }
 
-  /* when user drags draggable over a droppable
-  should be able to hop between position and containers
-  not super necessary to understand logic!  */
+  /**
+   * Handles the dragging over of a droppable area.
+   * @memberof Bookshelf
+   * @function handleDragOver
+   * @param {Object} event - The drag event object.
+   */
   function handleDragOver(event) {
     if (event.over.id) {
       //console.log(`Draggable item ${event.active.id} was moved over droppable area ${event.over.id}.`) ;
@@ -279,7 +317,12 @@ const Bookshelf = () => {
     });
   }
 
-  // when a user lets go of draggable
+  /**
+   * Handles the end of a drag operation.
+   * @memberof Bookshelf
+   * @function handleDragEnd
+   * @param {Object} event - The drag event object.
+   */
   function handleDragEnd(event) {
     // active is draggable component
     // over is the component it is dragging over
@@ -386,13 +429,22 @@ const Bookshelf = () => {
     setActiveId(null);
   }
 
-  // if user cancels drag, set active ID to null
+  /**
+   * Handles the cancellation of a drag operation.
+   * @memberof Bookshelf
+   * @function handleDragCancel
+   */
   function handleDragCancel() {
     setActiveId(null);
   }
 
-  // helper function to locate bookshelf container by component ID
-  // id = url corresponding to cover images
+  /**
+   * Helper function to locate bookshelf container by component ID.
+   * @memberof Bookshelf
+   * @function findContainer
+   * @param {string} id - The component ID.
+   * @returns {string} - The name of the bookshelf container.
+   */
   function findContainer(id) {
     if (id in items) {
       return id;

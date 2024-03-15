@@ -4,14 +4,44 @@ import bcrypt from "bcrypt";
 import User from "../models/user.js"
 import authenticateMiddleware from "../utils/middleware/auth.js";
 
+/** Express router providing Login related routes
+ * @module routers/login
+ * @requires express
+ */
+
+/**
+ * Express router to mount Login related functions on
+ * @type {object}
+ * @const
+ * @namespace loginRouter
+ */
 const loginRouter = express.Router();
 
-// route to get user data
+/**
+ * Route for getting user data.
+ * @name POST /getInfo
+ * @function
+ * @memberof module:routers/login~loginRouter
+ * @inner
+ * @returns {object} 201 - User object
+ */
 loginRouter.get('/info', async (request, response) => {
 	const user = await User.findOne({ username: request.user });
 	response.json(user);
 });
 
+/**
+ * Route for user login.
+ * @name POST /
+ * @function
+ * @memberof module:routers/login~loginRouter
+ * @inner
+ * @param {string} username - Username of the user (required)
+ * @param {string} password - Password of the user (required)
+ * @returns {object} 200 - Token, username, user_id, name, and genrePrefs of the user
+ * @returns {Error} 401 - Invalid username or password
+ * @returns {Error} 500 - Internal server error
+ */
 loginRouter.post('/', async (request, response) => {
     // picking username and password from request body
     const { username, password } = request.body;

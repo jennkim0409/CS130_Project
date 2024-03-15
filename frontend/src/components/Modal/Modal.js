@@ -1,15 +1,27 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, { useState, useEffect } from 'react';
 import './Modal.css';
 import remove from '../../assets/remove.png';
 import upload from '../../assets/cloud-computing.png';
 import Toggle from 'react-toggle';
-import "react-toggle/style.css"
-import { ChromePicker } from 'react-color'
-import 'react-tooltip/dist/react-tooltip.css'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+import "react-toggle/style.css";
+import { ChromePicker } from 'react-color';
+import 'react-tooltip/dist/react-tooltip.css';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'
+import 'react-toastify/dist/ReactToastify.css';
 
+/**
+ * Namespace for Modal related functions.
+ * @namespace Modal
+ */
+
+/**
+ * Resizes an image file.
+ * @memberof Modal
+ * @function resizeImage
+ * @param {File} file - The image file to resize.
+ * @param {Function} callback - The callback function to handle the resized image.
+ */
 function resizeImage(file, callback) {
     // limit max size of image
     const maxWidth = 800;
@@ -50,6 +62,17 @@ function resizeImage(file, callback) {
     reader.readAsDataURL(file);
 }
 
+/**
+ * Uploads an image.
+ * @memberof Modal
+ * @function upload_img
+ * @param {Event} event - The event triggering the upload.
+ * @param {object} pinDetails - Details of the pin.
+ * @param {Function} setPinDetails - Setter function for pinDetails.
+ * @param {Function} setShowLabel - Setter function for showLabel.
+ * @param {Function} setShowModalPin - Setter function for showModalPin.
+ * @param {Function} setImageUploaded - Setter function for imageUploaded.
+ */
 function upload_img(event, pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded) {
     if (event.target.files && event.target.files[0]) {
         if (/image\/*/.test(event.target.files[0].type)) {
@@ -73,6 +96,16 @@ function upload_img(event, pinDetails, setPinDetails, setShowLabel, setShowModal
     }
 }
 
+/**
+ * Removes an image.
+ * @memberof Modal
+ * @function remove_image
+ * @param {object} pinDetails - Details of the pin.
+ * @param {Function} setPinDetails - Setter function for pinDetails.
+ * @param {Function} setShowLabel - Setter function for showLabel.
+ * @param {Function} setShowModalPin - Setter function for showModalPin.
+ * @param {Function} setImageUploaded - Setter function for imageUploaded.
+ */
 function remove_image(pinDetails, setPinDetails, setShowLabel, setShowModalPin, setImageUploaded) {
     setPinDetails({
         ...pinDetails,
@@ -83,11 +116,15 @@ function remove_image(pinDetails, setPinDetails, setShowLabel, setShowModalPin, 
     setImageUploaded(false); 
 }
 
+/**
+ * Checks the size of an image.
+ * @memberof Modal
+ * @function check_size
+ * @param {Event} event - The event triggering the size check.
+ */
 function check_size(event) {
     const image = event.target;
     image.classList.add('pin_max_width');
-    // checking if image doesn't take up the entire dimension
-    // we want max height if it doesn't take up entire dimension but if it does, then keep as width
     if (
         image.getBoundingClientRect().width < image.parentElement.getBoundingClientRect().width ||
         image.getBoundingClientRect().height < image.parentElement.getBoundingClientRect().height
@@ -99,6 +136,13 @@ function check_size(event) {
     image.style.opacity = 1;
 }
 
+/**
+ * Saves pin details.
+ * @memberof Modal
+ * @function save_pin
+ * @param {object} pinDetails - Details of the pin.
+ * @param {Function} add_pin - Function to add a pin.
+ */
 function save_pin(pinDetails, add_pin) {
     const pinSize = document.querySelector('#pin_size').value;
     const pinTitle = document.querySelector('#pin_title').value;
@@ -132,6 +176,14 @@ function save_pin(pinDetails, add_pin) {
     }
 }
 
+/**
+ * Saves pin details with text.
+ * @memberof Modal
+ * @function save_pin_text
+ * @param {object} pinDetails - Details of the pin.
+ * @param {Function} add_pin - Function to add a pin.
+ * @param {string} textColor - Color of the text.
+ */
 function save_pin_text(pinDetails, add_pin, textColor) {
     const pinTitle = document.querySelector('#pin_title').value;
     const pinQuote = document.querySelector('#pin_quote').value;
@@ -158,6 +210,13 @@ function save_pin_text(pinDetails, add_pin, textColor) {
     }
 }
 
+/**
+ * Updates pin details.
+ * @memberof Modal
+ * @function update_pin
+ * @param {object} pinDetails - Details of the pin.
+ * @param {Function} change_pin - Function to change a pin.
+ */
 function update_pin(pinDetails, change_pin) {
     const pinSize = document.querySelector('#pin_size').value;
     const pinTitle = document.querySelector('#pin_title').value;
@@ -187,6 +246,13 @@ function update_pin(pinDetails, change_pin) {
     }
 }
 
+/**
+ * Updates pin details with text.
+ * @memberof Modal
+ * @function update_pin_text
+ * @param {object} pinDetails - Details of the pin.
+ * @param {Function} change_pin - Function to change a pin.
+ */
 function update_pin_text(pinDetails, change_pin) {
     const pinTitle = document.querySelector('#pin_title').value;
     const pinQuote = document.querySelector('#pin_quote').value;
@@ -210,7 +276,14 @@ function update_pin_text(pinDetails, change_pin) {
     }
 }
 
-function Modal(props) { 
+/**
+ * React component for a modal.
+ * @memberof Modal
+ * @function Modal
+ * @param {object} props - Component props.
+ * @returns {JSX.Element} A React JSX Element representing the modal component.
+ */
+function Modal(props) {
     const initialPinDetails = {
         title: '', // required for all
         ordering_id: '', // required for all
@@ -227,11 +300,8 @@ function Modal(props) {
     const [toggleText, setToggleText] = useState(false);
     const [textColor, setTextColor] = useState('#000');
 
-    // listens to whenever editPinDetails changes
-    // necessary to set up modal when user clicks on existing pin to edit/view
     useEffect(() => {
         if (props.editPinDetails !== null) {
-            // If we are editing a pin, set pinDetails to editPinDetails
             setPinDetails(props.editPinDetails);
 
             if (props.editPinDetails.quote !== '') {
@@ -249,7 +319,6 @@ function Modal(props) {
     return (
         <div className="add_pin_modal">
             { props.editPinDetails == null ? 
-            // WE ARE ADDING A NEW PIN !!!
             <div className="add_pin_container">
                 <div className="top">
                     <h5 style={{margin: '5px'}}>Add a Quote Instead</h5>
@@ -338,7 +407,6 @@ function Modal(props) {
                 }
             </div>
             :
-            // WE ARE EDITING OR VIEWING AN EXISTING PIN !!
             <div className="add_pin_container">
                 { toggleText?
                     <div className="add_pin_details_text">
