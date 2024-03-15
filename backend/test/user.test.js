@@ -84,15 +84,13 @@ describe("Authentication Routes", () => {
         username: mockUser.username,
         password: mockUser.password,
       });
-
-      // Make authenticated request to /info with token
     //   console.log(loginRes.body)
       const res = await request(app)
         .get("/auth/login/info")
         .set({Authorization: `${loginRes.body.token}` });
-        // console.log(res.body)
       expect(res.statusCode).toBe(200);
       expect(res.body.username).toBe(mockUser.username);
     });
   });
 }, 10000);
+
