@@ -48,5 +48,8 @@ jobs:
         run: npm ci
         working-directory: backend
 
-        # TODO: building and testing backend
+      - name: Run tests for backend
+        run: npm run test
+        working-directory: backend
+
 # TODO: deployment
