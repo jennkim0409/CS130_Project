@@ -13,7 +13,7 @@ import expiredToken from '../../components/ExpiredToken';
 const Board = () => {
   const navigate = useNavigate();
   const { userId, boardId } = useParams(); // This hooks into the router and gives you the dynamic part of the URL
-  const [togglePublic, setTogglePublic] = useState(true);
+  const [togglePublic, setTogglePublic] = useState(null);
   const [boardDetails, setBoardDetails] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [discoverOptions, setDiscoverOptions] = useState([]);
@@ -85,20 +85,22 @@ const Board = () => {
 
   // save board's visibility in backend
   useEffect(() => {
-    async function updateVisibility() {
-      try {
-        const response = await axios.post('http://localhost:5555/api/board/updateBoardVisibility/', 
-        { boardId: boardId, publicVisibility: togglePublic }, 
-        {
-            headers: { Authorization: localStorage.getItem("user_token") }
-        });
-        console.log(response.data);
-      } 
-      catch (error) {
-          console.error("Error saving public toggle status in backend: ", error);
+    if (togglePublic !== null) {
+      async function updateVisibility() {
+        try {
+          const response = await axios.post('http://localhost:5555/api/board/updateBoardVisibility/', 
+          { boardId: boardId, publicVisibility: togglePublic }, 
+          {
+              headers: { Authorization: localStorage.getItem("user_token") }
+          });
+          console.log(response.data);
+        } 
+        catch (error) {
+            console.error("Error saving public toggle status in backend: ", error);
+        }
       }
+      updateVisibility();
     }
-    updateVisibility();
   }, [togglePublic]);
 
   // handles allowing a user to click anywhere on page to get rid of 
