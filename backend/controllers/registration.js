@@ -36,7 +36,7 @@ registerRouter.post('/', async (req, res) => {
       const { username, password} = req.body
 
       if(!username || !password){
-        res.status(400)
+        return res.status(400)
             .json({message: "username and password required."});
       } 
 
@@ -70,12 +70,12 @@ registerRouter.post('/', async (req, res) => {
       // Wait for all bookshelves to be created
       await Promise.all(bookshelfPromises);
 
-      res.status(201).json({ message: 'User registered successfully', user: saved_user, token: token});
+      return res.status(201).json({ message: 'User registered successfully', user: saved_user, token: token});
     } catch (error) {
       if(error.message.includes('Username is already taken')){
         return res.status(400).json({ message: 'Username is already taken.' });
       }
-      res.status(500).json({ message: 'An error occurred', error: error.message });
+      return res.status(500).json({ message: 'An error occurred', error: error.message });
     }
   });
 
