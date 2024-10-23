@@ -1,5 +1,6 @@
 # BookPins
 BookPins is a web application designed to provide users with personalized book recommendations by integrating with the OpenLibrary API. It curates suggestions based on user preferences, allowing book lovers to discover new reads effortlessly.
+
 Link to Presentation + Project Demo: https://youtu.be/6Jw7WGwPdZU 
 
 ## Initial Setup
