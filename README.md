@@ -6,12 +6,12 @@ Link to Presentation + Project Demo: https://youtu.be/6Jw7WGwPdZU
 ## Initial Setup
 ### Frontend
 1. cd into frontend folder
-2. run "npm i" (installs dependencies)
+2. Run "npm i" (installs dependencies)
 
 ### Backend
-1. install express
-2. install nodemon
-3. install mongoose
+1. Install express
+2. Install nodemon
+3. Install mongoose
 
 ## Option #1
 1. Open up a terminal in the outermost directory of this project (outside frontend/backend directories)
